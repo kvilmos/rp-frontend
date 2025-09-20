@@ -1,0 +1,22 @@
+button {
+  padding: 10px 30px;
+  border: none;
+  border-radius: 2em;
+  font-weight: bold;
+  cursor: pointer;
+
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+  background-color: var(--rp-btn-bg, #4a4036);
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--rp-btn-border, #4a4036);
+  color: var(--rp-btn-color, white);
+
+  &:hover {
+    background-color: var(--rp-btn-bg-hover, #685a4c);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
