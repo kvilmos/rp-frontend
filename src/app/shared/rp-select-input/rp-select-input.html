@@ -1,0 +1,12 @@
+@if(control){
+<div class="rp-form-control">
+  @if(label){
+  <label [for]="selectId">{{ label }}</label>
+  }
+  <select [formControl]="control" [id]="selectId">
+    @for (option of options; track $index) {
+    <option [value]="option">{{ option }}</option>
+    }
+  </select>
+</div>
+}
