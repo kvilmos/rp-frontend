@@ -1,0 +1,60 @@
+<div>
+  <form [formGroup]="furnitureForm" (ngSubmit)="onSubmitFurnitureForm()" class="furniture-form">
+    <div class="sub-title">Modell kiválasztása</div>
+    <rp-file-input
+      inputId="furniture-file-input"
+      allowedFileTypes=".glb,.gltf"
+      (selected)="onSelectFile($event)"
+    ></rp-file-input>
+    <rp-validation-error [errors]="furnitureForm.controls.fileName.errors"></rp-validation-error>
+    <rp-validation-error [errors]="furnitureForm.controls.fileSize.errors"></rp-validation-error>
+
+    <div class="sub-title">Modell Adatai</div>
+    <rp-text-input label="fájl név" inputId="myId" formControlName="fileName"></rp-text-input>
+    <rp-text-input
+      placeholder="Szép kanapé"
+      label="Bútor neve"
+      inputId="myId"
+      formControlName="objectName"
+    ></rp-text-input>
+    <rp-validation-error [errors]="furnitureForm.controls.objectName.errors"></rp-validation-error>
+
+    <div>
+      <p>--category</p>
+      <!--category section-->
+    </div>
+
+    <div class="sub-title">Modell Mérete</div>
+
+    <div class="metric-display">
+      <rp-value-display class="metric-item" label="Szélesség">{{
+        modelWidth() | metric : 'cm' | number : '1.1-2'
+      }}</rp-value-display>
+      <rp-value-display class="metric-item" label="Magasság">{{
+        modelHeight() | metric : 'cm' | number : '1.1-2'
+      }}</rp-value-display>
+      <rp-value-display class="metric-item" label="Mélység">{{
+        modelDepth() | metric : 'cm' | number : '1.1-2'
+      }}</rp-value-display>
+    </div>
+
+    <div>
+      <rp-select-input
+        inputId="myId"
+        [options]="['m', 'cm', 'mm']"
+        formControlName="objectMetricGroup"
+      ></rp-select-input>
+      <rp-validation-error
+        [errors]="furnitureForm.controls.objectMetricGroup.errors"
+      ></rp-validation-error>
+    </div>
+
+    <div class="button-section">
+      <rp-button type="submit">Submit</rp-button>
+      <rp-button type="reset" class="cancel-button" (click)="onResetForm()">cancel</rp-button>
+    </div>
+  </form>
+  <div>
+    <!--image section-->
+  </div>
+</div>
