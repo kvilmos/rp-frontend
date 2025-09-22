@@ -14,8 +14,6 @@ import {
   styleUrl: './rp-value-display.scss',
   imports: [],
 })
-export class RpValueDisplay implements AfterContentInit {
+export class RpValueDisplay {
   @Input() label = '';
-
-  public ngAfterContentInit(): void {}
 }

@@ -1,5 +1,5 @@
 import { Component, forwardRef, Input } from '@angular/core';
-import { NG_VALUE_ACCESSOR, ReactiveFormsModule, ValidationErrors } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
 import { RpControlValueAccessor } from '../rp-control-value-accessor';
 
 type InputType = 'text' | 'number' | 'email' | 'password';
@@ -23,5 +23,4 @@ export class RpTextInput<T> extends RpControlValueAccessor<T> {
   @Input() label = '';
   @Input() type: InputType = 'text';
   @Input() placeholder = '';
-  @Input() customErrorMessage: Record<string, ValidationErrors> | null = {};
 }

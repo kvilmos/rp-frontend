@@ -17,19 +17,19 @@ import { Subject, takeUntil, startWith, distinctUntilChanged, tap } from 'rxjs';
 export class RpControlValueAccessor<T> implements ControlValueAccessor, OnInit, OnDestroy {
   public control: FormControl | undefined;
   public isRequired = false;
-
-  private isDisabled = false;
-  private destroy$ = new Subject<void>();
   public onTouched!: () => T;
+  public isDisabled = false;
+
+  private destroy$ = new Subject<void>();
 
   constructor(@Inject(Injector) private injector: Injector) {}
 
-  public ngOnInit() {
+  public ngOnInit(): void {
     this.setFormControl();
     this.isRequired = this.control?.hasValidator(Validators.required) ?? false;
   }
 
-  private setFormControl() {
+  private setFormControl(): void {
     try {
       const formControl = this.injector.get(NgControl);
 
@@ -49,7 +49,11 @@ export class RpControlValueAccessor<T> implements ControlValueAccessor, OnInit, 
   }
 
   public writeValue(value: T): void {
-    this.control ? this.control.setValue(value) : (this.control = new FormControl(value));
+    if (!this.control) {
+      this.control = new FormControl(value);
+    } else if (this.control && this.control.value !== value) {
+      this.control.setValue(value, { emitEvent: false });
+    }
   }
 
   public registerOnChange(fn: (val: T | null) => T): void {

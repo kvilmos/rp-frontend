@@ -42,6 +42,10 @@
   transform-origin: left top;
 }
 
+input:disabled {
+  font-style: italic;
+}
+
 .text-input:focus + .label,
 .text-input:not(:placeholder-shown) + .label {
   transform: translateY(-11px) scale(0.75);

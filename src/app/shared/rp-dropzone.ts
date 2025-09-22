@@ -9,7 +9,7 @@ export class RpDropzone {
   @Output() hovered = new EventEmitter<boolean>();
 
   @HostListener('drop', ['$event'])
-  public onDrop(event: DragEvent) {
+  public onDrop(event: DragEvent): void {
     event.preventDefault();
     if (event.dataTransfer) {
       this.dropped.emit(event.dataTransfer.files);
@@ -18,13 +18,13 @@ export class RpDropzone {
   }
 
   @HostListener('dragover', ['$event'])
-  public onDragOver(event: DragEvent) {
+  public onDragOver(event: DragEvent): void {
     event.preventDefault();
     this.hovered.emit(true);
   }
 
   @HostListener('dragleave', ['$event'])
-  public onDragLeave(event: DragEvent) {
+  public onDragLeave(event: DragEvent): void {
     event.preventDefault();
     this.hovered.emit(false);
   }

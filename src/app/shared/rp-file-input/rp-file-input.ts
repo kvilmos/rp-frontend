@@ -24,11 +24,11 @@ export class RpFileInput {
     this.domId = this.inputId || `rp-file-input-${nextUniqueId++}`;
   }
 
-  public toggleHover(event: boolean) {
+  public toggleHover(event: boolean): void {
     this.isHovering = event;
   }
 
-  public onDrop(fileList: FileList) {
+  public onDrop(fileList: FileList): void {
     if (fileList[0]) {
       const file = fileList[0];
       this.selectedFile = file;

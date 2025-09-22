@@ -20,5 +20,4 @@ export class RpSelectInput<T> extends RpControlValueAccessor<T> {
   @Input() options: T[] = [];
   @Input() selectId = '';
   @Input() label = '';
-  @Input() customErrorMessage: Record<string, ValidationErrors> | null = {};
 }
