@@ -1,0 +1,14 @@
+@if(control){
+<div class="input-container">
+  <input
+    [placeholder]="placeholder"
+    [type]="type"
+    [id]="inputId"
+    [formControl]="control"
+    class="text-input"
+  />
+  @if(label){
+  <label [for]="inputId" class="label">{{ label }}</label>
+  }
+</div>
+}

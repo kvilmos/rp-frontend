@@ -1,0 +1,8 @@
+<ul>
+  @for (error of errors | keyvalue; track error.key ) {
+  <li>
+    {{ errorMessages[error.key] }}
+    {{ error.key }}{{ error.value }}
+  </li>
+  }
+</ul>

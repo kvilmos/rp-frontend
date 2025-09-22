@@ -1,0 +1,12 @@
+@if(control){
+<div class="component">
+  @if(label){
+  <label [for]="selectId">{{ label }}</label>
+  }
+  <select [formControl]="control" [id]="selectId" class="select-input">
+    @for (option of options; track $index) {
+    <option [value]="option">{{ option }}</option>
+    }
+  </select>
+</div>
+}

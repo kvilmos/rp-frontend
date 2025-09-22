@@ -1,0 +1,40 @@
+.display-frame {
+  position: relative;
+}
+
+.text-input {
+  box-sizing: border-box;
+  padding: 20px 16px 0px 12px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+
+  min-height: 52px;
+  transition: all 0.2s ease-in-out;
+}
+
+.label {
+  position: absolute;
+  left: 5px;
+  padding: 0 4px;
+  color: #888;
+  background-color: #f0f0f0;
+  transform-origin: left top;
+
+  transition: all 0.2s ease-in-out;
+  font-weight: bold;
+  top: 2px;
+  font-size: 12px;
+  transform: translateY(20%);
+}
+
+.text-input:empty + .label {
+  top: 17px;
+  left: 2px;
+  font-size: 16px;
+  transform: translateY(0);
+  color: #888;
+  font-weight: normal;
+}
