@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MetricType, NewFurniture } from '../newfurniture';
+import { NewFurniture } from '../new_furniture';
 import { FurnitureService, ModelMeta } from '../furniture.service';
 import { RpFileInput } from '../../../shared/rp-file-input/rp-file-input';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
 import { RpSelectInput } from '../../../shared/rp-select-input/rp-select-input';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
+import { MetricType } from '../../../common/type/furniture';
 
 @Component({
   standalone: true,
@@ -95,7 +96,7 @@ export class FurnitureForm implements OnInit {
       metricType: metricType,
     };
 
-    this.furnitureService.requestUploadUrl(furnitureMeta);
+    this.furnitureService.createFurniture(furnitureMeta);
   }
 
   public onResetForm(): void {
