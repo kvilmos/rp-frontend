@@ -1,94 +1,59 @@
 import { Injectable } from '@angular/core';
 import { NewFurniture } from './new_furniture';
 import { HttpClient } from '@angular/common/http';
-import {
-  Observable,
-  BehaviorSubject,
-  switchMap,
-  of,
-  catchError,
-  shareReplay,
-  lastValueFrom,
-} from 'rxjs';
-import { Box3, Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import { Observable, BehaviorSubject, lastValueFrom } from 'rxjs';
 import { SignedUrl } from '../../common/interface/signed_url';
-
-export interface ModelMeta {
-  file: File;
-  sizeX: number;
-  sizeY: number;
-  sizeZ: number;
-}
+import { ObjectData } from './object_data';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FurnitureService {
-  public readonly fileData$: Observable<ModelMeta | null>;
-  private readonly file$ = new BehaviorSubject<File | undefined>(undefined);
+  private readonly file$ = new BehaviorSubject<File | null>(null);
+  private readonly objectData$ = new BehaviorSubject<ObjectData | null>(null);
+  private readonly thumbnails$ = new BehaviorSubject<string[]>([]);
 
-  constructor(private http: HttpClient) {
-    this.fileData$ = this.file$.asObservable().pipe(
-      switchMap((file) => {
-        if (!file) {
-          return of(null);
-        }
-        return this.parseFile$(file);
-      }),
-      catchError((error): Observable<null> => {
-        // TODO STORY-201 ERROR handler
-        console.error('Hiba a fájl feldolgozása közben a szervizben:', error);
-        return of(null);
-      }),
-      shareReplay(1)
-    );
+  constructor(private http: HttpClient) {}
+
+  public getFile(): Observable<File | null> {
+    return this.file$.asObservable();
   }
 
-  private parseFile$(file: File): Observable<ModelMeta> {
-    return new Observable((observer) => {
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        const contents = event.target?.result as ArrayBuffer;
-        if (!contents) {
-          // TODO STORY-201 ERROR handler
-          observer.error(new Error('A fájl olvasása sikertelen.'));
-          return;
-        }
-
-        new GLTFLoader().parse(
-          contents,
-          '',
-          (gltf) => {
-            const box = new Box3().setFromObject(gltf.scene);
-            const size = new Vector3();
-            box.getSize(size);
-
-            observer.next({
-              file: file,
-              sizeX: size.x,
-              sizeY: size.y,
-              sizeZ: size.z,
-            });
-            observer.complete();
-          },
-          (error) => observer.error(error)
-        );
-      };
-      reader.onerror = (error) => observer.error(error);
-      reader.readAsArrayBuffer(file);
-    });
+  public getObjectData(): Observable<ObjectData | null> {
+    return this.objectData$.asObservable();
   }
 
-  public setSelectedFile(file?: File): void {
-    if (file) {
-      this.file$.next(file);
+  public getThumbnails(): Observable<string[]> {
+    return this.thumbnails$.asObservable();
+  }
+
+  public setFile(file: File): void {
+    this.file$.next(file);
+  }
+
+  public resetFile(): void {
+    this.file$.next(null);
+  }
+
+  public setObjectData(meta: ObjectData | null): void {
+    this.objectData$.next(meta);
+  }
+
+  public pushThumbnail(imageUrl: string): void {
+    const images = this.thumbnails$.getValue();
+    if (images) {
+      this.thumbnails$.next([...images, imageUrl]);
     }
   }
 
-  public unsetSelectedFile(): void {
-    this.file$.next(undefined);
+  public unsetThumbnail(imageUrl: string): void {
+    const currentImages = this.thumbnails$.getValue();
+    const newImages = currentImages.filter((url) => url !== imageUrl);
+    this.thumbnails$.next(newImages);
+  }
+
+  public resetThumbnails(): void {
+    this.thumbnails$.next([]);
   }
 
   public async createFurniture(furniture: NewFurniture): Promise<void> {

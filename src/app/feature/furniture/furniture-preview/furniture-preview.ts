@@ -1,12 +1,14 @@
 import {
   AfterViewInit,
   Component,
+  DestroyRef,
   ElementRef,
   HostListener,
+  inject,
   OnInit,
   ViewChild,
 } from '@angular/core';
-import { FurnitureService, ModelMeta } from '../furniture.service';
+import { FurnitureService } from '../furniture.service';
 import { GLTFLoader, OrbitControls } from 'three/examples/jsm/Addons.js';
 import {
   Scene,
@@ -19,26 +21,43 @@ import {
   Object3D,
   Box3,
   Vector3,
+  PlaneGeometry,
+  ShadowMaterial,
+  Mesh,
 } from 'three';
 import { PREVIEW } from '../../../common/constants/renderer-constants';
+import { RpThumbnail } from '../../../shared/rp-thumbnail/rp-thumbnail';
+import { catchError, Observable, of, switchMap } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ObjectData } from '../object_data';
 
 @Component({
   standalone: true,
   selector: 'rp-furniture-preview',
   templateUrl: './furniture-preview.html',
   styleUrl: './furniture-preview.scss',
-  imports: [],
+  imports: [RpThumbnail, AsyncPipe],
 })
 export class FurniturePreview implements OnInit, AfterViewInit {
+  public thumbnails$!: Observable<string[]>;
+
   @ViewChild('previewCanvas', { static: true })
   private previewCanvas!: ElementRef<HTMLCanvasElement>;
   private controls!: OrbitControls;
   private scene!: Scene;
   private camera!: PerspectiveCamera;
+  private shadowPlane!: Mesh;
   private renderer3d!: WebGLRenderer;
-  private model!: Object3D;
+  private furniture!: Object3D;
 
-  constructor(private furnitureService: FurnitureService) {}
+  private backgroundGrid!: GridHelper;
+  private isGridVisible: boolean = true;
+  private isDark: boolean = false;
+
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly furnitureService = inject(FurnitureService);
+  constructor() {}
 
   public ngAfterViewInit(): void {
     setTimeout(() => {
@@ -49,9 +68,10 @@ export class FurniturePreview implements OnInit, AfterViewInit {
 
   private createPreviewCanvas(): void {
     this.scene = new Scene();
-    this.scene.background = new Color(0xbebfbe);
-    const backgroundGrid = new GridHelper(PREVIEW.GRID_SIZE, PREVIEW.GRID_DIVISION);
-    this.scene.add(backgroundGrid);
+    this.scene.background = new Color(0xf2f0ea);
+
+    this.backgroundGrid = new GridHelper(PREVIEW.GRID_SIZE, PREVIEW.GRID_DIVISION);
+    this.scene.add(this.backgroundGrid);
 
     // CAMERA
     const aspect = this.getAspectRatio();
@@ -64,18 +84,36 @@ export class FurniturePreview implements OnInit, AfterViewInit {
     this.camera.position.z = PREVIEW.CAMERA_START_Z;
     this.camera.position.y = 2;
 
+    const planeGeometry = new PlaneGeometry(PREVIEW.GRID_SIZE, PREVIEW.GRID_SIZE);
+    const planeMaterial = new ShadowMaterial({ opacity: 0.3 });
+    this.shadowPlane = new Mesh(planeGeometry, planeMaterial);
+    this.shadowPlane.rotation.x = -Math.PI / 2;
+    this.shadowPlane.position.y = 0.01;
+    this.shadowPlane.receiveShadow = true;
+    this.scene.add(this.shadowPlane);
+
     // LIGHT
     const ambientLight = new AmbientLight(0xffffff, 0.5);
     this.scene.add(ambientLight);
+
     const directionalLight = new DirectionalLight(0xffffff, 1);
     directionalLight.position.set(0, 10, 5);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
     this.scene.add(directionalLight);
 
     const canvas = this.previewCanvas.nativeElement;
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableDamping = true;
 
-    this.renderer3d = new WebGLRenderer({ canvas: canvas, antialias: true });
+    this.renderer3d = new WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    this.renderer3d.shadowMap.enabled = true;
+
     this.onResizeBrowser();
   }
 
@@ -85,69 +123,158 @@ export class FurniturePreview implements OnInit, AfterViewInit {
   }
 
   public ngOnInit(): void {
-    this.furnitureService.fileData$.subscribe((modelMeta: ModelMeta | null) => {
-      if (!modelMeta || !modelMeta.file) {
-        if (this.model) {
-          this.scene.remove(this.model);
+    this.furnitureService
+      .getFile()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        switchMap((file) => {
+          if (!file) {
+            this.clearScene();
+            return of(null);
+          }
+
+          return this.processFurnitureFile$(file).pipe(
+            catchError((error) => {
+              //TODO STORY-201 Handle error.
+              console.error('Hiba a fájl feldolgozása során:', error);
+              this.clearScene();
+
+              return of(null);
+            })
+          );
+        })
+      )
+      .subscribe((data: ObjectData | null) => {
+        this.furnitureService.setObjectData(data);
+      });
+
+    this.thumbnails$ = this.furnitureService.getThumbnails();
+  }
+
+  private processFurnitureFile$(file: File): Observable<ObjectData> {
+    return new Observable((observer) => {
+      const loader = new GLTFLoader();
+      const reader = new FileReader();
+
+      reader.onload = (event) => {
+        const fileContent = event.target?.result;
+        if (!(fileContent instanceof ArrayBuffer)) {
+          // TODO: STORY-201 ERROR HANDLER
+          observer.error(new Error('A fájl beolvasása nem ArrayBuffer-t eredményezett.'));
+          return;
         }
-      } else {
-        this.loadFurniturePreview(modelMeta.file);
-      }
+
+        loader.parse(
+          fileContent,
+          '',
+          (gltf) => {
+            this.clearScene();
+
+            this.furniture = gltf.scene;
+            this.scene.add(this.furniture);
+
+            const box = new Box3().setFromObject(this.furniture);
+            const size = new Vector3();
+            box.getSize(size);
+
+            const meta: ObjectData = {
+              sizeX: size.x,
+              sizeY: size.y,
+              sizeZ: size.z,
+            };
+
+            this.furniture.traverse((child) => {
+              if (child instanceof Mesh) {
+                child.castShadow = true;
+              }
+            });
+
+            this.furniture.position.sub(new Vector3(0, 0, 0));
+
+            observer.next(meta);
+            observer.complete();
+          },
+          (error) => observer.error(error)
+        );
+      };
+
+      reader.onerror = (error) => observer.error(error);
+      reader.readAsArrayBuffer(file);
     });
   }
 
-  private loadFurniturePreview(file: File): void {
-    const loader = new GLTFLoader();
-    const reader = new FileReader();
+  private clearScene(): void {
+    if (this.furniture) {
+      this.scene.remove(this.furniture);
+      this.furniture = new Object3D();
+    }
+  }
 
-    reader.onload = (event) => {
-      const fileContent = event.target?.result;
-      if (!(fileContent instanceof ArrayBuffer)) {
-        // TODO: STORY-201 ERROR HANDLER
-        console.error('Hiba: A fájl beolvasása nem ArrayBuffer-t eredményezett.');
-        return;
-      }
+  public takePhoto(): void {
+    const dataUrl = this.createThumbnail(300, 300);
+    this.furnitureService.pushThumbnail(dataUrl);
+  }
 
-      loader.parse(
-        fileContent,
-        '',
-        (gltf) => {
-          if (this.model) {
-            this.scene.remove(this.model);
-          }
-          this.model = gltf.scene;
-          this.scene.add(this.model);
+  private createThumbnail(width: number = 300, height: number = 300): string {
+    const thumbCamera = this.camera.clone();
+    thumbCamera.aspect = width / height;
+    thumbCamera.updateProjectionMatrix();
 
-          const box = new Box3().setFromObject(this.model);
-          const size = new Vector3();
-          box.getSize(size);
+    const thumbRenderer = new WebGLRenderer({
+      antialias: true,
+      alpha: true,
+    });
+    thumbRenderer.shadowMap.enabled = true;
 
-          this.model.position.sub(new Vector3(0, 0, 0));
+    thumbRenderer.setSize(width, height);
+    thumbRenderer.render(this.scene, thumbCamera);
 
-          this.controls.target.set(0, 0, 0);
-          this.controls.update();
-        },
-        (error) => {
-          // TODO: STORY-201 ERROR HANDLER
-          console.error('Hiba történt a 3D modell feldolgozása közben:', error);
-        }
-      );
-    };
+    const dataUrl = thumbRenderer.domElement.toDataURL('image/png');
 
-    reader.onerror = (error) => {
-      // TODO: STORY-201 ERROR HANDLER
-      console.error('Hiba történt a fájl beolvasása közben:', error);
-    };
+    thumbRenderer.dispose();
+    thumbRenderer.forceContextLoss();
 
-    reader.readAsArrayBuffer(file);
+    return dataUrl;
+  }
+
+  public resetThumbnails(): void {
+    this.furnitureService.resetThumbnails();
+  }
+
+  public toggleShadow(): void {
+    this.shadowPlane.visible = !this.shadowPlane.visible;
+  }
+
+  public toggleGrid(): void {
+    this.isGridVisible = !this.isGridVisible; // Átfordítjuk az állapotot
+    this.backgroundGrid.visible = this.isGridVisible;
+  }
+
+  public removeGrid(): void {
+    this.backgroundGrid.visible = false;
+    this.isGridVisible = false;
+  }
+
+  public showGrid(): void {
+    this.backgroundGrid.visible = true;
+    this.isGridVisible = true;
+  }
+
+  public toggleDarkMode(): void {
+    this.isDark = !this.isDark;
+    if (!this.isDark) {
+      this.scene.background = new Color(0xf2f0ea);
+    } else {
+      this.scene.background = new Color(0x323231);
+    }
   }
 
   public startRenderingLoop(): void {
     const component: FurniturePreview = this;
     (function render() {
-      requestAnimationFrame(render);
       component.controls.update();
       component.renderer3d.render(component.scene, component.camera);
+      requestAnimationFrame(render);
     })();
   }
 

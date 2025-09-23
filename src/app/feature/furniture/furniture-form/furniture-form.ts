@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -7,12 +7,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { NewFurniture } from '../new_furniture';
-import { FurnitureService, ModelMeta } from '../furniture.service';
+import { FurnitureService } from '../furniture.service';
 import { RpFileInput } from '../../../shared/rp-file-input/rp-file-input';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { RpValidationError } from '../../../shared/rp-validation-error/rp-validation-error';
 import { RpButton } from '../../../shared/rp-button/rp-button';
-import { Observable } from 'rxjs';
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
@@ -39,8 +38,6 @@ import { MetricType } from '../../../common/type/furniture';
   ],
 })
 export class FurnitureForm implements OnInit {
-  public fileData$!: Observable<ModelMeta | null>;
-
   public furnitureForm = new FormGroup({
     fileName: new FormControl({ value: '', disabled: true }, Validators.required),
     fileSize: new FormControl(0, [Validators.max(1000000000), Validators.required]),
@@ -48,38 +45,37 @@ export class FurnitureForm implements OnInit {
     objectMetricGroup: new FormControl('', Validators.required),
   });
 
-  public modelWidth = signal<number | undefined>(undefined);
-  public modelHeight = signal<number | undefined>(undefined);
-  public modelDepth = signal<number | undefined>(undefined);
+  public modelWidth = signal<number | null>(null);
+  public modelHeight = signal<number | null>(null);
+  public modelDepth = signal<number | null>(null);
 
-  constructor(
-    private readonly furnitureService: FurnitureService,
-    private readonly destroyRef: DestroyRef
-  ) {}
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly furnitureService = inject(FurnitureService);
+  constructor() {}
 
   public ngOnInit(): void {
     this.furnitureForm.controls.fileSize.reset();
 
-    this.furnitureService.fileData$
+    this.furnitureService
+      .getFile()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((file) => {
+        this.furnitureForm.controls['fileName'].setValue(file?.name ?? null);
+        this.furnitureForm.controls['fileSize'].setValue(file?.size ?? null);
+      });
+
+    this.furnitureService
+      .getObjectData()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((metadata) => {
-        if (metadata) {
-          this.furnitureForm.controls['fileName'].setValue(metadata.file.name);
-          this.furnitureForm.controls['fileSize'].setValue(metadata.file.size);
-
-          this.modelWidth.set(metadata.sizeX);
-          this.modelHeight.set(metadata.sizeY);
-          this.modelDepth.set(metadata.sizeZ);
-        } else {
-          this.modelWidth.set(undefined);
-          this.modelHeight.set(undefined);
-          this.modelDepth.set(undefined);
-        }
+        this.modelWidth.set(metadata?.sizeX ?? null);
+        this.modelHeight.set(metadata?.sizeY ?? null);
+        this.modelDepth.set(metadata?.sizeZ ?? null);
       });
   }
 
   public onSelectFile(file: File) {
-    this.furnitureService.setSelectedFile(file);
+    this.furnitureService.setFile(file);
   }
 
   public onSubmitFurnitureForm(): void {
@@ -100,6 +96,6 @@ export class FurnitureForm implements OnInit {
   }
 
   public onResetForm(): void {
-    this.furnitureService.unsetSelectedFile();
+    this.furnitureService.resetFile();
   }
 }

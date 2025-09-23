@@ -1,1 +1,20 @@
 <canvas class="preview-canvas" #previewCanvas></canvas>
+
+<div class="scene-controls">
+  <button (click)="takePhoto()">take photo</button>
+  <button (click)="toggleShadow()">add drop shadow</button>
+  <button (click)="toggleGrid()">toggle grid</button>
+  <button (click)="toggleDarkMode()">Dark/Bright</button>
+  <button (click)="resetThumbnails()">clear image</button>
+</div>
+
+<div class="image-section">
+  <div>img</div>
+  @for (imageUrl of thumbnails$ | async; track $index) {
+  <div class="image-thumbnail">
+    <rp-thumbnail [imageUrl]="imageUrl"></rp-thumbnail>
+  </div>
+  }
+</div>
+
+<div class="matterial-section"></div>
