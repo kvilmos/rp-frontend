@@ -3,9 +3,30 @@
   height: 100%;
 }
 
-.label {
-  color: #fff;
-  font-family: sans-serif;
-  padding: 2px;
-  background: rgba(0, 0, 0, 0.6);
+.scene-controls {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  margin-bottom: 6em;
+}
+
+.image-section {
+  overflow: auto;
+  height: 80%;
+  position: absolute;
+  right: 2em;
+  top: 4em;
+  padding: 0.3em;
+  background-color: gray;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.image-thumbnail {
+  width: 12em;
+  height: 12em;
 }

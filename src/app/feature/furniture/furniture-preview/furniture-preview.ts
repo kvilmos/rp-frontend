@@ -31,6 +31,8 @@ import { catchError, Observable, of, switchMap } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ObjectData } from '../object_data';
+import { FurnitureThumbnail } from '../furniture_thumbnail';
+import { THUMBNAIL } from '../../../common/constants/file-constants';
 
 @Component({
   standalone: true,
@@ -40,85 +42,91 @@ import { ObjectData } from '../object_data';
   imports: [RpThumbnail, AsyncPipe],
 })
 export class FurniturePreview implements OnInit, AfterViewInit {
-  public thumbnails$!: Observable<string[]>;
+  public thumbnails$!: Observable<FurnitureThumbnail[]>;
 
   @ViewChild('previewCanvas', { static: true })
-  private previewCanvas!: ElementRef<HTMLCanvasElement>;
-  private controls!: OrbitControls;
-  private scene!: Scene;
-  private camera!: PerspectiveCamera;
-  private shadowPlane!: Mesh;
-  private renderer3d!: WebGLRenderer;
-  private furniture!: Object3D;
+  private mainCanvas!: ElementRef<HTMLCanvasElement>;
+  private mainRenderer!: WebGLRenderer;
+  private mainScene!: Scene;
+  private mainControls!: OrbitControls;
+  private mainCamera!: PerspectiveCamera;
+  private mainShadowPlane!: Mesh;
+  private furnitureObject!: Object3D;
 
-  private backgroundGrid!: GridHelper;
-  private isGridVisible: boolean = true;
-  private isDark: boolean = false;
+  private mainGrid!: GridHelper;
+  private isMainGridShown: boolean = true;
+  private isMainThemeDark: boolean = false;
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly furnitureService = inject(FurnitureService);
   constructor() {}
 
   public ngAfterViewInit(): void {
-    setTimeout(() => {
-      this.createPreviewCanvas();
-      this.startRenderingLoop();
-    }, 0);
+    this.createPreviewCanvas();
+    this.startRenderingLoop();
   }
 
   private createPreviewCanvas(): void {
-    this.scene = new Scene();
-    this.scene.background = new Color(0xf2f0ea);
+    this.mainScene = new Scene();
+    this.mainScene.background = new Color(PREVIEW.BACKGROUND_COLOR_LIGHT);
+    this.mainGrid = new GridHelper(PREVIEW.GRID_SIZE, PREVIEW.GRID_DIVISION);
+    this.mainScene.add(this.mainGrid);
 
-    this.backgroundGrid = new GridHelper(PREVIEW.GRID_SIZE, PREVIEW.GRID_DIVISION);
-    this.scene.add(this.backgroundGrid);
-
-    // CAMERA
     const aspect = this.getAspectRatio();
-    this.camera = new PerspectiveCamera(
+    this.mainCamera = new PerspectiveCamera(
       PREVIEW.CAMERA_FOV,
       aspect,
       PREVIEW.CAMERA_NEAR_PLANE,
       PREVIEW.CAMERA_FAR_PLANE
     );
-    this.camera.position.z = PREVIEW.CAMERA_START_Z;
-    this.camera.position.y = 2;
+    this.mainCamera.position.z = PREVIEW.CAMERA_START_Z;
+    this.mainCamera.position.y = PREVIEW.CAMERA_START_Y;
 
     const planeGeometry = new PlaneGeometry(PREVIEW.GRID_SIZE, PREVIEW.GRID_SIZE);
-    const planeMaterial = new ShadowMaterial({ opacity: 0.3 });
-    this.shadowPlane = new Mesh(planeGeometry, planeMaterial);
-    this.shadowPlane.rotation.x = -Math.PI / 2;
-    this.shadowPlane.position.y = 0.01;
-    this.shadowPlane.receiveShadow = true;
-    this.scene.add(this.shadowPlane);
+    const planeMaterial = new ShadowMaterial({ opacity: PREVIEW.SHADOW_OPACITY });
+    this.mainShadowPlane = new Mesh(planeGeometry, planeMaterial);
+    this.mainShadowPlane.rotation.x = PREVIEW.SHADOW_PLANE_ROTATION_X;
+    this.mainShadowPlane.position.y = PREVIEW.SHADOW_PLANE_Y_OFFSET;
+    this.mainShadowPlane.receiveShadow = true;
+    this.mainScene.add(this.mainShadowPlane);
 
     // LIGHT
-    const ambientLight = new AmbientLight(0xffffff, 0.5);
-    this.scene.add(ambientLight);
+    const ambientLight = new AmbientLight(
+      PREVIEW.AMBIENT_LIGHT_COLOR,
+      PREVIEW.AMBIENT_LIGHT_INTENSITY
+    );
+    this.mainScene.add(ambientLight);
 
-    const directionalLight = new DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(0, 10, 5);
+    const directionalLight = new DirectionalLight(
+      PREVIEW.DIRECTIONAL_LIGHT_COLOR,
+      PREVIEW.DIRECTIONAL_LIGHT_INTENSITY
+    );
+    directionalLight.position.set(
+      PREVIEW.DIRECTIONAL_LIGHT_POS_X,
+      PREVIEW.DIRECTIONAL_LIGHT_POS_Y,
+      PREVIEW.DIRECTIONAL_LIGHT_POS_Z
+    );
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    this.scene.add(directionalLight);
+    directionalLight.shadow.mapSize.width = PREVIEW.SHADOW_MAP_SIZE;
+    directionalLight.shadow.mapSize.height = PREVIEW.SHADOW_MAP_SIZE;
+    this.mainScene.add(directionalLight);
 
-    const canvas = this.previewCanvas.nativeElement;
-    this.controls = new OrbitControls(this.camera, canvas);
-    this.controls.enableDamping = true;
+    const canvas = this.mainCanvas.nativeElement;
+    this.mainControls = new OrbitControls(this.mainCamera, canvas);
+    this.mainControls.enableDamping = true;
 
-    this.renderer3d = new WebGLRenderer({
+    this.mainRenderer = new WebGLRenderer({
       canvas: canvas,
       antialias: true,
       preserveDrawingBuffer: true,
     });
-    this.renderer3d.shadowMap.enabled = true;
+    this.mainRenderer.shadowMap.enabled = true;
 
     this.onResizeBrowser();
   }
 
   private getAspectRatio(): number {
-    const canvas = this.previewCanvas.nativeElement;
+    const canvas = this.mainCanvas.nativeElement;
     return canvas.clientHeight === 0 ? 1 : canvas.clientWidth / canvas.clientHeight;
   }
 
@@ -136,9 +144,8 @@ export class FurniturePreview implements OnInit, AfterViewInit {
           return this.processFurnitureFile$(file).pipe(
             catchError((error) => {
               //TODO STORY-201 Handle error.
-              console.error('Hiba a fájl feldolgozása során:', error);
+              console.error(error);
               this.clearScene();
-
               return of(null);
             })
           );
@@ -170,26 +177,23 @@ export class FurniturePreview implements OnInit, AfterViewInit {
           (gltf) => {
             this.clearScene();
 
-            this.furniture = gltf.scene;
-            this.scene.add(this.furniture);
-
-            const box = new Box3().setFromObject(this.furniture);
-            const size = new Vector3();
-            box.getSize(size);
-
-            const meta: ObjectData = {
-              sizeX: size.x,
-              sizeY: size.y,
-              sizeZ: size.z,
-            };
-
-            this.furniture.traverse((child) => {
+            this.furnitureObject = gltf.scene;
+            this.mainScene.add(this.furnitureObject);
+            this.furnitureObject.position.sub(new Vector3(0, 0, 0));
+            this.furnitureObject.traverse((child) => {
               if (child instanceof Mesh) {
                 child.castShadow = true;
               }
             });
 
-            this.furniture.position.sub(new Vector3(0, 0, 0));
+            const box = new Box3().setFromObject(this.furnitureObject);
+            const size = new Vector3();
+            box.getSize(size);
+            const meta: ObjectData = {
+              sizeX: size.x,
+              sizeY: size.y,
+              sizeZ: size.z,
+            };
 
             observer.next(meta);
             observer.complete();
@@ -199,97 +203,87 @@ export class FurniturePreview implements OnInit, AfterViewInit {
       };
 
       reader.onerror = (error) => observer.error(error);
+      // TODO: STORY-201 ERROR HANDLER
       reader.readAsArrayBuffer(file);
     });
   }
 
   private clearScene(): void {
-    if (this.furniture) {
-      this.scene.remove(this.furniture);
-      this.furniture = new Object3D();
+    if (this.furnitureObject) {
+      this.mainScene.remove(this.furnitureObject);
+      this.furnitureObject = new Object3D();
     }
   }
 
-  public takePhoto(): void {
-    const dataUrl = this.createThumbnail(300, 300);
-    this.furnitureService.pushThumbnail(dataUrl);
+  public onCreateThumbnail(): void {
+    const thumbnail = this.createThumbnail(THUMBNAIL.WIDTH, THUMBNAIL.HIGHT);
+    this.furnitureService.pushThumbnail(thumbnail);
   }
 
-  private createThumbnail(width: number = 300, height: number = 300): string {
-    const thumbCamera = this.camera.clone();
-    thumbCamera.aspect = width / height;
-    thumbCamera.updateProjectionMatrix();
+  private createThumbnail(width: number, height: number): FurnitureThumbnail {
+    const camera = this.mainCamera.clone();
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
 
-    const thumbRenderer = new WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
+    const thumbRenderer = new WebGLRenderer({ antialias: true, alpha: true });
     thumbRenderer.shadowMap.enabled = true;
-
     thumbRenderer.setSize(width, height);
-    thumbRenderer.render(this.scene, thumbCamera);
+    thumbRenderer.render(this.mainScene, camera);
 
     const dataUrl = thumbRenderer.domElement.toDataURL('image/png');
+    const thumbnail: FurnitureThumbnail = {
+      id: crypto.randomUUID(),
+      imageSrc: dataUrl,
+    };
 
     thumbRenderer.dispose();
     thumbRenderer.forceContextLoss();
 
-    return dataUrl;
+    return thumbnail;
   }
 
-  public resetThumbnails(): void {
+  public onResetThumbnails(): void {
     this.furnitureService.resetThumbnails();
   }
 
-  public toggleShadow(): void {
-    this.shadowPlane.visible = !this.shadowPlane.visible;
+  public removeThumbnail(id: string): void {
+    this.furnitureService.unsetThumbnail(id);
   }
 
-  public toggleGrid(): void {
-    this.isGridVisible = !this.isGridVisible; // Átfordítjuk az állapotot
-    this.backgroundGrid.visible = this.isGridVisible;
+  public onToggleGrid(): void {
+    this.isMainGridShown = !this.isMainGridShown;
+    this.mainGrid.visible = this.isMainGridShown;
   }
 
-  public removeGrid(): void {
-    this.backgroundGrid.visible = false;
-    this.isGridVisible = false;
-  }
-
-  public showGrid(): void {
-    this.backgroundGrid.visible = true;
-    this.isGridVisible = true;
-  }
-
-  public toggleDarkMode(): void {
-    this.isDark = !this.isDark;
-    if (!this.isDark) {
-      this.scene.background = new Color(0xf2f0ea);
+  public onChangeTheme(): void {
+    this.isMainThemeDark = !this.isMainThemeDark;
+    if (!this.isMainThemeDark) {
+      this.mainScene.background = new Color(0xf2f0ea);
     } else {
-      this.scene.background = new Color(0x323231);
+      this.mainScene.background = new Color(0x323231);
     }
   }
 
   public startRenderingLoop(): void {
     const component: FurniturePreview = this;
     (function render() {
-      component.controls.update();
-      component.renderer3d.render(component.scene, component.camera);
+      component.mainControls.update();
+      component.mainRenderer.render(component.mainScene, component.mainCamera);
       requestAnimationFrame(render);
     })();
   }
 
   @HostListener('window:resize')
   public onResizeBrowser(): void {
-    const canvas = this.previewCanvas.nativeElement;
+    const canvas = this.mainCanvas.nativeElement;
     const width = canvas.clientWidth;
     const height = canvas.clientHeight;
     if (width === 0 || height === 0) {
       return;
     }
 
-    this.renderer3d.setSize(width, height, false);
-
-    this.camera.aspect = width / height;
-    this.camera.updateProjectionMatrix();
+    this.mainRenderer.setSize(width, height, false);
+    this.mainCamera.aspect = width / height;
+    this.mainCamera.updateProjectionMatrix();
   }
 }
