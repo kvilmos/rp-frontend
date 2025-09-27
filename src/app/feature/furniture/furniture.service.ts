@@ -4,130 +4,131 @@ import { HttpClient } from '@angular/common/http';
 import {
   Observable,
   BehaviorSubject,
-  switchMap,
-  of,
-  catchError,
-  shareReplay,
   lastValueFrom,
+  last,
+  map,
+  catchError,
+  of,
+  forkJoin,
 } from 'rxjs';
-import { Box3, Vector3 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/Addons.js';
-import { SignedUrl } from '../../common/interface/signed_url';
+import { ObjectData } from './object_data';
+import { FurnitureThumbnail } from './furniture_thumbnail';
+import { FurnitureUrls } from '../../common/interface/furniture_urls';
 
-export interface ModelMeta {
-  file: File;
-  sizeX: number;
-  sizeY: number;
-  sizeZ: number;
+interface UploadResult {
+  source: string;
+  success: boolean;
+  error?: any;
 }
-
 @Injectable({
   providedIn: 'root',
 })
 export class FurnitureService {
-  public readonly fileData$: Observable<ModelMeta | null>;
-  private readonly file$ = new BehaviorSubject<File | undefined>(undefined);
+  private readonly file$ = new BehaviorSubject<File | null>(null);
+  private readonly objectData$ = new BehaviorSubject<ObjectData | null>(null);
+  private readonly thumbnails$ = new BehaviorSubject<FurnitureThumbnail[]>([]);
 
-  constructor(private http: HttpClient) {
-    this.fileData$ = this.file$.asObservable().pipe(
-      switchMap((file) => {
-        if (!file) {
-          return of(null);
-        }
-        return this.parseFile$(file);
-      }),
-      catchError((error): Observable<null> => {
-        // TODO STORY-201 ERROR handler
-        console.error('Hiba a fájl feldolgozása közben a szervizben:', error);
-        return of(null);
-      }),
-      shareReplay(1)
-    );
+  constructor(private http: HttpClient) {}
+
+  public getFile(): Observable<File | null> {
+    return this.file$.asObservable();
   }
 
-  private parseFile$(file: File): Observable<ModelMeta> {
-    return new Observable((observer) => {
-      const reader = new FileReader();
-
-      reader.onload = (event) => {
-        const contents = event.target?.result as ArrayBuffer;
-        if (!contents) {
-          // TODO STORY-201 ERROR handler
-          observer.error(new Error('A fájl olvasása sikertelen.'));
-          return;
-        }
-
-        new GLTFLoader().parse(
-          contents,
-          '',
-          (gltf) => {
-            const box = new Box3().setFromObject(gltf.scene);
-            const size = new Vector3();
-            box.getSize(size);
-
-            observer.next({
-              file: file,
-              sizeX: size.x,
-              sizeY: size.y,
-              sizeZ: size.z,
-            });
-            observer.complete();
-          },
-          (error) => observer.error(error)
-        );
-      };
-      reader.onerror = (error) => observer.error(error);
-      reader.readAsArrayBuffer(file);
-    });
+  public getObjectData(): Observable<ObjectData | null> {
+    return this.objectData$.asObservable();
   }
 
-  public setSelectedFile(file?: File): void {
-    if (file) {
-      this.file$.next(file);
+  public getThumbnails(): Observable<FurnitureThumbnail[]> {
+    return this.thumbnails$.asObservable();
+  }
+
+  public setFile(file: File): void {
+    this.file$.next(file);
+  }
+
+  public resetFile(): void {
+    this.file$.next(null);
+  }
+
+  public setObjectData(meta: ObjectData | null): void {
+    this.objectData$.next(meta);
+  }
+
+  public pushThumbnail(thumbnail: FurnitureThumbnail): void {
+    const thumbnails = this.thumbnails$.getValue();
+    if (thumbnails) {
+      this.thumbnails$.next([...thumbnails, thumbnail]);
     }
   }
 
-  public unsetSelectedFile(): void {
-    this.file$.next(undefined);
+  public unsetThumbnail(id: string): void {
+    const currentThumbnails = this.thumbnails$.getValue();
+    const newImages = currentThumbnails.filter((thumbnail) => thumbnail.id !== id);
+    this.thumbnails$.next(newImages);
+  }
+
+  public resetThumbnails(): void {
+    this.thumbnails$.next([]);
   }
 
   public async createFurniture(furniture: NewFurniture): Promise<void> {
-    const file = this.file$.getValue();
-    if (!file) {
-      //TODO STORY-201 ERROR HANDLER
-      console.error('Nincs kiválasztva fájl a feltöltéshez.');
+    const modelFile = this.file$.getValue();
+    const thumbnails = this.thumbnails$.getValue();
+
+    if (!modelFile) {
+      console.error('Nincs fő modell fájl a feltöltéshez.');
+      // TODO STORY-201 ERROR HANDLER
+      return;
+    }
+    if (thumbnails.length === 0) {
+      console.error('Nincsenek bélyegképek a feltöltéshez.');
+      // TODO STORY-201 ERROR HANDLER
       return;
     }
 
     try {
-      const uploadUrl = await lastValueFrom(this.requestCreateFurniture(furniture));
-      console.log('Presigned URL sikeresen lekérve:', uploadUrl);
+      const uploadUrls = await lastValueFrom(this.requestCreateFurniture(furniture));
 
-      this.uploadFile(uploadUrl.url, file).subscribe({
-        next: (progress) => {
-          //TODO STORY-201 ERROR HANDLER
-          console.log(`Feltöltési folyamat: ${progress}%`);
-        },
-        error: (error) => {
-          //TODO STORY-201 ERROR HANDLER
-          console.error('Hiba történt a fájl feltöltése során.', error);
-        },
-        complete: () => {
-          //TODO STORY-201 ERROR HANDLER
-          console.log('A fájl feltöltése sikeresen befejeződött.');
-        },
-      });
+      const thumbnail = thumbnails[0];
+      const thumbnailBlob = await this.dataUrlToBlob(thumbnail.imageSrc);
+
+      const allUploads$: Observable<UploadResult>[] = [];
+      const modelUpload$ = this.uploadFile(uploadUrls.objectUrl, modelFile).pipe(
+        last(),
+        map(() => ({ source: 'main_model', success: true })),
+        catchError((error) => of({ source: 'main_model', success: false, error }))
+        // TODO STORY-201 ERROR HANDLER
+      );
+      allUploads$.push(modelUpload$);
+      const thumbnailUpload$ = this.uploadFile(uploadUrls.thumbnailUrl, thumbnailBlob).pipe(
+        last(),
+        map(() => ({ source: thumbnail.id, success: true })),
+        catchError((error) => of({ source: thumbnail.id, success: false, error }))
+        // TODO STORY-201 ERROR HANDLER
+      );
+      allUploads$.push(thumbnailUpload$);
+
+      const uploadResults = await lastValueFrom(forkJoin(allUploads$));
+      const failedUploads = uploadResults.filter((result) => !result.success);
+      if (failedUploads.length > 0) {
+        // TODO STORY-201 ERROR HANDLER
+        return;
+      }
     } catch (error) {
-      //TODO STORY-201 ERROR HANDLER
-      console.error('Hiba történt a presigned URL lekérése során.', error);
+      // TODO STORY-201 ERROR HANDLER
     }
   }
 
-  private requestCreateFurniture(furniture: NewFurniture): Observable<SignedUrl> {
-    return this.http.post<SignedUrl>('/api/furniture', furniture);
+  private async dataUrlToBlob(dataUrl: string): Promise<Blob> {
+    const response = await fetch(dataUrl);
+    return await response.blob();
   }
 
-  private uploadFile(url: string, file: File): Observable<number> {
+  private requestCreateFurniture(furniture: NewFurniture): Observable<FurnitureUrls> {
+    return this.http.post<FurnitureUrls>('/api/furniture', furniture);
+  }
+
+  private uploadFile(url: string, file: File | Blob): Observable<number> {
     return new Observable<number>((observer) => {
       const xhr = new XMLHttpRequest();
 
@@ -141,7 +142,6 @@ export class FurnitureService {
 
       xhr.addEventListener('load', (event) => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          console.log('load', event);
           observer.next(100);
           observer.complete();
         } else {
