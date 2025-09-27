@@ -40,7 +40,6 @@ export class FurnitureForm implements OnInit {
     fileName: new FormControl({ value: '', disabled: true }),
     fileSize: new FormControl(0, [Validators.max(1000000000), Validators.required]),
     objectName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
-    objectMetricGroup: new FormControl('', Validators.required),
   });
 
   public modelWidth = signal<number | null>(null);
@@ -86,13 +85,11 @@ export class FurnitureForm implements OnInit {
       return;
     }
 
-    const name = this.furnitureForm.value.objectName as string;
-    const metricType = this.furnitureForm.value.objectMetricGroup as MetricType;
+    const objectName = this.furnitureForm.value.objectName as string;
+    //const metricType = this.furnitureForm.value.objectMetricGroup as MetricType;
 
     const furnitureMeta: NewFurniture = {
-      name: name,
-      thumbnailsCount: 5,
-      metricType: metricType,
+      name: objectName,
     };
 
     this.furnitureService.createFurniture(furnitureMeta);
