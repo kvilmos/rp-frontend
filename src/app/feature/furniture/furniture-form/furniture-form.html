@@ -1,12 +1,15 @@
-<form [formGroup]="furnitureForm" (ngSubmit)="onSubmitFurnitureForm()" class="furniture-form">
+<form [formGroup]="furnitureForm" (ngSubmit)="onSubmitForm()" class="furniture-form">
   <div class="sub-title">Modell kiválasztása</div>
   <rp-file-input
     inputId="furniture-file-input"
     allowedFileTypes=".glb,.gltf"
     (selected)="onSelectFile($event)"
   ></rp-file-input>
-  <rp-validation-error [errors]="furnitureForm.controls.fileName.errors"></rp-validation-error>
-  <rp-validation-error [errors]="furnitureForm.controls.fileSize.errors"></rp-validation-error>
+
+  <rp-validation-error
+    [class.hidden]="!submitted && !furnitureForm.controls.fileSize.touched"
+    [errors]="furnitureForm.controls.fileSize.errors"
+  ></rp-validation-error>
 
   <div class="sub-title">Modell Adatai</div>
   <rp-text-input label="fájl név" inputId="myId" formControlName="fileName"></rp-text-input>
@@ -16,12 +19,15 @@
     inputId="myId"
     formControlName="objectName"
   ></rp-text-input>
-  <rp-validation-error [errors]="furnitureForm.controls.objectName.errors"></rp-validation-error>
+  <rp-validation-error
+    [class.hidden]="!submitted && !furnitureForm.controls.objectName.touched"
+    [errors]="furnitureForm.controls.objectName.errors"
+  ></rp-validation-error>
 
-  <div>
+  <!--div>
     <p>--category</p>
-    <!--category section-->
-  </div>
+    category section
+  </div-->
 
   <div class="sub-title">Modell Mérete</div>
 
@@ -37,7 +43,7 @@
     }}</rp-value-display>
   </div>
 
-  <div>
+  <!--div >
     <div class="select-wrapper">
       <rp-select-input
         inputId="myId"
@@ -49,7 +55,9 @@
     <rp-validation-error
       [errors]="furnitureForm.controls.objectMetricGroup.errors"
     ></rp-validation-error>
-  </div>
+  </div-->
+
+  <div>{{ submitted }} {{ furnitureForm.controls.objectName.touched }}</div>
 
   <div class="button-section">
     <rp-button type="submit" class="submit-button">Submit</rp-button>

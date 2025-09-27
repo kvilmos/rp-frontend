@@ -15,7 +15,6 @@ import { RpButton } from '../../../shared/rp-button/rp-button';
 import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
-import { RpSelectInput } from '../../../shared/rp-select-input/rp-select-input';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
 import { MetricType } from '../../../common/type/furniture';
 
@@ -32,14 +31,13 @@ import { MetricType } from '../../../common/type/furniture';
     RpButton,
     RpFileInput,
     RpTextInput,
-    RpSelectInput,
     RpValidationError,
     RpValueDisplay,
   ],
 })
 export class FurnitureForm implements OnInit {
   public furnitureForm = new FormGroup({
-    fileName: new FormControl({ value: '', disabled: true }, Validators.required),
+    fileName: new FormControl({ value: '', disabled: true }),
     fileSize: new FormControl(0, [Validators.max(1000000000), Validators.required]),
     objectName: new FormControl('', [Validators.required, Validators.maxLength(100)]),
     objectMetricGroup: new FormControl('', Validators.required),
@@ -48,9 +46,11 @@ export class FurnitureForm implements OnInit {
   public modelWidth = signal<number | null>(null);
   public modelHeight = signal<number | null>(null);
   public modelDepth = signal<number | null>(null);
+  public submitted = false;
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly furnitureService = inject(FurnitureService);
+
   constructor() {}
 
   public ngOnInit(): void {
@@ -75,10 +75,12 @@ export class FurnitureForm implements OnInit {
   }
 
   public onSelectFile(file: File) {
+    this.furnitureService.resetThumbnails();
     this.furnitureService.setFile(file);
   }
 
-  public onSubmitFurnitureForm(): void {
+  public onSubmitForm(): void {
+    this.submitted = true;
     if (this.furnitureForm.invalid) {
       // TODO: STORY-201 ERROR HANDLER
       return;
@@ -89,6 +91,7 @@ export class FurnitureForm implements OnInit {
 
     const furnitureMeta: NewFurniture = {
       name: name,
+      thumbnailsCount: 5,
       metricType: metricType,
     };
 
@@ -96,6 +99,8 @@ export class FurnitureForm implements OnInit {
   }
 
   public onResetForm(): void {
+    this.submitted = false;
+    this.furnitureService.resetThumbnails();
     this.furnitureService.resetFile();
   }
 }
