@@ -8,17 +8,26 @@ html body {
 }
 
 :root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
+  --bg-color: #f1efe9;
 
+  --card-primary-color: #ffffff;
+  --card-secondary-color: #e4dcd2;
+
+  --outline-color: #cfceca;
+
+  --text-color: #333333;
   --title-color: #48392e;
 
   --primary-color: #cbbca8;
-  --card-color: #e4dcd2;
 }
 
 .dark-mode {
   --bg-color: #333333;
+
+  --card-primary-color: #a8957c; // or darker
+
+  --outline-color: #cfceca;
+
   --text-color: #ffffff;
 }
 

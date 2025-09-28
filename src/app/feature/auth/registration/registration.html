@@ -1,0 +1,68 @@
+<div>
+  <div class="title">Sign Up</div>
+  <form class="form-section" [formGroup]="registrationForm" (ngSubmit)="onSubmitForm()">
+    <div>
+      <rp-text-input
+        placeholder="Type your name"
+        label="Name"
+        formControlName="username"
+      ></rp-text-input>
+      <rp-validation-error
+        [class.hidden]="!registrationForm.controls.username.touched"
+        [errors]="registrationForm.controls.username.errors"
+      ></rp-validation-error>
+    </div>
+    <div>
+      <rp-text-input
+        placeholder="Type your email"
+        label="Email"
+        type="email"
+        formControlName="email"
+      ></rp-text-input>
+      <rp-validation-error
+        [class.hidden]="!registrationForm.controls.email.touched"
+        [errors]="registrationForm.controls.email.errors"
+      ></rp-validation-error>
+    </div>
+    <div>
+      <rp-text-input
+        placeholder="Confirm your email"
+        label="Email Confirm"
+        type="email"
+        formControlName="emailConfirm"
+      ></rp-text-input>
+      <rp-validation-error
+        [class.hidden]="!registrationForm.controls.emailConfirm.touched"
+        [errors]="registrationForm.controls.emailConfirm.errors"
+      ></rp-validation-error>
+    </div>
+    <div>
+      <rp-text-input
+        placeholder="Type your strong password"
+        label="Password"
+        type="password"
+        formControlName="password"
+      ></rp-text-input>
+      <rp-validation-error
+        [class.hidden]="!registrationForm.controls.password.touched"
+        [errors]="registrationForm.controls.password.errors"
+      ></rp-validation-error>
+    </div>
+    <div>
+      <rp-text-input
+        placeholder="Confirm your password"
+        label="Password Confirm"
+        type="password"
+        formControlName="passwordConfirm"
+      ></rp-text-input>
+      <rp-validation-error
+        [class.hidden]="!registrationForm.controls.passwordConfirm.touched"
+        [errors]="registrationForm.controls.passwordConfirm.errors"
+      ></rp-validation-error>
+    </div>
+    <rp-button type="submit">Sign Up</rp-button>
+    <hr />
+    <div class="or">Or</div>
+    <rp-button>Sign In</rp-button>
+  </form>
+</div>
