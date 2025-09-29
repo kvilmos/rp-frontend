@@ -1,3 +1,17 @@
 {
-  "singUp": "Sign Up"
+  "auth": {
+    "email": "Email",
+    "emailConfirm": "Email confirm",
+    "name": "Name",
+    "or": "Or",
+    "password": "Password",
+    "passwordConfirm": "Password confirm",
+    "typeEmail": "Type your email...",
+    "typeEmailConfirm": "Confirm your email...",
+    "typeName": "Type your name...",
+    "typePassword": "Type strong password...",
+    "typePasswordConfirm": "Confirm password...",
+    "signIn": "Sign In",
+    "signUp": "Sign Up"
+  }
 }

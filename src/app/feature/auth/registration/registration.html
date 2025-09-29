@@ -1,10 +1,11 @@
 <div>
-  <div class="title">Sign Up</div>
+  <div class="title">{{ 'auth.signUp' | translate }}</div>
   <form class="form-section" [formGroup]="registrationForm" (ngSubmit)="onSubmitForm()">
     <div>
       <rp-text-input
-        placeholder="Type your name"
-        label="Name"
+        inputId="username"
+        [placeholder]="'auth.typeName' | translate"
+        [label]="'auth.name' | translate"
         formControlName="username"
       ></rp-text-input>
       <rp-validation-error
@@ -14,8 +15,9 @@
     </div>
     <div>
       <rp-text-input
-        placeholder="Type your email"
-        label="Email"
+        inputId="email"
+        [placeholder]="'auth.typeEmail' | translate"
+        [label]="'auth.email' | translate"
         type="email"
         formControlName="email"
       ></rp-text-input>
@@ -26,8 +28,9 @@
     </div>
     <div>
       <rp-text-input
-        placeholder="Confirm your email"
-        label="Email Confirm"
+        inputId="emailConfirm"
+        [placeholder]="'auth.typeEmailConfirm' | translate"
+        [label]="'auth.emailConfirm' | translate"
         type="email"
         formControlName="emailConfirm"
       ></rp-text-input>
@@ -38,8 +41,9 @@
     </div>
     <div>
       <rp-text-input
-        placeholder="Type your strong password"
-        label="Password"
+        inputId="password"
+        [placeholder]="'auth.typePassword' | translate"
+        [label]="'auth.password' | translate"
         type="password"
         formControlName="password"
       ></rp-text-input>
@@ -50,8 +54,9 @@
     </div>
     <div>
       <rp-text-input
-        placeholder="Confirm your password"
-        label="Password Confirm"
+        inputId="passwordConfirm"
+        [placeholder]="'auth.typePasswordConfirm' | translate"
+        [label]="'auth.passwordConfirm' | translate"
         type="password"
         formControlName="passwordConfirm"
       ></rp-text-input>
@@ -60,9 +65,9 @@
         [errors]="registrationForm.controls.passwordConfirm.errors"
       ></rp-validation-error>
     </div>
-    <rp-button type="submit">Sign Up</rp-button>
+    <rp-button type="submit">{{ 'auth.signUp' | translate }}</rp-button>
     <hr />
-    <div class="or">Or</div>
-    <rp-button>Sign In</rp-button>
+    <div class="or">{{ 'auth.or' | translate }}</div>
+    <rp-button>{{ 'auth.signIn' | translate }}</rp-button>
   </form>
 </div>
