@@ -1,8 +1,11 @@
-<ul>
-  @for (error of errors | keyvalue; track error.key ) {
-  <li>
-    {{ errorMessages[error.key] }}
-    {{ error.key }}{{ error.value }}
-  </li>
+<div class="error-container">
+  @if (errors){
+  <ul>
+    @for (error of errors | keyvalue; track error.key ) {
+    <li>
+      {{ 'validation.' + error.key | translate : error.value }}
+    </li>
+    }
+  </ul>
   }
-</ul>
+</div>

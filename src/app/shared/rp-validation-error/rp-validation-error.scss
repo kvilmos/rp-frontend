@@ -1,5 +1,10 @@
+.error-container {
+  min-height: 1.5rem;
+  font-size: 0.8em;
+}
+
 li {
-  color: #e53935;
+  color: var(--error-color);
 }
 ul {
   list-style: none;
