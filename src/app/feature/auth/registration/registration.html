@@ -2,72 +2,77 @@
   <div class="title">{{ 'auth.signUp' | translate }}</div>
   <form class="form-section" [formGroup]="registrationForm" (ngSubmit)="onSubmitForm()">
     <div>
-      <rp-text-input
-        inputId="username"
-        [placeholder]="'auth.typeName' | translate"
-        [label]="'auth.name' | translate"
-        formControlName="username"
-      ></rp-text-input>
-      <rp-validation-error
-        [class.hidden]="!registrationForm.controls.username.touched"
-        [errors]="registrationForm.controls.username.errors"
-      ></rp-validation-error>
-    </div>
-    <div>
-      <rp-text-input
-        inputId="email"
-        [placeholder]="'auth.typeEmail' | translate"
-        [label]="'auth.email' | translate"
-        type="email"
-        formControlName="email"
-      ></rp-text-input>
-      <rp-validation-error
-        [class.hidden]="!registrationForm.controls.email.touched"
-        [errors]="registrationForm.controls.email.errors"
-      ></rp-validation-error>
-    </div>
-    <div>
-      <rp-text-input
-        inputId="emailConfirm"
-        [placeholder]="'auth.typeEmailConfirm' | translate"
-        [label]="'auth.emailConfirm' | translate"
-        type="email"
-        formControlName="emailConfirm"
-      ></rp-text-input>
-      <rp-validation-error
-        [class.hidden]="!registrationForm.controls.emailConfirm.touched"
-        [errors]="registrationForm.controls.emailConfirm.errors"
-      ></rp-validation-error>
-    </div>
-    <div>
-      <rp-text-input
-        inputId="password"
-        [placeholder]="'auth.typePassword' | translate"
-        [label]="'auth.password' | translate"
-        type="password"
-        formControlName="password"
-      ></rp-text-input>
-      <rp-validation-error
-        [class.hidden]="!registrationForm.controls.password.touched"
-        [errors]="registrationForm.controls.password.errors"
-      ></rp-validation-error>
-    </div>
-    <div>
-      <rp-text-input
-        inputId="passwordConfirm"
-        [placeholder]="'auth.typePasswordConfirm' | translate"
-        [label]="'auth.passwordConfirm' | translate"
-        type="password"
-        formControlName="passwordConfirm"
-      ></rp-text-input>
-      <rp-validation-error
-        [class.hidden]="!registrationForm.controls.passwordConfirm.touched"
-        [errors]="registrationForm.controls.passwordConfirm.errors"
-      ></rp-validation-error>
+      <div>
+        <rp-text-input
+          inputId="username"
+          [placeholder]="'auth.typeName' | translate"
+          [label]="'auth.name' | translate"
+          formControlName="username"
+        ></rp-text-input>
+        <rp-validation-error
+          [class.hidden]="!isSubmitted && !registrationForm.controls.username.touched"
+          [errors]="registrationForm.controls.username.errors"
+        ></rp-validation-error>
+      </div>
+      <div>
+        <rp-text-input
+          inputId="email"
+          [placeholder]="'auth.typeEmail' | translate"
+          [label]="'auth.email' | translate"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+        ></rp-text-input>
+        <rp-validation-error
+          [class.hidden]="!isSubmitted && !registrationForm.controls.email.touched"
+          [errors]="registrationForm.controls.email.errors"
+        ></rp-validation-error>
+      </div>
+      <div>
+        <rp-text-input
+          inputId="emailConfirm"
+          [placeholder]="'auth.typeEmailConfirm' | translate"
+          [label]="'auth.emailConfirm' | translate"
+          type="email"
+          formControlName="emailConfirm"
+        ></rp-text-input>
+        <rp-validation-error
+          [class.hidden]="!isSubmitted && !registrationForm.controls.emailConfirm.touched"
+          [errors]="registrationForm.controls.emailConfirm.errors"
+        ></rp-validation-error>
+      </div>
+      <div>
+        <rp-text-input
+          inputId="password"
+          [placeholder]="'auth.typePassword' | translate"
+          [label]="'auth.password' | translate"
+          type="password"
+          formControlName="password"
+        ></rp-text-input>
+        <rp-validation-error
+          [class.hidden]="!isSubmitted && !registrationForm.controls.password.touched"
+          [errors]="registrationForm.controls.password.errors"
+        ></rp-validation-error>
+      </div>
+      <div>
+        <rp-text-input
+          inputId="passwordConfirm"
+          [placeholder]="'auth.typePasswordConfirm' | translate"
+          [label]="'auth.passwordConfirm' | translate"
+          type="password"
+          formControlName="passwordConfirm"
+        ></rp-text-input>
+        <rp-validation-error
+          [class.hidden]="!isSubmitted && !registrationForm.controls.passwordConfirm.touched"
+          [errors]="registrationForm.controls.passwordConfirm.errors"
+        ></rp-validation-error>
+      </div>
     </div>
     <rp-button type="submit">{{ 'auth.signUp' | translate }}</rp-button>
-    <hr />
-    <div class="or">{{ 'auth.or' | translate }}</div>
-    <rp-button>{{ 'auth.signIn' | translate }}</rp-button>
+    <hr class="line" />
+    <div class="text">{{ 'auth.or' | translate }}</div>
+    <rp-button (click)="onClickMode()" class="change-mode-button">{{
+      'auth.signIn' | translate
+    }}</rp-button>
   </form>
 </div>

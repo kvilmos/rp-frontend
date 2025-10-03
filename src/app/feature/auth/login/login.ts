@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
@@ -15,6 +15,8 @@ import { Router } from '@angular/router';
   imports: [ReactiveFormsModule, TranslatePipe, RpTextInput, RpButton],
 })
 export class Login {
+  @Output() modeClick = new EventEmitter<void>();
+
   public loginForm = new FormGroup({
     email: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
@@ -39,5 +41,9 @@ export class Login {
         // TODO STORY-201 Error handler
       },
     });
+  }
+
+  public onClickMode(): void {
+    this.modeClick.emit();
   }
 }

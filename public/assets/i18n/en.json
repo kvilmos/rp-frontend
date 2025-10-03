@@ -13,5 +13,12 @@
     "typePasswordConfirm": "Confirm password...",
     "signIn": "Sign In",
     "signUp": "Sign Up"
+  },
+  "validation": {
+    "emailMismatch": "The email addresses do not match.",
+    "maxlength": "The maximum length for this field is {{required_length}} characters.",
+    "minlength": "Please enter at least {{requiredLength}} characters.",
+    "passwordMismatch": "The passwords do not match.",
+    "required": "This field is required."
   }
 }

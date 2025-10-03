@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   public registerNewUser(user: NewUser): Observable<any> {
-    return this.http.post('/api/registration', user, { withCredentials: true });
+    return this.http.post('/api/auth/register', user, { withCredentials: true });
   }
 
   public loginUser(credentials: LoginCredentials): Observable<LoginResponse> {

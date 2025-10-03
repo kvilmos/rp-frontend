@@ -1,26 +1,33 @@
 .form-section {
-  padding: 2em;
-  gap: 1em;
   display: flex;
   flex-direction: column;
-
+  gap: 1em;
   border-style: solid;
   border-width: 1px;
   border-color: var(--outline-color);
   border-radius: 0.4em;
-  box-shadow: 0px 0px 5px 1px rgba(207, 206, 202, 1);
+  box-shadow: 0px 0px 5px 1px var(--outline-shadow-color);
+  padding: 2em;
 }
 
 .title {
   font-size: 2rem;
   padding-bottom: 1.2rem;
 }
-.or {
-  text-align: center;
-}
-hr {
+.line {
   border: 0;
   width: 100%;
-  background-color: var(--outline-color);
   height: 1px;
+  background-color: var(--outline-color);
+}
+
+.text {
+  text-align: center;
+}
+
+.change-mode-button {
+  --color: var(--button-secondary-color);
+  --border-color: var(--button-secondary-border-color);
+  --background-color: var(--button-secondary-background-color);
+  --background-color_hover: var(--button-secondary-background-color_hover);
 }

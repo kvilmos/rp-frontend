@@ -7,6 +7,7 @@
         [placeholder]="'auth.typeEmail' | translate"
         [label]="'auth.email' | translate"
         formControlName="email"
+        autocomplete="email"
       ></rp-text-input>
     </div>
     <div>
@@ -19,8 +20,10 @@
       ></rp-text-input>
     </div>
     <rp-button type="submit">{{ 'auth.signIn' | translate }}</rp-button>
-    <hr />
-    <div class="or">{{ 'auth.or' | translate }}</div>
-    <rp-button>{{ 'auth.signUp' | translate }}</rp-button>
+    <hr class="line" />
+    <div class="text">{{ 'auth.or' | translate }}</div>
+    <rp-button (click)="onClickMode()" class="change-mode-button">{{
+      'auth.signUp' | translate
+    }}</rp-button>
   </form>
 </div>
