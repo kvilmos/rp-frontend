@@ -6,15 +6,17 @@ button {
   font-weight: bold;
   cursor: pointer;
 
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-  background-color: var(--rp-btn-bg, #4a4036);
+  background-color: var(--background-color, var(--button-primary-background-color));
+  color: var(--color, var(--button-primary-color));
+
   border-style: solid;
   border-width: 1px;
-  border-color: var(--rp-btn-border, #4a4036);
-  color: var(--rp-btn-color, white);
+  border-color: var(--border-color, var(--button-primary-border-color));
+
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 
   &:hover {
-    background-color: var(--rp-btn-bg-hover, #685a4c);
+    background-color: var(--background-color_hover, var(--button-primary-background-color_hover));
   }
 
   &:active {

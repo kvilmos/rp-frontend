@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
@@ -8,4 +9,10 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.scss',
   imports: [RouterOutlet],
 })
-export class App {}
+export class App {
+  private readonly translate = inject(TranslateService);
+
+  constructor() {
+    this.translate.addLangs(['en', 'hu']);
+  }
+}

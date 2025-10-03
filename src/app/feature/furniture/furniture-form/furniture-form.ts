@@ -16,7 +16,6 @@ import { DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
-import { MetricType } from '../../../common/type/furniture';
 
 @Component({
   standalone: true,
@@ -49,7 +48,6 @@ export class FurnitureForm implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly furnitureService = inject(FurnitureService);
-
   constructor() {}
 
   public ngOnInit(): void {
@@ -86,7 +84,6 @@ export class FurnitureForm implements OnInit {
     }
 
     const objectName = this.furnitureForm.value.objectName as string;
-    //const metricType = this.furnitureForm.value.objectMetricGroup as MetricType;
 
     const furnitureMeta: NewFurniture = {
       name: objectName,

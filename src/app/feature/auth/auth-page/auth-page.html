@@ -1,0 +1,20 @@
+<div class="background">
+  <div
+    class="container"
+    [ngClass]="{ 'registration-mode': !isLoginMode, 'login-mode': isLoginMode }"
+  >
+    <div class="forms-container">
+      <div class="form-item login-form">
+        <rp-login (modeClick)="onSelectRegistration()"></rp-login>
+      </div>
+      <div class="form-item registration-form">
+        <rp-registration (modeClick)="onSelectLogin()"></rp-registration>
+      </div>
+    </div>
+    <div class="overlay-container">
+      <div class="overlay">
+        <img src="assets/images/home_cover.png" class="image" />
+      </div>
+    </div>
+  </div>
+</div>

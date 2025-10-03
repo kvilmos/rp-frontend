@@ -23,4 +23,5 @@ export class RpTextInput<T> extends RpControlValueAccessor<T> {
   @Input() label = '';
   @Input() type: InputType = 'text';
   @Input() placeholder = '';
+  @Input() autocomplete: string | undefined = undefined;
 }

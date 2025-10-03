@@ -6,20 +6,65 @@ html body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
-
 :root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
+  //.dark-mode {
+  --bg-color: #f1efe9;
+  --primary-color: #cbbca8;
 
+  --text-color: #333333;
   --title-color: #48392e;
 
-  --primary-color: #cbbca8;
-  --card-color: #e4dcd2;
-}
+  --error-color: #e53935;
 
+  --card-primary-color: #ffffff;
+  --card-secondary-color: #e4dcd2;
+
+  --outline-color: #cfceca;
+  --outline-shadow-color: rgba(207, 206, 202, 1);
+
+  --text-input-label-color: #888;
+  --text-input-placeholder-color: #888;
+  --text-input-background-color: #ffffff;
+
+  --button-primary-color: #ffffff;
+  --button-primary-border-color: #4a4036;
+  --button-primary-background-color: #4a4036;
+  --button-primary-background-color_hover: #685a4c;
+
+  --button-secondary-color: #4a4036;
+  --button-secondary-border-color: #4a4036;
+  --button-secondary-background-color: #ffffff;
+  --button-secondary-background-color_hover: #f0e9e2;
+}
 .dark-mode {
-  --bg-color: #333333;
-  --text-color: #ffffff;
+  //:root {
+  --bg-color: #242424;
+  --primary-color: #cbbca8;
+
+  --text-color: #d4d1c5;
+  --title-color: #d4d1c5;
+
+  --error-color: #b12725;
+
+  --card-primary-color: #8a7963;
+  --card-secondary-color: #e4dcd2;
+
+  --outline-color: #4a4036;
+  --outline-shadow-color: rgba(74, 64, 54, 0.726);
+
+  --text-input-label-color: #333;
+  --text-input-placeholder-color: #b3b0a5;
+  --text-input-background-color: #796858;
+
+  --button-primary-color: #d4d1c5;
+  --button-primary-border-color: #4a4036;
+  --button-primary-background-color: #38322a;
+  --button-primary-background-color_hover: #685a4c;
+
+  --button-secondary-color: #d4d1c5;
+  --button-secondary-border-color: #29241e;
+  --button-secondary-background-color: #443a31;
+  --button-secondary-background-color_hover: #5f5345;
 }
 
 .hidden {

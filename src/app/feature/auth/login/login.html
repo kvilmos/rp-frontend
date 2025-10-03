@@ -1,0 +1,29 @@
+<div>
+  <div class="title">{{ 'auth.signIn' | translate }}</div>
+  <form class="form-section" [formGroup]="loginForm" (ngSubmit)="onSubmitForm()">
+    <div>
+      <rp-text-input
+        inputId="email"
+        [placeholder]="'auth.typeEmail' | translate"
+        [label]="'auth.email' | translate"
+        formControlName="email"
+        autocomplete="email"
+      ></rp-text-input>
+    </div>
+    <div>
+      <rp-text-input
+        inputId="password"
+        [placeholder]="'auth.typePassword' | translate"
+        [label]="'auth.password' | translate"
+        type="password"
+        formControlName="password"
+      ></rp-text-input>
+    </div>
+    <rp-button type="submit">{{ 'auth.signIn' | translate }}</rp-button>
+    <hr class="line" />
+    <div class="text">{{ 'auth.or' | translate }}</div>
+    <rp-button (click)="onClickMode()" class="change-mode-button">{{
+      'auth.signUp' | translate
+    }}</rp-button>
+  </form>
+</div>

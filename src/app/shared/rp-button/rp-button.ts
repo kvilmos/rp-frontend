@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 type ButtonType = 'submit' | 'reset' | 'button';
 
@@ -11,4 +11,9 @@ type ButtonType = 'submit' | 'reset' | 'button';
 })
 export class RpButton {
   @Input() type: ButtonType = 'button';
+  @Output() click = new EventEmitter<void>();
+
+  public onClick(): void {
+    this.click.emit();
+  }
 }
