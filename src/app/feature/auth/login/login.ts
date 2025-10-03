@@ -4,6 +4,8 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { RpButton } from '../../../shared/rp-button/rp-button';
 import { AuthService } from '../auth.service';
+import { LoginCredentials } from '../login_credentials';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -19,6 +21,7 @@ export class Login {
   });
 
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   constructor() {}
 
   public onSubmitForm(): void {
@@ -26,7 +29,15 @@ export class Login {
       return;
     }
 
-    this.authService.loginUser(this.loginForm);
-    this.loginForm.reset();
+    const credentials: LoginCredentials = this.loginForm.value as LoginCredentials;
+    this.authService.loginUser(credentials).subscribe({
+      next: () => {
+        this.loginForm.reset();
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        // TODO STORY-201 Error handler
+      },
+    });
   }
 }

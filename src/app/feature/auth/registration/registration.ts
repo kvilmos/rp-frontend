@@ -5,6 +5,8 @@ import { RpValidationError } from '../../../shared/rp-validation-error/rp-valida
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
+import { NewUser } from '../new_user';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
@@ -23,6 +25,7 @@ export class Registration {
   });
 
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   constructor() {}
 
   public onSubmitForm(): void {
@@ -30,7 +33,15 @@ export class Registration {
       return;
     }
 
-    this.authService.registerNewUser(this.registrationForm);
-    this.registrationForm.reset();
+    const user: NewUser = this.registrationForm.value as NewUser;
+    this.authService.registerNewUser(user).subscribe({
+      next: () => {
+        this.registrationForm.reset();
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        // TODO STORY-201 Error handler
+      },
+    });
   }
 }

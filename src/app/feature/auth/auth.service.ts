@@ -1,41 +1,110 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
 import { NewUser } from './new_user';
 import { HttpClient } from '@angular/common/http';
-import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { User } from './user';
+import { LoginCredentials } from './login_credentials';
+import { UserData } from './user_data';
+import { LoginResponse } from './login_response';
+import { Token } from './token';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
+  private accessToken: string | null = null;
+  private readonly currentUser = new BehaviorSubject<UserData | null>(null);
+  private readonly authState = new BehaviorSubject<boolean>(false);
+
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   constructor() {}
 
-  public registerNewUser(registrationFrom: FormGroup): void {
-    const user: NewUser = registrationFrom.value;
-    this.requestCreateUser(user).subscribe((data) => {
-      console.log('REG:', data);
-      this.router.navigate(['/']);
+  public getAccessToken(): string | null {
+    return this.accessToken;
+  }
+
+  public getCurrentUser(): Observable<UserData | null> {
+    return this.currentUser.asObservable();
+  }
+
+  public getAuthState(): Observable<boolean> {
+    return this.authState.asObservable();
+  }
+
+  public registerNewUser(user: NewUser): Observable<any> {
+    return this.http.post('/api/registration', user, { withCredentials: true });
+  }
+
+  public loginUser(credentials: LoginCredentials): Observable<LoginResponse> {
+    return this.requestLogin(credentials).pipe(
+      tap((loginRes) => {
+        this.accessToken = loginRes.accessToken;
+        this.currentUser.next(loginRes.user);
+        this.authState.next(true);
+        this.router.navigate(['']);
+      })
+    );
+  }
+
+  private requestLogin(user: LoginCredentials): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>('/api/auth/login', user, { withCredentials: true });
+  }
+
+  public logout(): void {
+    this.requestLogout().subscribe({
+      next: () => this.handleLogout(),
+      error: () => this.handleLogout(),
     });
   }
 
-  private requestCreateUser(user: NewUser): Observable<any> {
-    return this.http.post('/api/signup', user);
+  private requestLogout(): Observable<void> {
+    return this.http.post<void>('/api/auth/logout', {}, { withCredentials: true });
   }
 
-  public loginUser(loginFrom: FormGroup): void {
-    const user: User = loginFrom.value;
-
-    this.requestLogin(user).subscribe((data) => {
-      console.log('REG:', data);
-      this.router.navigate(['/']);
-    });
+  private handleLogout(): void {
+    this.accessToken = null;
+    this.currentUser.next(null);
+    this.authState.next(false);
+    this.router.navigate(['/authentication']);
   }
 
-  private requestLogin(user: User): Observable<any> {
-    return this.http.post('/api/login', user);
+  public initializeAppState(): Observable<any> {
+    return this.renewToken().pipe(
+      switchMap(() => {
+        return this.requestCurrentUser();
+      }),
+
+      catchError(() => {
+        this.authState.next(false);
+        this.currentUser.next(null);
+        this.handleLogout();
+        return of(null);
+      })
+    );
+  }
+
+  public requestCurrentUser(): Observable<UserData> {
+    return this.http.get<UserData>('/api/verify/me', { withCredentials: true }).pipe(
+      tap((user) => {
+        this.currentUser.next(user);
+        this.authState.next(true);
+      })
+    );
+  }
+
+  public renewToken(): Observable<Token> {
+    return this.requestRenewToken().pipe(
+      tap((token) => {
+        this.accessToken = token.accessToken;
+      }),
+      catchError((error) => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  public requestRenewToken(): Observable<Token> {
+    return this.http.post<Token>('/api/auth/token', {}, { withCredentials: true });
   }
 }
