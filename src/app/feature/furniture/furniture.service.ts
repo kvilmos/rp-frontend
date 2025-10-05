@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { NewFurniture } from './new_furniture';
 import { HttpClient } from '@angular/common/http';
 import {
@@ -24,56 +24,57 @@ interface UploadResult {
   providedIn: 'root',
 })
 export class FurnitureService {
-  private readonly file$ = new BehaviorSubject<File | null>(null);
-  private readonly objectData$ = new BehaviorSubject<ObjectData | null>(null);
-  private readonly thumbnails$ = new BehaviorSubject<FurnitureThumbnail[]>([]);
+  private readonly file = new BehaviorSubject<File | null>(null);
+  private readonly objectData = new BehaviorSubject<ObjectData | null>(null);
+  private readonly thumbnails = new BehaviorSubject<FurnitureThumbnail[]>([]);
 
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
+  constructor() {}
 
   public getFile(): Observable<File | null> {
-    return this.file$.asObservable();
+    return this.file.asObservable();
   }
 
   public getObjectData(): Observable<ObjectData | null> {
-    return this.objectData$.asObservable();
+    return this.objectData.asObservable();
   }
 
   public getThumbnails(): Observable<FurnitureThumbnail[]> {
-    return this.thumbnails$.asObservable();
+    return this.thumbnails.asObservable();
   }
 
   public setFile(file: File): void {
-    this.file$.next(file);
+    this.file.next(file);
   }
 
   public resetFile(): void {
-    this.file$.next(null);
+    this.file.next(null);
   }
 
   public setObjectData(meta: ObjectData | null): void {
-    this.objectData$.next(meta);
+    this.objectData.next(meta);
   }
 
   public pushThumbnail(thumbnail: FurnitureThumbnail): void {
-    const thumbnails = this.thumbnails$.getValue();
+    const thumbnails = this.thumbnails.getValue();
     if (thumbnails) {
-      this.thumbnails$.next([...thumbnails, thumbnail]);
+      this.thumbnails.next([...thumbnails, thumbnail]);
     }
   }
 
   public unsetThumbnail(id: string): void {
-    const currentThumbnails = this.thumbnails$.getValue();
+    const currentThumbnails = this.thumbnails.getValue();
     const newImages = currentThumbnails.filter((thumbnail) => thumbnail.id !== id);
-    this.thumbnails$.next(newImages);
+    this.thumbnails.next(newImages);
   }
 
   public resetThumbnails(): void {
-    this.thumbnails$.next([]);
+    this.thumbnails.next([]);
   }
 
   public async createFurniture(furniture: NewFurniture): Promise<void> {
-    const modelFile = this.file$.getValue();
-    const thumbnails = this.thumbnails$.getValue();
+    const modelFile = this.file.getValue();
+    const thumbnails = this.thumbnails.getValue();
 
     if (!modelFile) {
       console.error('Nincs fő modell fájl a feltöltéshez.');

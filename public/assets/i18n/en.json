@@ -14,7 +14,22 @@
     "signIn": "Sign In",
     "signUp": "Sign Up"
   },
-  "validation": {
+
+  "error": {
+    "email": {
+      "email": "Please provide a valid email address.",
+      "max": "The email cannot exceed {{maximumLength}} characters.",
+      "min": "The email must be at least {{requiredLength}} characters long.",
+      "required": "The email field is required."
+    },
+    "unexpectedError": "Opps! Something went wrong. Please tye again in little while.",
+    "internalServerError": "We're sorry, something went wrong on our end. Please try again in a little while",
+    "invalidLoginCredentials": "We couldn't find an account with that email and password.",
+    "password": {
+      "max": "The password cannot exceed {{maximumLength}} characters.",
+      "min": "The password must be at least {{requiredLength}} characters long.",
+      "required": "The password field is required."
+    },
     "emailMismatch": "The email addresses do not match.",
     "maxlength": "The maximum length for this field is {{required_length}} characters.",
     "minlength": "Please enter at least {{requiredLength}} characters.",

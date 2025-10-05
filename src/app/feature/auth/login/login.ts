@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal, WritableSignal } from '@angular/core';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
@@ -6,16 +6,21 @@ import { RpButton } from '../../../shared/rp-button/rp-button';
 import { AuthService } from '../auth.service';
 import { LoginCredentials } from '../login_credentials';
 import { Router } from '@angular/router';
+import { ErrorHandler } from '../../../core/error/error_handler';
+import { Observable } from 'rxjs';
+import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import { ErrorDisplay } from '../../../core/error/type';
 
 @Component({
   standalone: true,
   selector: 'rp-login',
   templateUrl: 'login.html',
   styleUrl: 'login.scss',
-  imports: [ReactiveFormsModule, TranslatePipe, RpTextInput, RpButton],
+  imports: [KeyValuePipe, ReactiveFormsModule, TranslatePipe, RpTextInput, RpButton],
 })
 export class Login {
   @Output() modeClick = new EventEmitter<void>();
+  public serverErrors: WritableSignal<ErrorDisplay[]> = signal([]);
 
   public loginForm = new FormGroup({
     email: new FormControl('', [Validators.required]),
@@ -23,6 +28,7 @@ export class Login {
   });
 
   private readonly authService = inject(AuthService);
+  private readonly errorHandler = inject(ErrorHandler);
   private readonly router = inject(Router);
   constructor() {}
 
@@ -38,7 +44,7 @@ export class Login {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        // TODO STORY-201 Error handler
+        this.serverErrors.set(this.errorHandler.parseHttpError(err));
       },
     });
   }

@@ -19,6 +19,21 @@
         formControlName="password"
       ></rp-text-input>
     </div>
+
+    @if(serverErrors().length > 0) {
+    <div class="error-display">
+      @for(error of serverErrors(); track $index) {
+      <div>
+        @if (error.param) { @for (param of error.param | keyvalue; track param.key) {
+        {{ 'error.' + error.key | translate : error.param }}
+        } }@else {
+        {{ 'error.' + error.key | translate }}
+        }
+      </div>
+      }
+    </div>
+    }
+
     <rp-button type="submit">{{ 'auth.signIn' | translate }}</rp-button>
     <hr class="line" />
     <div class="text">{{ 'auth.or' | translate }}</div>
