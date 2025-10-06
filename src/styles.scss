@@ -9,18 +9,30 @@ html body {
 :root {
   //.dark-mode {
   --bg-color: #f1efe9;
+  --nav-background-color: #bdae9e;
   --primary-color: #cbbca8;
 
   --text-color: #333333;
   --title-color: #48392e;
 
   --error-color: #e53935;
+  --error-display-color: #ebb8b7;
+
+  --icon-hearth-color: #d49090;
+  --icon-trash-color: #808080;
 
   --card-primary-color: #ffffff;
   --card-secondary-color: #e4dcd2;
 
   --outline-color: #cfceca;
   --outline-shadow-color: rgba(207, 206, 202, 1);
+
+  --disabled-background-color: #eeeeee;
+
+  --dropzone-text-color: #888;
+  --dropzone-svg-color: #aaa;
+  --dropzone-border-color: #ccc;
+  --dropzone-hover-color: #f1f1f1;
 
   --text-input-label-color: #888;
   --text-input-placeholder-color: #888;
@@ -52,6 +64,14 @@ html body {
   --outline-color: #4a4036;
   --outline-shadow-color: rgba(74, 64, 54, 0.726);
 
+  //not picked
+  --disabled-background-color: #eeeeee;
+
+  --dropzone-text-color: #888;
+  --dropzone-svg-color: #aaa;
+  --dropzone-border-color: #ccc;
+  --dropzone-hover-color: #f1f1f1;
+  //
   --text-input-label-color: #333;
   --text-input-placeholder-color: #b3b0a5;
   --text-input-background-color: #796858;

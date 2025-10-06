@@ -20,6 +20,7 @@ export const routes: Routes = [
   {
     path: 'furniture-upload',
     component: FurnitureUpload,
+    canActivate: [authGuard],
   },
   {
     path: '**',

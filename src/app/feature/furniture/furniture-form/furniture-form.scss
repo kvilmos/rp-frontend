@@ -1,6 +1,11 @@
 .furniture-form {
   padding: 1em;
-  background-color: var(--card-color);
+  background-color: var(--bg-color);
+}
+.title {
+  font-weight: bold;
+  font-size: 1.5em;
+  color: var(--title-color);
 }
 
 .sub-title {
@@ -8,6 +13,12 @@
   font-size: 1.02em;
   padding: 0.5em 0;
   color: var(--title-color);
+}
+
+.text-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
 }
 
 .metric-display {
@@ -19,18 +30,6 @@
 .metric-item {
   width: 100%;
   vertical-align: middle;
-}
-
-.select-wrapper {
-  position: relative;
-  height: 20px;
-}
-
-.select-input {
-  height: 20px;
-  position: absolute;
-  right: 0;
-  top: 0;
 }
 
 .button-section {
@@ -46,8 +45,8 @@
 
 .cancel-button {
   width: 100%;
-  --rp-btn-bg: white;
-  --rp-btn-color: #4a4036;
-  --rp-btn-bg-hover: #f0e9e2;
-  --rp-btn-border: #4a4036;
+  --color: var(--button-secondary-color);
+  --border-color: var(--button-secondary-border-color);
+  --background-color: var(--button-secondary-background-color);
+  --background-color_hover: var(--button-secondary-background-color_hover);
 }

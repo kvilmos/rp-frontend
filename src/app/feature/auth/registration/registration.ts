@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal, WritableSignal } from '@angular/core';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { RpButton } from '../../../shared/rp-button/rp-button';
 import { RpValidationError } from '../../../shared/rp-validation-error/rp-validation-error';
@@ -6,20 +6,30 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
 import { NewUser } from '../new_user';
-import { Router } from '@angular/router';
 import { matchValidator } from '../../../common/validator';
+import { ErrorDisplay } from '../../../core/error/type';
+import { ErrorHandler } from '../../../core/error/error_handler';
+import { KeyValuePipe } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'rp-registration',
   templateUrl: 'registration.html',
   styleUrl: 'registration.scss',
-  imports: [ReactiveFormsModule, RpTextInput, RpButton, RpValidationError, TranslatePipe],
+  imports: [
+    KeyValuePipe,
+    ReactiveFormsModule,
+    RpTextInput,
+    RpButton,
+    RpValidationError,
+    TranslatePipe,
+  ],
 })
 export class Registration {
   @Output() modeClick = new EventEmitter<void>();
 
   public isSubmitted = false;
+  public serverErrors: WritableSignal<ErrorDisplay[]> = signal([]);
   public registrationForm = new FormGroup(
     {
       username: new FormControl('', [Validators.required, Validators.maxLength(100)]),
@@ -41,7 +51,7 @@ export class Registration {
   );
 
   private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly errorHandler = inject(ErrorHandler);
   constructor() {}
 
   public onSubmitForm(): void {
@@ -57,7 +67,7 @@ export class Registration {
         this.modeClick.emit();
       },
       error: (err) => {
-        // TODO STORY-201 Error handler
+        this.serverErrors.set(this.errorHandler.parseHttpError(err));
       },
     });
   }
