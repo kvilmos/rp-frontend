@@ -1,0 +1,25 @@
+import { Color } from 'three';
+
+export const PLANNER = {};
+
+export const BLUEPRINT = {
+  GRID_SPACING: 20,
+  GRID_WIDTH: 1,
+  GRID_COLOR: '#f1f1f1',
+
+  MODE_MOVE: 1,
+  MODE_DRAW: 2,
+};
+
+export const DECORATOR = {
+  BACKGROUND_COLOR_LIGHT: new Color(0xffffff),
+  BACKGROUND_COLOR_DARK: new Color(0x323231),
+
+  CAMERA_FOV: 70,
+  CAMERA_NEAR_PLANE: 0.01,
+  CAMERA_FAR_PLANE: 100,
+
+  GRID_SIZE: 5,
+  GRID_DIVISION: 50,
+  GRID_PRIMARY_COLOR: 0xcfceca,
+};
