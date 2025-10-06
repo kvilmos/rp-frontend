@@ -26,22 +26,27 @@ import {
   Mesh,
 } from 'three';
 import { PREVIEW } from '../../../common/constants/renderer-constants';
-import { RpThumbnail } from '../../../shared/rp-thumbnail/rp-thumbnail';
 import { catchError, Observable, of, switchMap } from 'rxjs';
-import { AsyncPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ObjectData } from '../object_data';
 import { FurnitureThumbnail } from '../furniture_thumbnail';
 import { THUMBNAIL } from '../../../common/constants/file-constants';
+import { faCamera, faCircleHalfStroke, faTableCells } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { ErrorHandler } from '../../../core/error/error_handler';
 
 @Component({
   standalone: true,
   selector: 'rp-furniture-preview',
   templateUrl: './furniture-preview.html',
   styleUrl: './furniture-preview.scss',
-  imports: [RpThumbnail, AsyncPipe],
+  imports: [FontAwesomeModule],
 })
 export class FurniturePreview implements OnInit, AfterViewInit {
+  public faCam = faCamera;
+  public faGrid = faTableCells;
+  public faTheme = faCircleHalfStroke;
+
   public thumbnails$!: Observable<FurnitureThumbnail[]>;
 
   @ViewChild('previewCanvas', { static: true })
@@ -58,6 +63,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
   private isMainThemeDark: boolean = false;
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly errorHandler = inject(ErrorHandler);
   private readonly furnitureService = inject(FurnitureService);
   constructor() {}
 
@@ -69,9 +75,35 @@ export class FurniturePreview implements OnInit, AfterViewInit {
   private createPreviewCanvas(): void {
     this.mainScene = new Scene();
     this.mainScene.background = new Color(PREVIEW.BACKGROUND_COLOR_LIGHT);
-    this.mainGrid = new GridHelper(PREVIEW.GRID_SIZE, PREVIEW.GRID_DIVISION);
+    this.mainGrid = new GridHelper(
+      PREVIEW.GRID_SIZE,
+      PREVIEW.GRID_DIVISION,
+      PREVIEW.GRID_PRIMARY_COLOR,
+      PREVIEW.GRID_PRIMARY_COLOR
+    );
+
+    this.mainGrid.visible = this.isMainGridShown;
     this.mainScene.add(this.mainGrid);
 
+    this.initCamera();
+    this.initShadowRendering();
+    this.initLights();
+
+    const canvas = this.mainCanvas.nativeElement;
+    this.mainControls = new OrbitControls(this.mainCamera, canvas);
+    this.mainControls.enableDamping = true;
+
+    this.mainRenderer = new WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+      preserveDrawingBuffer: true,
+    });
+    this.mainRenderer.shadowMap.enabled = true;
+
+    this.onResizeBrowser();
+  }
+
+  private initCamera(): void {
     const aspect = this.getAspectRatio();
     this.mainCamera = new PerspectiveCamera(
       PREVIEW.CAMERA_FOV,
@@ -81,7 +113,14 @@ export class FurniturePreview implements OnInit, AfterViewInit {
     );
     this.mainCamera.position.z = PREVIEW.CAMERA_START_Z;
     this.mainCamera.position.y = PREVIEW.CAMERA_START_Y;
+  }
 
+  private getAspectRatio(): number {
+    const canvas = this.mainCanvas.nativeElement;
+    return canvas.clientHeight === 0 ? 1 : canvas.clientWidth / canvas.clientHeight;
+  }
+
+  private initShadowRendering(): void {
     const planeGeometry = new PlaneGeometry(PREVIEW.GRID_SIZE, PREVIEW.GRID_SIZE);
     const planeMaterial = new ShadowMaterial({ opacity: PREVIEW.SHADOW_OPACITY });
     this.mainShadowPlane = new Mesh(planeGeometry, planeMaterial);
@@ -89,8 +128,9 @@ export class FurniturePreview implements OnInit, AfterViewInit {
     this.mainShadowPlane.position.y = PREVIEW.SHADOW_PLANE_Y_OFFSET;
     this.mainShadowPlane.receiveShadow = true;
     this.mainScene.add(this.mainShadowPlane);
+  }
 
-    // LIGHT
+  private initLights(): void {
     const ambientLight = new AmbientLight(
       PREVIEW.AMBIENT_LIGHT_COLOR,
       PREVIEW.AMBIENT_LIGHT_INTENSITY
@@ -110,24 +150,6 @@ export class FurniturePreview implements OnInit, AfterViewInit {
     directionalLight.shadow.mapSize.width = PREVIEW.SHADOW_MAP_SIZE;
     directionalLight.shadow.mapSize.height = PREVIEW.SHADOW_MAP_SIZE;
     this.mainScene.add(directionalLight);
-
-    const canvas = this.mainCanvas.nativeElement;
-    this.mainControls = new OrbitControls(this.mainCamera, canvas);
-    this.mainControls.enableDamping = true;
-
-    this.mainRenderer = new WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-      preserveDrawingBuffer: true,
-    });
-    this.mainRenderer.shadowMap.enabled = true;
-
-    this.onResizeBrowser();
-  }
-
-  private getAspectRatio(): number {
-    const canvas = this.mainCanvas.nativeElement;
-    return canvas.clientHeight === 0 ? 1 : canvas.clientWidth / canvas.clientHeight;
   }
 
   public ngOnInit(): void {
@@ -143,8 +165,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
 
           return this.processFurnitureFile$(file).pipe(
             catchError((error) => {
-              //TODO STORY-201 Handle error.
-              console.error(error);
+              this.errorHandler.showUserError(error);
               this.clearScene();
               return of(null);
             })
@@ -166,8 +187,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
       reader.onload = (event) => {
         const fileContent = event.target?.result;
         if (!(fileContent instanceof ArrayBuffer)) {
-          // TODO: STORY-201 ERROR HANDLER
-          observer.error(new Error('A fájl beolvasása nem ArrayBuffer-t eredményezett.'));
+          this.errorHandler.showUserError('fileReaderFailed');
           return;
         }
 
@@ -201,9 +221,8 @@ export class FurniturePreview implements OnInit, AfterViewInit {
           (error) => observer.error(error)
         );
       };
-
       reader.onerror = (error) => observer.error(error);
-      // TODO: STORY-201 ERROR HANDLER
+
       reader.readAsArrayBuffer(file);
     });
   }
@@ -246,10 +265,6 @@ export class FurniturePreview implements OnInit, AfterViewInit {
     this.furnitureService.resetThumbnails();
   }
 
-  public removeThumbnail(id: string): void {
-    this.furnitureService.unsetThumbnail(id);
-  }
-
   public onToggleGrid(): void {
     this.isMainGridShown = !this.isMainGridShown;
     this.mainGrid.visible = this.isMainGridShown;
@@ -258,9 +273,9 @@ export class FurniturePreview implements OnInit, AfterViewInit {
   public onChangeTheme(): void {
     this.isMainThemeDark = !this.isMainThemeDark;
     if (!this.isMainThemeDark) {
-      this.mainScene.background = new Color(0xf2f0ea);
+      this.mainScene.background = PREVIEW.BACKGROUND_COLOR_LIGHT;
     } else {
-      this.mainScene.background = new Color(0x323231);
+      this.mainScene.background = PREVIEW.BACKGROUND_COLOR_DARK;
     }
   }
 

@@ -52,7 +52,6 @@ export class Registration {
 
   private readonly authService = inject(AuthService);
   private readonly errorHandler = inject(ErrorHandler);
-  // private readonly snackBar = inject(MatSnackBar);
   constructor() {}
 
   public onSubmitForm(): void {

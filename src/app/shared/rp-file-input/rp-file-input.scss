@@ -5,20 +5,20 @@
   text-align: center;
   padding: 1.5em;
 
-  border: 3px dashed #ccc;
-  background-color: #f9f9f9;
+  border: 3px dashed var(--dropzone-border-color);
+  background-color: var(--card-primary-color);
   border-radius: var(--uploader-border-radius, 12px);
   transition: border-color 0.2s, background-color 0.2s;
   cursor: pointer;
 
   &.hovering {
-    border-color: #007bff;
-    background-color: #e9f5ff;
+    border-color: var(--button-primary-background-color_hover);
+    background-color: var(--dropzone-hover-color);
   }
 }
 
 .dropzone-content {
-  color: #888;
+  color: var(--dropzone-text-color);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,12 +27,12 @@
 
 .dropzone-content svg {
   height: 4em;
-  stroke: #aaa;
+  stroke: var(--dropzone-svg-color);
 }
 
 .dropzone:hover {
-  border-color: #007bff;
-  background-color: #e9f5ff;
+  border-color: var(--button-primary-background-color_hover);
+  background-color: var(--dropzone-hover-color);
 }
 .file-input {
   display: none;

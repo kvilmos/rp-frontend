@@ -14,7 +14,27 @@
     "signIn": "Sign In",
     "signUp": "Sign Up"
   },
-
+  "common": {
+    "cancel": "Cancel",
+    "submit": "Submit"
+  },
+  "furniture": {
+    "chooseFile": "Choose File",
+    "fileName": "File name",
+    "furnitureDetails": "Furniture Details",
+    "furnitureSize": "Furniture Size",
+    "gallery": "Gallery",
+    "name": "Furniture Name",
+    "namePlaceholder": "Black Leather Couch",
+    "previewTitle": "Furniture Preview",
+    "thumbnailsTitle": "Thumbnails Gallery",
+    "thumbnailsText": "Choose one",
+    "sizeDepth": "Depth",
+    "sizeHeight": "Height",
+    "sizeWidth": "Width",
+    "subTitleThumbnail": "Selected Thumbnail",
+    "uploadFurniture": "Upload Furniture"
+  },
   "error": {
     "email": {
       "email": "Please provide a valid email address.",
@@ -30,10 +50,21 @@
       "min": "The password must be at least {{requiredLength}} characters long.",
       "required": "The password field is required."
     },
+    "type": {
+      "unexpectedError": "Something went wrong. Please tye again in little while.",
+      "internalServerError": "We're sorry, something went wrong on our end. Please try again in a little while"
+    },
     "emailMismatch": "The email addresses do not match.",
     "maxlength": "The maximum length for this field is {{required_length}} characters.",
     "minlength": "Please enter at least {{requiredLength}} characters.",
     "passwordMismatch": "The passwords do not match.",
     "required": "This field is required."
+  },
+  "input": {
+    "file": {
+      "clickHere": "click to upload.",
+      "dropFile": "Drop files here or",
+      "supportedFormats": "Supports"
+    }
   }
 }

@@ -3,7 +3,7 @@
   <ul>
     @for (error of errors | keyvalue; track error.key ) {
     <li>
-      {{ 'validation.' + error.key | translate : error.value }}
+      {{ 'error.' + error.key | translate : error.value }}
     </li>
     }
   </ul>

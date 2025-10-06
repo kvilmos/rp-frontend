@@ -20,12 +20,11 @@ interface UploadResult {
   success: boolean;
   error?: any;
 }
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class FurnitureService {
   private readonly file = new BehaviorSubject<File | null>(null);
   private readonly objectData = new BehaviorSubject<ObjectData | null>(null);
+  private readonly selectedThumbnail = new BehaviorSubject<FurnitureThumbnail | null>(null);
   private readonly thumbnails = new BehaviorSubject<FurnitureThumbnail[]>([]);
 
   private readonly http = inject(HttpClient);
@@ -68,29 +67,39 @@ export class FurnitureService {
     this.thumbnails.next(newImages);
   }
 
+  public selectThumbnail(id: string): void {
+    const currentThumbnails = this.thumbnails.getValue();
+    const selectedThumbnail = currentThumbnails.find((thumbnail) => thumbnail.id === id);
+    if (selectedThumbnail) {
+      this.selectedThumbnail.next(selectedThumbnail);
+    }
+  }
+
+  public getSelectedThumbnail(): Observable<FurnitureThumbnail | null> {
+    return this.selectedThumbnail.asObservable();
+  }
+
+  public resetSelectedThumbnail(): void {
+    this.selectedThumbnail.next(null);
+  }
+
   public resetThumbnails(): void {
     this.thumbnails.next([]);
   }
 
   public async createFurniture(furniture: NewFurniture): Promise<void> {
     const modelFile = this.file.getValue();
-    const thumbnails = this.thumbnails.getValue();
+    const thumbnail = this.selectedThumbnail.getValue();
 
     if (!modelFile) {
-      console.error('Nincs fő modell fájl a feltöltéshez.');
-      // TODO STORY-201 ERROR HANDLER
-      return;
+      throw new Error('fileNotFound');
     }
-    if (thumbnails.length === 0) {
-      console.error('Nincsenek bélyegképek a feltöltéshez.');
-      // TODO STORY-201 ERROR HANDLER
-      return;
+    if (!thumbnail) {
+      throw new Error('thumbnailNotFound');
     }
 
     try {
       const uploadUrls = await lastValueFrom(this.requestCreateFurniture(furniture));
-
-      const thumbnail = thumbnails[0];
       const thumbnailBlob = await this.dataUrlToBlob(thumbnail.imageSrc);
 
       const allUploads$: Observable<UploadResult>[] = [];
@@ -98,25 +107,22 @@ export class FurnitureService {
         last(),
         map(() => ({ source: 'main_model', success: true })),
         catchError((error) => of({ source: 'main_model', success: false, error }))
-        // TODO STORY-201 ERROR HANDLER
       );
       allUploads$.push(modelUpload$);
       const thumbnailUpload$ = this.uploadFile(uploadUrls.thumbnailUrl, thumbnailBlob).pipe(
         last(),
         map(() => ({ source: thumbnail.id, success: true })),
         catchError((error) => of({ source: thumbnail.id, success: false, error }))
-        // TODO STORY-201 ERROR HANDLER
       );
       allUploads$.push(thumbnailUpload$);
 
       const uploadResults = await lastValueFrom(forkJoin(allUploads$));
       const failedUploads = uploadResults.filter((result) => !result.success);
       if (failedUploads.length > 0) {
-        // TODO STORY-201 ERROR HANDLER
-        return;
+        throw new Error('uploadingFailed');
       }
     } catch (error) {
-      // TODO STORY-201 ERROR HANDLER
+      throw error;
     }
   }
 
@@ -141,19 +147,19 @@ export class FurnitureService {
         }
       });
 
-      xhr.addEventListener('load', (event) => {
+      xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
           observer.next(100);
           observer.complete();
         } else {
-          //TODO STORY-201 ERROR HANDLER
-          observer.error(new Error(`Szerverhiba: ${xhr.status}`));
+          const error = new Error(`ServerError: ${xhr.status}`);
+          observer.error(error);
         }
       });
 
-      xhr.addEventListener('error', () => {
-        //TODO STORY-201 ERROR HANDLER
-        observer.error(new Error('Hálózati hiba történt a feltöltés során.'));
+      xhr.addEventListener('error', (event) => {
+        const error = new Error(`ServerError: ${event}`);
+        observer.error(error);
       });
 
       xhr.open('PUT', url, true);

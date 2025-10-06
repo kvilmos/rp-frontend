@@ -1,11 +1,16 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { ApiError, ErrorDisplay, ValidationError } from './type';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ErrorHandler {
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
+
   public parseHttpError(err: HttpErrorResponse): ErrorDisplay[] {
     const errors: ErrorDisplay[] = [];
 
@@ -33,5 +38,21 @@ export class ErrorHandler {
     }
 
     return errors;
+  }
+
+  public handleHttpError(error: any): void {
+    console.log(error);
+
+    this.translate.get('error.type.unexpectedError').subscribe((message: string) => {
+      this.snackBar.open(message, 'x', {
+        duration: 5000,
+      });
+    });
+  }
+
+  public showUserError(message: string): void {
+    this.snackBar.open(message, 'x', {
+      duration: 3000,
+    });
   }
 }

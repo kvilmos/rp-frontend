@@ -7,8 +7,7 @@ import { AuthService } from '../auth.service';
 import { LoginCredentials } from '../login_credentials';
 import { Router } from '@angular/router';
 import { ErrorHandler } from '../../../core/error/error_handler';
-import { Observable } from 'rxjs';
-import { AsyncPipe, KeyValuePipe } from '@angular/common';
+import { KeyValuePipe } from '@angular/common';
 import { ErrorDisplay } from '../../../core/error/type';
 
 @Component({

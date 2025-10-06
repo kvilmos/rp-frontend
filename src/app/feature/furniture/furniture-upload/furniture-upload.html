@@ -1,12 +1,13 @@
 <div class="container">
   <div class="nav">
-    <div class="nav-back">back</div>
-    <div class="nav-title">editor-navigation</div>
+    <fa-icon class="nav-back" [icon]="faArrowLeft" (click)="onClickBack()"></fa-icon>
+    <div class="nav-title">{{ 'furniture.previewTitle' | translate }}</div>
   </div>
   <div>
     <div class="form-section">
       <rp-furniture-form></rp-furniture-form>
     </div>
+    <rp-thumbnail-holder></rp-thumbnail-holder>
     <div class="canvas-wrapper">
       <rp-furniture-preview></rp-furniture-preview>
     </div>
