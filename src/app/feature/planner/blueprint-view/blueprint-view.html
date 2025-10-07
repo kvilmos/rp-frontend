@@ -1,3 +1,9 @@
 <div class="blueprint">
-  <canvas #blueprintCanvas class="blueprintCanvas"></canvas>
+  <canvas
+    #blueprintCanvas
+    (mousedown)="blueprintCtrl.onMouseDown()"
+    (mouseup)="blueprintCtrl.onMouseUp()"
+    (mousemove)="blueprintCtrl.onMouseMove($event)"
+    class="blueprintCanvas"
+  ></canvas>
 </div>

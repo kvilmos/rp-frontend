@@ -9,6 +9,12 @@ export const BLUEPRINT = {
 
   MODE_MOVE: 1,
   MODE_DRAW: 2,
+
+  SNAP_TOLERANCE: 25,
+
+  CORNER_COLOR: '#008cba',
+  CORNER_RADIUS: 7,
+  CORNER_RADIUS_HOVER: 7,
 };
 
 export const DECORATOR = {
