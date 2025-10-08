@@ -3,6 +3,9 @@ import { BLUEPRINT } from '../../../common/constants/planner-constants';
 import { BlueprintControl } from './blueprint_control';
 import { Blueprint } from './blueprint';
 import { Corner } from './corner';
+import { Wall } from './wall';
+import { map } from '../utils';
+import { Room } from '../Room';
 
 export class BlueprintCanvas {
   public canvasElement!: HTMLCanvasElement;
@@ -27,20 +30,27 @@ export class BlueprintCanvas {
     this.ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
     this.drawGrid();
 
-    const corners = this.blueprint.getCorners();
-    if (corners) {
-      for (var i = 0; i < corners.length; i++) {
-        this.drawCorner(corners[i]);
-      }
+    const rooms = this.blueprint.getRooms();
+    for (let i = 0; i < rooms.length; i++) {
+      this.drawRoom(rooms[i]);
     }
-    //this.blueprint.getCorners().forEach((corner) => {});
+
+    const walls = this.blueprint.getWalls();
+    for (let i = 0; i < walls.length; i++) {
+      this.drawWall(walls[i]);
+    }
+
+    const corners = this.blueprint.getCorners();
+    for (var i = 0; i < corners.length; i++) {
+      this.drawCorner(corners[i]);
+    }
   }
 
   private drawGrid(): void {
-    var offsetX = this.calculateGridOffset(-this.blueprintCtrl.originX);
-    var offsetY = this.calculateGridOffset(-this.blueprintCtrl.originY);
-    var width = this.canvasElement.width;
-    var height = this.canvasElement.height;
+    const offsetX = this.calculateGridOffset(-this.blueprintCtrl.originX);
+    const offsetY = this.calculateGridOffset(-this.blueprintCtrl.originY);
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
     for (var x = 0; x <= width / BLUEPRINT.GRID_SPACING; x++) {
       this.drawLine(
         BLUEPRINT.GRID_SPACING * x + offsetX,
@@ -108,6 +118,35 @@ export class BlueprintCanvas {
     );
   }
 
+  private drawWall(wall: Wall) {
+    /*
+        var hover = wall === this.viewmodel.activeWall;
+        var color = wallColor;
+        if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
+        color = deleteColor;
+        } else if (hover) {
+        color = wallColorHover;
+        }
+    */
+
+    this.drawLine(
+      this.blueprintCtrl.convertX(wall.getStartX()),
+      this.blueprintCtrl.convertY(wall.getStartY()),
+      this.blueprintCtrl.convertX(wall.getEndX()),
+      this.blueprintCtrl.convertY(wall.getEndY()),
+      BLUEPRINT.WALL_WIDTH, //hover ? wallWidthHover : wallWidth,
+      BLUEPRINT.WALL_COLOR //color
+    );
+    /*
+        if (!hover && wall.frontEdge) {
+        this.drawEdge(wall.frontEdge, hover);
+        }
+        if (!hover && wall.backEdge) {
+        this.drawEdge(wall.backEdge, hover);
+        }
+    */
+  }
+
   private drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
     this.ctx.beginPath();
     this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
@@ -115,8 +154,50 @@ export class BlueprintCanvas {
     this.ctx.fill();
   }
 
+  private drawRoom(room: Room) {
+    // var scope = this; ?
+    this.drawPolygon(
+      map(room.corners, (corner: Corner) => {
+        return this.blueprintCtrl.convertX(corner.x);
+      }),
+      map(room.corners, (corner: Corner) => {
+        return this.blueprintCtrl.convertY(corner.y);
+      }),
+      true,
+      BLUEPRINT.ROOM_COLOR
+    );
+  }
+
+  private drawPolygon(
+    xArr: number[],
+    yArr: number[],
+    fill: boolean,
+    fillColor: string,
+    stroke?: boolean,
+    strokeColor?: string,
+    strokeWidth?: number
+  ) {
+    // fill = fill || false;
+    // stroke = stroke || false;
+    this.ctx.beginPath();
+    this.ctx.moveTo(xArr[0], yArr[0]);
+    for (var i = 1; i < xArr.length; i++) {
+      this.ctx.lineTo(xArr[i], yArr[i]);
+    }
+    this.ctx.closePath();
+    if (fill) {
+      this.ctx.fillStyle = fillColor;
+      this.ctx.fill();
+    }
+    if (stroke && strokeWidth && strokeColor) {
+      this.ctx.lineWidth = strokeWidth;
+      this.ctx.strokeStyle = strokeColor;
+      this.ctx.stroke();
+    }
+  }
+
   public handleWindowResize(): void {
-    var parent = this.canvasElement.parentElement;
+    const parent = this.canvasElement.parentElement;
     if (parent) {
       this.canvasElement.height = parent.clientHeight;
       this.canvasElement.width = parent.clientWidth;

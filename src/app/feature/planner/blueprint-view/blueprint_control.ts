@@ -2,6 +2,8 @@ import { ElementRef } from '@angular/core';
 import { BlueprintCanvas } from './blueprint_canvas';
 import { Blueprint } from './blueprint';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { Corner } from './corner';
+import { Wall } from './wall';
 
 export class BlueprintControl {
   public mode = BLUEPRINT.MODE_DRAW;
@@ -24,7 +26,9 @@ export class BlueprintControl {
   private mouseDown = false;
   private mouseMoved = false;
 
-  private lastNode: any;
+  public activeWall: Wall | null = null;
+  public activeCorner: Corner | null = null;
+  private lastNode: Corner | null = null;
 
   public view: BlueprintCanvas;
   private blueprint: Blueprint;
@@ -90,10 +94,7 @@ export class BlueprintControl {
       this.updateTarget();
     }
 
-    //&& !this.activeCorner && !this.activeWall) {
-    // NO CORNERS # WALL YET
-
-    if (this.mouseDown) {
+    if (this.mouseDown && !this.activeCorner && !this.activeWall) {
       this.originX += this.lastX - this.rawMouseX;
       this.originY += this.lastY - this.rawMouseY;
       this.lastX = this.rawMouseX;
@@ -107,6 +108,14 @@ export class BlueprintControl {
 
     if (this.mode === BLUEPRINT.MODE_DRAW && !this.mouseMoved) {
       const corner = this.blueprint.newCorner(this.targetX, this.targetY);
+      if (this.lastNode) {
+        this.blueprint.newWall(this.lastNode, corner);
+      }
+      if (corner.mergeWithIntersected() && this.lastNode != null) {
+        console.log('merged');
+        //this.setMode(floorplannerModes.MOVE);
+      }
+
       this.lastNode = corner;
     }
   }
