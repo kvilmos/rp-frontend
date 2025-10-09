@@ -1,38 +1,49 @@
 import { Vector3 } from 'three';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { angle2pi, cycle, isClockwise, map, removeIf } from '../utils';
+import { angle2pi, cycle_OnTest, isClockwise, map, removeIf } from '../utils';
 import { Room } from '../Room';
 import { HalfEdge } from '../HalfEdge';
-import { Callbacks } from '../callbacks';
+import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { Subject, takeUntil } from 'rxjs';
 
 export class Blueprint {
   private corners: Corner[] = [];
   private walls: Wall[] = [];
   private rooms: Room[] = [];
 
-  private updated_rooms = new Callbacks();
+  private readonly destroy$ = new Subject<void>();
+
+  // private updated_rooms = new Callbacks();
+  // private new_corner_callbacks = new Callbacks();
 
   constructor() {}
 
   public newCorner(x: number, y: number, id?: string): Corner {
-    var corner = new Corner(this, x, y, id);
+    const corner = new Corner(this, x, y, id);
     this.corners.push(corner);
 
-    /*
-      corner.fireOnDelete(() => {
-        this.removeCorner;
-      });
-      this.new_corner_callbacks.fire(corner);
-    */
+    corner.onDelete$.pipe(takeUntil(this.destroy$)).subscribe((cornerToDelete: Corner) => {
+      this.removeCorner(cornerToDelete);
+    });
 
     return corner;
+  }
+
+  private removeCorner(corner: Corner) {
+    this.corners = this.corners.filter((c: Corner) => c !== corner);
+    // removeValue(this.corners, corner);
   }
 
   public newWall(start: Corner, end: Corner): Wall {
     const wall = new Wall(start, end);
     this.walls.push(wall);
+
+    wall.onDelete$.pipe(takeUntil(this.destroy$)).subscribe((wallToDestroy: Wall) => {
+      this.removeWall(wallToDestroy);
+    });
     /*
+    
     var scope = this;
       wall.fireOnDelete(() => {
         scope.removeWall(wall);
@@ -40,7 +51,15 @@ export class Blueprint {
       this.new_wall_callbacks.fire(wall);
       this.update();
     */
+    this.update();
+
     return wall;
+  }
+
+  private removeWall(wall: Wall) {
+    // removeValue(this.walls, wall);
+    this.walls = this.walls.filter((w: Wall) => w !== wall);
+    this.update();
   }
 
   public getCorners(): Corner[] {
@@ -86,20 +105,17 @@ export class Blueprint {
 
     const roomCorners = this.findRooms(this.corners);
     this.rooms = [];
-    const scope = this;
     for (let i = 0; i < roomCorners.length; i++) {
-      scope.rooms.push(new Room(scope, roomCorners[i]));
+      this.rooms.push(new Room(this, roomCorners[i]));
     }
 
     this.assignOrphanEdges();
     // this.updateFloorTextures();
-    this.updated_rooms.fire();
-
-    console.log(this.rooms);
+    // this.updated_rooms.fire();
   }
 
   private assignOrphanEdges() {
-    const orphanWalls = [];
+    // const orphanWalls = [];
 
     for (let i = 0; i < this.walls.length; i++) {
       const wall = this.walls[i];
@@ -109,7 +125,7 @@ export class Blueprint {
         back.generatePlane();
         const front = new HalfEdge(wall, true);
         front.generatePlane();
-        orphanWalls.push(wall);
+        // orphanWalls.push(wall);
       }
     }
   }
@@ -138,7 +154,7 @@ export class Blueprint {
         let add = true;
         let str;
         for (var j = 0; j < room.length; j++) {
-          const roomShift = cycle(room, j);
+          const roomShift = cycle_OnTest(room, j);
           str = map(roomShift, hashFunc).join(sep);
           if (lookup.hasOwnProperty(str)) {
             add = false;
@@ -231,5 +247,30 @@ export class Blueprint {
     const uniqueCCWLoops = removeIf(uniqueLoops, isClockwise);
 
     return uniqueCCWLoops;
+  }
+
+  public overlappedCorner(x: number, y: number, tolerance?: number): Corner | null {
+    tolerance = tolerance || BLUEPRINT.DEFAULT_TOLERANCE;
+    for (var i = 0; i < this.corners.length; i++) {
+      if (this.corners[i].distanceFrom(x, y) < tolerance) {
+        return this.corners[i];
+      }
+    }
+    return null;
+  }
+
+  public overlappedWall(x: number, y: number, tolerance?: number): Wall | null {
+    tolerance = tolerance || BLUEPRINT.DEFAULT_TOLERANCE;
+    for (var i = 0; i < this.walls.length; i++) {
+      if (this.walls[i].distanceFrom(x, y) < tolerance) {
+        return this.walls[i];
+      }
+    }
+    return null;
+  }
+
+  public destroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

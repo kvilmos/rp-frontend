@@ -1,14 +1,18 @@
+import { array } from 'three/src/nodes/TSL.js';
+
 export function distance(x1: number, y1: number, x2: number, y2: number): number {
   return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 }
 
+/*
 export function removeValue(array: any, value: any) {
-  for (var tI = array.length - 1; tI >= 0; tI--) {
+  for (let tI = array.length - 1; tI >= 0; tI--) {
     if (array[tI] === value) {
       array.splice(tI, 1);
     }
   }
 }
+  */
 
 export function pointDistanceFromLine(
   x: number,
@@ -33,16 +37,16 @@ export function closestPointOnLine(
   y2: number
 ): { x: number; y: number } {
   // Inspired by: http://stackoverflow.com/a/6853926
-  var tA = x - x1;
-  var tB = y - y1;
-  var tC = x2 - x1;
-  var tD = y2 - y1;
+  const tA = x - x1;
+  const tB = y - y1;
+  const tC = x2 - x1;
+  const tD = y2 - y1;
 
-  var tDot = tA * tC + tB * tD;
-  var tLenSq = tC * tC + tD * tD;
-  var tParam = tDot / tLenSq;
+  const tDot = tA * tC + tB * tD;
+  const tLenSq = tC * tC + tD * tD;
+  const tParam = tDot / tLenSq;
 
-  var tXx, tYy;
+  let tXx, tYy;
 
   if (tParam < 0 || (x1 == x2 && y1 == y2)) {
     tXx = x1;
@@ -61,8 +65,8 @@ export function closestPointOnLine(
   };
 }
 
-export function angle2pi(x1: number, y1: number, x2: number, y2: number) {
-  var tTheta = getAngle(x1, y1, x2, y2);
+export function angle2pi(x1: number, y1: number, x2: number, y2: number): number {
+  let tTheta = getAngle(x1, y1, x2, y2);
   if (tTheta < 0) {
     tTheta += 2 * Math.PI;
   }
@@ -70,9 +74,9 @@ export function angle2pi(x1: number, y1: number, x2: number, y2: number) {
 }
 
 export function getAngle(x1: number, y1: number, x2: number, y2: number): number {
-  var tDot = x1 * x2 + y1 * y2;
-  var tDet = x1 * y2 - y1 * x2;
-  var tAngle = -Math.atan2(tDet, tDot);
+  const tDot = x1 * x2 + y1 * y2;
+  const tDet = x1 * y2 - y1 * x2;
+  const tAngle = -Math.atan2(tDet, tDot);
   return tAngle;
 }
 
@@ -83,6 +87,17 @@ export function cycle(arr: any[], shift: any) {
     tReturn.push(tmp);
   }
   return tReturn;
+}
+
+export function cycle_OnTest<T>(arr: T[], shift: number): T[] {
+  const effectiveShift = shift % array.length;
+  if (effectiveShift === 0) {
+    return [...arr];
+  }
+
+  const partToMove = arr.slice(0, effectiveShift);
+  const remainingPart = arr.slice(effectiveShift);
+  return [...remainingPart, ...partToMove];
 }
 
 export function map(array: any[], func: any) {

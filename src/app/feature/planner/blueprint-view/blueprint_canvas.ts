@@ -4,8 +4,8 @@ import { BlueprintControl } from './blueprint_control';
 import { Blueprint } from './blueprint';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { map } from '../utils';
 import { Room } from '../Room';
+import { HalfEdge } from '../HalfEdge';
 
 export class BlueprintCanvas {
   public canvasElement!: HTMLCanvasElement;
@@ -41,34 +41,15 @@ export class BlueprintCanvas {
     }
 
     const corners = this.blueprint.getCorners();
-    for (var i = 0; i < corners.length; i++) {
+    for (let i = 0; i < corners.length; i++) {
       this.drawCorner(corners[i]);
     }
-  }
 
-  private drawGrid(): void {
-    const offsetX = this.calculateGridOffset(-this.blueprintCtrl.originX);
-    const offsetY = this.calculateGridOffset(-this.blueprintCtrl.originY);
-    const width = this.canvasElement.width;
-    const height = this.canvasElement.height;
-    for (var x = 0; x <= width / BLUEPRINT.GRID_SPACING; x++) {
-      this.drawLine(
-        BLUEPRINT.GRID_SPACING * x + offsetX,
-        0,
-        BLUEPRINT.GRID_SPACING * x + offsetX,
-        height,
-        BLUEPRINT.GRID_WIDTH,
-        BLUEPRINT.GRID_COLOR
-      );
-    }
-    for (var y = 0; y <= height / BLUEPRINT.GRID_SPACING; y++) {
-      this.drawLine(
-        0,
-        BLUEPRINT.GRID_SPACING * y + offsetY,
-        width,
-        BLUEPRINT.GRID_SPACING * y + offsetY,
-        BLUEPRINT.GRID_WIDTH,
-        BLUEPRINT.GRID_COLOR
+    if (this.blueprintCtrl.mode === BLUEPRINT.MODE_DRAW && this.blueprintCtrl.lastNode) {
+      this.drawTarget(
+        this.blueprintCtrl.targetX,
+        this.blueprintCtrl.targetY,
+        this.blueprintCtrl.lastNode
       );
     }
   }
@@ -82,6 +63,157 @@ export class BlueprintCanvas {
       return (
         ((n - BLUEPRINT.GRID_SPACING / 2.0) % BLUEPRINT.GRID_SPACING) + BLUEPRINT.GRID_SPACING / 2.0
       );
+    }
+  }
+
+  private drawGrid(): void {
+    const offsetX = this.calculateGridOffset(-this.blueprintCtrl.originX);
+    const offsetY = this.calculateGridOffset(-this.blueprintCtrl.originY);
+    const width = this.canvasElement.width;
+    const height = this.canvasElement.height;
+    for (let x = 0; x <= width / BLUEPRINT.GRID_SPACING; x++) {
+      this.drawLine(
+        BLUEPRINT.GRID_SPACING * x + offsetX,
+        0,
+        BLUEPRINT.GRID_SPACING * x + offsetX,
+        height,
+        BLUEPRINT.GRID_WIDTH,
+        BLUEPRINT.GRID_COLOR
+      );
+    }
+    for (let y = 0; y <= height / BLUEPRINT.GRID_SPACING; y++) {
+      this.drawLine(
+        0,
+        BLUEPRINT.GRID_SPACING * y + offsetY,
+        width,
+        BLUEPRINT.GRID_SPACING * y + offsetY,
+        BLUEPRINT.GRID_WIDTH,
+        BLUEPRINT.GRID_COLOR
+      );
+    }
+  }
+
+  private drawRoom(room: Room) {
+    this.drawPolygon(
+      room.corners.map((corner) => this.blueprintCtrl.convertX(corner.x)),
+      room.corners.map((corner) => this.blueprintCtrl.convertY(corner.y)),
+      true,
+      BLUEPRINT.ROOM_COLOR
+    );
+  }
+
+  private drawWall(wall: Wall) {
+    const hover = wall === this.blueprintCtrl.activeWall;
+    let color = BLUEPRINT.WALL_COLOR;
+
+    if (hover && this.blueprintCtrl.mode === BLUEPRINT.MODE_DELETE) {
+      color = BLUEPRINT.DELETE_COLOR;
+    } else if (hover) {
+      color = BLUEPRINT.WALL_COLOR_HOVER;
+    }
+
+    this.drawLine(
+      this.blueprintCtrl.convertX(wall.getStartX()),
+      this.blueprintCtrl.convertY(wall.getStartY()),
+      this.blueprintCtrl.convertX(wall.getEndX()),
+      this.blueprintCtrl.convertY(wall.getEndY()),
+      BLUEPRINT.WALL_WIDTH, //hover ? wallWidthHover : wallWidth,
+      color
+    );
+
+    if (!hover && wall.frontEdge) {
+      this.drawEdge(wall.frontEdge, hover);
+    }
+    if (!hover && wall.backEdge) {
+      this.drawEdge(wall.backEdge, hover);
+    }
+  }
+
+  private drawEdge(edge: HalfEdge, hover: boolean) {
+    let color = BLUEPRINT.EDGE_COLOR;
+    if (hover && this.blueprintCtrl.mode === BLUEPRINT.MODE_DELETE) {
+      color = BLUEPRINT.DELETE_COLOR;
+    } else if (hover) {
+      color = BLUEPRINT.EDGE_COLOR_HOVER;
+    }
+
+    const corners = edge.corners() as Corner[];
+    this.drawPolygon(
+      corners.map((corner) => this.blueprintCtrl.convertX(corner.x)),
+      corners.map((corner) => this.blueprintCtrl.convertY(corner.y)),
+      false,
+      undefined,
+      true,
+      color,
+      BLUEPRINT.EDGE_WIDTH
+    );
+  }
+
+  private drawCorner(corner: Corner) {
+    const hover = corner === this.blueprintCtrl.activeCorner;
+    let color = BLUEPRINT.CORNER_COLOR;
+    if (hover && this.blueprintCtrl.mode === BLUEPRINT.MODE_DELETE) {
+      color = BLUEPRINT.DELETE_COLOR;
+    } else if (hover) {
+      color = BLUEPRINT.CORNER_COLOR_HOVER;
+    }
+    this.drawCircle(
+      this.blueprintCtrl.convertX(corner.x),
+      this.blueprintCtrl.convertY(corner.y),
+      BLUEPRINT.CORNER_RADIUS, //hover ? cornerRadiusHover : cornerRadius,
+      color
+    );
+  }
+
+  private drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
+    this.ctx.beginPath();
+    this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+    this.ctx.fillStyle = fillColor;
+    this.ctx.fill();
+  }
+
+  private drawTarget(x: number, y: number, lastNode: Corner) {
+    this.drawCircle(
+      this.blueprintCtrl.convertX(x),
+      this.blueprintCtrl.convertY(y),
+      BLUEPRINT.CORNER_RADIUS_HOVER,
+      BLUEPRINT.CORNER_COLOR_HOVER
+    );
+    if (this.blueprintCtrl.lastNode) {
+      this.drawLine(
+        this.blueprintCtrl.convertX(lastNode.x),
+        this.blueprintCtrl.convertY(lastNode.y),
+        this.blueprintCtrl.convertX(x),
+        this.blueprintCtrl.convertY(y),
+        BLUEPRINT.WALL_WIDTH_HOVER,
+        BLUEPRINT.WALL_COLOR_HOVER
+      );
+    }
+  }
+
+  private drawPolygon(
+    xArr: number[],
+    yArr: number[],
+    fill: boolean,
+    fillColor?: string,
+    stroke?: boolean,
+    strokeColor?: string,
+    strokeWidth?: number
+  ) {
+    this.ctx.beginPath();
+    this.ctx.moveTo(xArr[0], yArr[0]);
+    for (let i = 1; i < xArr.length; i++) {
+      this.ctx.lineTo(xArr[i], yArr[i]);
+    }
+    this.ctx.closePath();
+    if (fill && fillColor) {
+      this.ctx.fillStyle = fillColor;
+      this.ctx.fill();
+    }
+    if (stroke && strokeWidth && strokeColor) {
+      this.ctx.lineWidth = strokeWidth;
+      this.ctx.strokeStyle = strokeColor;
+      this.ctx.stroke();
     }
   }
 
@@ -99,101 +231,6 @@ export class BlueprintCanvas {
     this.ctx.lineWidth = width;
     this.ctx.strokeStyle = color;
     this.ctx.stroke();
-  }
-
-  private drawCorner(corner: Corner) {
-    /*var hover = corner === this.blueprintCtrl.activeCorner;
-    var color = cornerColor;
-    if (hover && this.blueprintCtrl.mode == floorplannerModes.DELETE) {
-      color = deleteColor;
-    } else if (hover) {
-      color = cornerColorHover;
-    }
-    */
-    this.drawCircle(
-      this.blueprintCtrl.convertX(corner.x),
-      this.blueprintCtrl.convertY(corner.y),
-      BLUEPRINT.CORNER_RADIUS, //hover ? cornerRadiusHover : cornerRadius,
-      BLUEPRINT.CORNER_COLOR //color
-    );
-  }
-
-  private drawWall(wall: Wall) {
-    /*
-        var hover = wall === this.viewmodel.activeWall;
-        var color = wallColor;
-        if (hover && this.viewmodel.mode == floorplannerModes.DELETE) {
-        color = deleteColor;
-        } else if (hover) {
-        color = wallColorHover;
-        }
-    */
-
-    this.drawLine(
-      this.blueprintCtrl.convertX(wall.getStartX()),
-      this.blueprintCtrl.convertY(wall.getStartY()),
-      this.blueprintCtrl.convertX(wall.getEndX()),
-      this.blueprintCtrl.convertY(wall.getEndY()),
-      BLUEPRINT.WALL_WIDTH, //hover ? wallWidthHover : wallWidth,
-      BLUEPRINT.WALL_COLOR //color
-    );
-    /*
-        if (!hover && wall.frontEdge) {
-        this.drawEdge(wall.frontEdge, hover);
-        }
-        if (!hover && wall.backEdge) {
-        this.drawEdge(wall.backEdge, hover);
-        }
-    */
-  }
-
-  private drawCircle(centerX: number, centerY: number, radius: number, fillColor: string) {
-    this.ctx.beginPath();
-    this.ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-    this.ctx.fillStyle = fillColor;
-    this.ctx.fill();
-  }
-
-  private drawRoom(room: Room) {
-    // var scope = this; ?
-    this.drawPolygon(
-      map(room.corners, (corner: Corner) => {
-        return this.blueprintCtrl.convertX(corner.x);
-      }),
-      map(room.corners, (corner: Corner) => {
-        return this.blueprintCtrl.convertY(corner.y);
-      }),
-      true,
-      BLUEPRINT.ROOM_COLOR
-    );
-  }
-
-  private drawPolygon(
-    xArr: number[],
-    yArr: number[],
-    fill: boolean,
-    fillColor: string,
-    stroke?: boolean,
-    strokeColor?: string,
-    strokeWidth?: number
-  ) {
-    // fill = fill || false;
-    // stroke = stroke || false;
-    this.ctx.beginPath();
-    this.ctx.moveTo(xArr[0], yArr[0]);
-    for (var i = 1; i < xArr.length; i++) {
-      this.ctx.lineTo(xArr[i], yArr[i]);
-    }
-    this.ctx.closePath();
-    if (fill) {
-      this.ctx.fillStyle = fillColor;
-      this.ctx.fill();
-    }
-    if (stroke && strokeWidth && strokeColor) {
-      this.ctx.lineWidth = strokeWidth;
-      this.ctx.strokeStyle = strokeColor;
-      this.ctx.stroke();
-    }
   }
 
   public handleWindowResize(): void {

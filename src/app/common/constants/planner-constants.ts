@@ -3,18 +3,38 @@ import { Color } from 'three';
 export const PLANNER = {};
 
 export const BLUEPRINT = {
+  DEFAULT_TOLERANCE: 10.0,
+  DELETE_COLOR: '#fc7676',
+
   GRID_SPACING: 20,
   GRID_WIDTH: 1,
   GRID_COLOR: '#f1f1f1',
 
   MODE_MOVE: 1,
   MODE_DRAW: 2,
+  MODE_DELETE: 3,
 
   SNAP_TOLERANCE: 25,
 
   CORNER_COLOR: '#008cba',
-  CORNER_RADIUS: 7,
+  CORNER_COLOR_HOVER: '#78c2d8',
+  CORNER_RADIUS: 5,
   CORNER_RADIUS_HOVER: 7,
+  CORNER_TOLERANCE: 20, // 20
+
+  EDGE_COLOR: '#888888',
+  EDGE_COLOR_HOVER: '#258d31ff',
+  EDGE_WIDTH: 1,
+
+  ROOM_COLOR: '#ffffff',
+
+  WALL_COLOR: '#dddddd',
+  WALL_COLOR_HOVER: '#008cba',
+  WALL_WIDTH: 5,
+  WALL_WIDTH_HOVER: 7,
+
+  WALL_HEIGHT: 250,
+  WALL_THICKNESS: 10,
 };
 
 export const DECORATOR = {

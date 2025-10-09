@@ -28,10 +28,12 @@ export class BlueprintControl {
 
   public activeWall: Wall | null = null;
   public activeCorner: Corner | null = null;
-  private lastNode: Corner | null = null;
+  public lastNode: Corner | null = null;
 
   public view: BlueprintCanvas;
   private blueprint: Blueprint;
+
+  // public modeResetCallbacks = new Callbacks();
 
   // Const?
   private cmPerFoot = 30.48;
@@ -45,6 +47,13 @@ export class BlueprintControl {
 
     // after load?
     this.reset();
+  }
+
+  public setMode(mode: number) {
+    this.lastNode = null;
+    this.mode = mode;
+    // this.modeResetCallbacks.fire(mode);
+    this.updateTarget();
   }
 
   private updateTarget() {
@@ -72,6 +81,16 @@ export class BlueprintControl {
     this.mouseMoved = false;
     this.lastX = this.rawMouseX;
     this.lastY = this.rawMouseY;
+
+    if (this.mode === BLUEPRINT.MODE_DELETE) {
+      if (this.activeCorner) {
+        this.activeCorner.removeAll();
+      } else if (this.activeWall) {
+        this.activeWall.remove();
+      } else {
+        this.setMode(BLUEPRINT.MODE_MOVE);
+      }
+    }
   }
 
   public onMouseMove(event: MouseEvent): void {
@@ -94,11 +113,52 @@ export class BlueprintControl {
       this.updateTarget();
     }
 
+    // hover
+    if (this.mode !== BLUEPRINT.MODE_DRAW && !this.mouseDown) {
+      const hoverCorner = this.blueprint.overlappedCorner(this.mouseX, this.mouseY);
+      const hoverWall = this.blueprint.overlappedWall(this.mouseX, this.mouseY);
+      let draw = false;
+      if (hoverCorner !== this.activeCorner) {
+        this.activeCorner = hoverCorner;
+        draw = true;
+      }
+
+      if (this.activeCorner === null) {
+        if (hoverWall !== this.activeWall) {
+          this.activeWall = hoverWall;
+          draw = true;
+        }
+      } else {
+        this.activeWall = null;
+      }
+
+      if (draw) {
+        this.view.draw();
+      }
+    }
+
     if (this.mouseDown && !this.activeCorner && !this.activeWall) {
       this.originX += this.lastX - this.rawMouseX;
       this.originY += this.lastY - this.rawMouseY;
       this.lastX = this.rawMouseX;
       this.lastY = this.rawMouseY;
+      this.view.draw();
+    }
+
+    // moving blueprint components e.g. wall or corner
+    if (this.mode === BLUEPRINT.MODE_MOVE && this.mouseDown) {
+      if (this.activeCorner) {
+        this.activeCorner.move(this.mouseX, this.mouseY);
+        this.activeCorner.snapToAxis(BLUEPRINT.SNAP_TOLERANCE);
+      } else if (this.activeWall) {
+        this.activeWall.relativeMove(
+          (this.rawMouseX - this.lastX) * this.cmPerPixel,
+          (this.rawMouseY - this.lastY) * this.cmPerPixel
+        );
+        this.activeWall.snapToAxis(BLUEPRINT.SNAP_TOLERANCE);
+        this.lastX = this.rawMouseX;
+        this.lastY = this.rawMouseY;
+      }
       this.view.draw();
     }
   }
@@ -112,8 +172,7 @@ export class BlueprintControl {
         this.blueprint.newWall(this.lastNode, corner);
       }
       if (corner.mergeWithIntersected() && this.lastNode != null) {
-        console.log('merged');
-        //this.setMode(floorplannerModes.MOVE);
+        this.setMode(BLUEPRINT.MODE_MOVE);
       }
 
       this.lastNode = corner;

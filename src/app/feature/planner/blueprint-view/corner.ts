@@ -1,9 +1,9 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
 import { Blueprint } from './blueprint';
 import { Wall } from './wall';
-import { closestPointOnLine, distance, removeValue } from '../utils';
+import { closestPointOnLine, distance } from '../utils';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { Callbacks } from '../callbacks';
+import { Subject } from 'rxjs';
 
 export class Corner {
   public id: string;
@@ -15,7 +15,8 @@ export class Corner {
 
   private blueprint: Blueprint;
 
-  private deleted_callbacks = new Callbacks();
+  private readonly deleteSubject = new Subject<Corner>();
+  public readonly onDelete$ = this.deleteSubject.asObservable();
 
   constructor(blueprint: Blueprint, x: number, y: number, id?: string) {
     this.blueprint = blueprint;
@@ -24,8 +25,50 @@ export class Corner {
     this.id = id || generateUUID();
   }
 
+  public snapToAxis(tolerance: number): { x: boolean; y: boolean } {
+    // try to snap this corner to an axis
+    var snapped = {
+      x: false,
+      y: false,
+    };
+
+    var scope = this;
+
+    this.adjacentCorners().forEach((corner) => {
+      if (Math.abs(corner.x - scope.x) < tolerance) {
+        scope.x = corner.x;
+        snapped.x = true;
+      }
+      if (Math.abs(corner.y - scope.y) < tolerance) {
+        scope.y = corner.y;
+        snapped.y = true;
+      }
+    });
+    return snapped;
+  }
+
+  public move(newX: number, newY: number): void {
+    this.x = newX;
+    this.y = newY;
+    this.mergeWithIntersected();
+    // this.moved_callbacks.fire(this.x, this.y);
+    /*
+      this.wallStarts.forEach((wall) => {
+        wall.fireMoved();
+      });
+
+      this.wallEnds.forEach((wall) => {
+        wall.fireMoved();
+      });
+    */
+  }
+
+  public relativeMove(dx: number, dy: number) {
+    this.move(this.x + dx, this.y + dy);
+  }
+
   public adjacentCorners(): Corner[] {
-    const retArray = [];
+    const retArray: Corner[] = [];
     for (let i = 0; i < this.wallStarts.length; i++) {
       retArray.push(this.wallStarts[i].getEnd());
     }
@@ -53,16 +96,19 @@ export class Corner {
 
   public mergeWithIntersected(): boolean {
     const corners = this.blueprint.getCorners();
+    console.log('corners count: ', corners.length);
     for (let i = 0; i < corners.length; i++) {
       const corner = corners[i];
       if (this.distanceFromCorner(corner) < BLUEPRINT.CORNER_TOLERANCE && corner != this) {
         this.combineWithCorner(corner);
+
         return true;
       }
     }
 
-    for (var i = 0; i < this.blueprint.getWalls().length; i++) {
-      var wall = this.blueprint.getWalls()[i];
+    const walls = this.blueprint.getWalls();
+    for (var i = 0; i < walls.length; i++) {
+      var wall = walls[i];
       if (this.distanceFromWall(wall) < BLUEPRINT.CORNER_TOLERANCE && !this.isWallConnected(wall)) {
         // update position to be on wall
         var intersection = closestPointOnLine(
@@ -73,12 +119,14 @@ export class Corner {
           wall.getEnd().x,
           wall.getEnd().y
         );
+
         this.x = intersection.x;
         this.y = intersection.y;
         // merge this corner into wall by breaking wall into two parts
         this.blueprint.newWall(this, wall.getEnd());
         wall.setEnd(this);
         this.blueprint.update();
+
         return true;
       }
     }
@@ -90,7 +138,7 @@ export class Corner {
     this.x = corner.x;
     this.y = corner.y;
 
-    // absorb the other corner's wallStarts and wallEnds
+    // rewrite the other corner's wallStarts and wallEnds
     for (let i = corner.wallStarts.length - 1; i >= 0; i--) {
       corner.wallStarts[i].setStart(this);
     }
@@ -112,12 +160,16 @@ export class Corner {
   }
 
   public detachWall(wall: Wall) {
-    removeValue(this.wallStarts, wall);
-    removeValue(this.wallEnds, wall);
+    this.wallStarts = this.wallStarts.filter((w: Wall) => w !== wall);
+    this.wallEnds = this.wallEnds.filter((w: Wall) => w !== wall);
+
+    // removeValue(this.wallStarts, wall);
+    // removeValue(this.wallEnds, wall);
     if (this.wallStarts.length == 0 && this.wallEnds.length == 0) {
       this.remove();
     }
   }
+
   private removeDuplicateWalls() {
     const wallEndPoints: { [key: string]: boolean } = {};
     const wallStartPoints: { [key: string]: boolean } = {};
@@ -142,12 +194,12 @@ export class Corner {
   }
   private isWallConnected(wall: Wall): boolean {
     for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i] == wall) {
+      if (this.wallStarts[i] === wall) {
         return true;
       }
     }
     for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i] == wall) {
+      if (this.wallEnds[i] === wall) {
         return true;
       }
     }
@@ -176,16 +228,25 @@ export class Corner {
   }
 
   public remove() {
-    this.deleted_callbacks.fire(this);
+    this.deleteSubject.next(this);
   }
 
-  private removeAll() {
+  public removeAll() {
+    console.log('removeAll?');
+
     for (let i = 0; i < this.wallStarts.length; i++) {
       this.wallStarts[i].remove();
+      console.log('wallStarts?');
     }
     for (let i = 0; i < this.wallEnds.length; i++) {
       this.wallEnds[i].remove();
+      console.log('wallEnds?');
     }
+
     this.remove();
+  }
+
+  public destroy() {
+    this.deleteSubject.complete();
   }
 }

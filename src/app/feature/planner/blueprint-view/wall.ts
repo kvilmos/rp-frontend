@@ -4,6 +4,7 @@ import { Callbacks } from '../callbacks';
 import { pointDistanceFromLine } from '../utils';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
 import { HalfEdge } from '../HalfEdge';
+import { Subject } from 'rxjs';
 
 export class Wall {
   public id: string;
@@ -14,15 +15,19 @@ export class Wall {
   public backEdge: HalfEdge | null = null;
   public orphan = false;
 
+  private readonly deleteSubject = new Subject<Wall>();
+  public readonly onDelete$ = this.deleteSubject.asObservable();
+  private readonly moveSubject = new Subject<Wall>();
+  public readonly onMove$ = this.moveSubject.asObservable();
+
   private moved_callbacks = new Callbacks();
-  private deleted_callbacks = new Callbacks();
+  // private deleted_callbacks = new Callbacks();
 
   public thickness = BLUEPRINT.WALL_THICKNESS; // Configuration.getNumericValue(configWallThickness);
   public height = BLUEPRINT.WALL_HEIGHT; //Configuration.getNumericValue(configWallHeight);
 
   constructor(start: Corner, end: Corner) {
     this.id = generateUUID();
-
     this.start = start;
     this.end = end;
 
@@ -44,10 +49,6 @@ export class Wall {
 
   public getEndY(): number {
     return this.end.getY();
-  }
-
-  public fireMoved() {
-    this.moved_callbacks.fire();
   }
 
   public setStart(corner: Corner) {
@@ -89,9 +90,30 @@ export class Wall {
     this.orphan = false;
   }
 
+  public snapToAxis(tolerance: number) {
+    // order here is important, but unfortunately arbitrary
+    this.start.snapToAxis(tolerance);
+    this.end.snapToAxis(tolerance);
+  }
+
+  public relativeMove(dx: number, dy: number) {
+    this.start.relativeMove(dx, dy);
+    this.end.relativeMove(dx, dy);
+  }
+
+  public fireMoved() {
+    this.moved_callbacks.fire();
+  }
+
   public remove() {
     this.start.detachWall(this);
     this.end.detachWall(this);
-    this.deleted_callbacks.fire(this);
+    this.deleteSubject.next(this);
+    // this.deleted_callbacks.fire(this);
+  }
+
+  public destroy() {
+    this.deleteSubject.complete();
+    this.moveSubject.complete();
   }
 }
