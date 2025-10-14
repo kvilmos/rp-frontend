@@ -17,7 +17,12 @@ export class Home {
   public onClickLogout(): void {
     this.authService.logout();
   }
+
   public onClickFurnitureUpload(): void {
     this.router.navigate(['furniture-upload']);
+  }
+
+  public onClickPlanner(): void {
+    this.router.navigate(['planner']);
   }
 }

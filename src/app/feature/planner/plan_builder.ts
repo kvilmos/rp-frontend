@@ -1,5 +1,5 @@
 import { ElementRef, inject, Injectable, NgZone, OnDestroy } from '@angular/core';
-import { Blueprint } from './blueprint-view/blueprint';
+import { Blueprint } from './blueprint';
 import { BlueprintScene } from './blueprint_scene';
 import {
   CameraHelper,

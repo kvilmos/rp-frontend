@@ -6,7 +6,7 @@ import {
   inject,
   ViewChild,
 } from '@angular/core';
-import { BlueprintController } from './blueprint_control';
+import { BlueprintController } from '../blueprint_controller';
 import {
   faArrowLeft,
   faArrowsUpDownLeftRight,

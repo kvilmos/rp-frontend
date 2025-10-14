@@ -1,5 +1,5 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
-import { Corner } from './blueprint-view/corner';
+import { Corner } from './corner';
 import { pointDistanceFromLine } from './utils';
 import { BLUEPRINT } from '../../common/constants/planner-constants';
 import { HalfEdge } from './HalfEdge';

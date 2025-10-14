@@ -1,7 +1,7 @@
 import { DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } from 'three';
-import { Corner } from './blueprint-view/corner';
+import { Corner } from './corner';
 import { HalfEdge } from './HalfEdge';
-import { Blueprint } from './blueprint-view/blueprint';
+import { Blueprint } from './blueprint';
 import { map } from './utils';
 
 const defaultRoomTexture = {

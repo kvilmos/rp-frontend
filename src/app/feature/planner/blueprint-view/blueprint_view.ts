@@ -1,14 +1,14 @@
 import { ElementRef } from '@angular/core';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { BlueprintController } from './blueprint_control';
-import { Corner } from './corner';
+import { BlueprintController } from '../blueprint_controller';
+import { Corner } from '../corner';
 import { Wall } from '../wall';
 import { Room } from '../Room';
 import { HalfEdge } from '../HalfEdge';
-import { Blueprint } from './blueprint';
+import { Blueprint } from '../blueprint';
 import { cmToMeasure } from '../utils';
 
-export class BlueprintCanvas {
+export class BlueprintView {
   public canvasElement!: HTMLCanvasElement;
 
   private ctx!: CanvasRenderingContext2D;

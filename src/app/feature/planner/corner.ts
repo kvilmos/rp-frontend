@@ -1,7 +1,7 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
-import { Wall } from '../wall';
-import { closestPointOnLine, distance } from '../utils';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { Wall } from './wall';
+import { closestPointOnLine, distance } from './utils';
+import { BLUEPRINT } from '../../common/constants/planner-constants';
 import { Subject } from 'rxjs';
 import { Blueprint } from './blueprint';
 

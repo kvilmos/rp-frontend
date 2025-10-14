@@ -3,12 +3,12 @@ import { Injectable } from '@angular/core';
 import { Vector3 } from 'three';
 
 import { Subject, takeUntil } from 'rxjs';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { HalfEdge } from '../HalfEdge';
-import { Room } from '../Room';
-import { angle2pi, cycle_OnTest, removeIf, isClockwise, map, hasValue } from '../utils';
+import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { HalfEdge } from './HalfEdge';
+import { Room } from './Room';
+import { angle2pi, cycle_OnTest, removeIf, isClockwise, map, hasValue } from './utils';
 import { Corner } from './corner';
-import { Wall } from '../wall';
+import { Wall } from './wall';
 
 @Injectable({
   providedIn: 'root',

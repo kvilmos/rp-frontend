@@ -1,8 +1,8 @@
 import { ElementRef, inject, Injectable } from '@angular/core';
-import { BlueprintCanvas } from './blueprint_canvas';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { BlueprintView } from './blueprint-view/blueprint_view';
+import { BLUEPRINT } from '../../common/constants/planner-constants';
 import { Corner } from './corner';
-import { Wall } from '../wall';
+import { Wall } from './wall';
 import { Blueprint } from './blueprint';
 
 @Injectable({
@@ -33,7 +33,7 @@ export class BlueprintController {
   public activeCorner: Corner | null = null;
   public lastNode: Corner | null = null;
 
-  public view!: BlueprintCanvas;
+  public view!: BlueprintView;
 
   private readonly bpService = inject(Blueprint);
 
@@ -46,7 +46,7 @@ export class BlueprintController {
   constructor() {}
 
   public init(ref: ElementRef<HTMLCanvasElement>): void {
-    this.view = new BlueprintCanvas(ref, this, this.bpService);
+    this.view = new BlueprintView(ref, this, this.bpService);
     this.reset();
   }
 
