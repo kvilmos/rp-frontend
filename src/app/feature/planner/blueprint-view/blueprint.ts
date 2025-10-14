@@ -1,21 +1,27 @@
-import { Vector3 } from 'three';
-import { Corner } from './corner';
-import { Wall } from './wall';
-import { angle2pi, cycle_OnTest, isClockwise, map, removeIf } from '../utils';
-import { Room } from '../Room';
-import { HalfEdge } from '../HalfEdge';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { Subject, takeUntil } from 'rxjs';
+import { Injectable } from '@angular/core';
 
+import { Vector3 } from 'three';
+
+import { Subject, takeUntil } from 'rxjs';
+import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { HalfEdge } from '../HalfEdge';
+import { Room } from '../Room';
+import { angle2pi, cycle_OnTest, removeIf, isClockwise, map, hasValue } from '../utils';
+import { Corner } from './corner';
+import { Wall } from '../wall';
+
+@Injectable({
+  providedIn: 'root',
+})
 export class Blueprint {
   private corners: Corner[] = [];
   private walls: Wall[] = [];
   private rooms: Room[] = [];
+  private floorTextures: { [key: string]: boolean } = {};
 
+  private readonly updateRoomSubject = new Subject();
+  public readonly onUpdateRoom$ = this.updateRoomSubject.asObservable();
   private readonly destroy$ = new Subject<void>();
-
-  // private updated_rooms = new Callbacks();
-  // private new_corner_callbacks = new Callbacks();
 
   constructor() {}
 
@@ -32,7 +38,6 @@ export class Blueprint {
 
   private removeCorner(corner: Corner) {
     this.corners = this.corners.filter((c: Corner) => c !== corner);
-    // removeValue(this.corners, corner);
   }
 
   public newWall(start: Corner, end: Corner): Wall {
@@ -42,22 +47,12 @@ export class Blueprint {
     wall.onDelete$.pipe(takeUntil(this.destroy$)).subscribe((wallToDestroy: Wall) => {
       this.removeWall(wallToDestroy);
     });
-    /*
-    
-    var scope = this;
-      wall.fireOnDelete(() => {
-        scope.removeWall(wall);
-      });
-      this.new_wall_callbacks.fire(wall);
-      this.update();
-    */
     this.update();
 
     return wall;
   }
 
   private removeWall(wall: Wall) {
-    // removeValue(this.walls, wall);
     this.walls = this.walls.filter((w: Wall) => w !== wall);
     this.update();
   }
@@ -75,10 +70,14 @@ export class Blueprint {
   }
 
   public getCenter() {
-    return this.getDimensions();
+    return this.getDimensions(true);
   }
 
-  public getDimensions(): Vector3 {
+  public getSize() {
+    return this.getDimensions(false);
+  }
+
+  public getDimensions(center: boolean): Vector3 {
     let xMin = Infinity;
     let xMax = -Infinity;
     let zMin = Infinity;
@@ -95,7 +94,10 @@ export class Blueprint {
     if (xMin == Infinity || xMax == -Infinity || zMin == Infinity || zMax == -Infinity) {
       return new Vector3();
     }
-    return new Vector3((xMin + xMax) * 0.5, 0, (zMin + zMax) * 0.5);
+    if (center) {
+      return new Vector3((xMin + xMax) * 0.5, 0, (zMin + zMax) * 0.5);
+    }
+    return new Vector3(xMax - xMin, 0, zMax - zMin);
   }
 
   public update() {
@@ -110,12 +112,24 @@ export class Blueprint {
     }
 
     this.assignOrphanEdges();
-    // this.updateFloorTextures();
-    // this.updated_rooms.fire();
+
+    this.updateFloorTextures();
+    this.updateRoomSubject.next('update');
+  }
+
+  private updateFloorTextures() {
+    var uuids = map(this.rooms, function (room: Room) {
+      return room.getUuid();
+    });
+    for (var uuid in this.floorTextures) {
+      if (!hasValue(uuids, uuid)) {
+        delete this.floorTextures[uuid];
+      }
+    }
   }
 
   private assignOrphanEdges() {
-    // const orphanWalls = [];
+    const orphanWalls = [];
 
     for (let i = 0; i < this.walls.length; i++) {
       const wall = this.walls[i];
@@ -125,7 +139,7 @@ export class Blueprint {
         back.generatePlane();
         const front = new HalfEdge(wall, true);
         front.generatePlane();
-        // orphanWalls.push(wall);
+        orphanWalls.push(wall);
       }
     }
   }
@@ -269,8 +283,30 @@ export class Blueprint {
     return null;
   }
 
+  public wallEdges(): HalfEdge[] {
+    const edges: HalfEdge[] = [];
+
+    this.walls.forEach((wall) => {
+      if (wall.frontEdge) {
+        edges.push(wall.frontEdge);
+      }
+      if (wall.backEdge) {
+        edges.push(wall.backEdge);
+      }
+    });
+    return edges;
+  }
+
   public destroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  public getFloorTexture(uuid: string) {
+    if (uuid in this.floorTextures) {
+      return this.floorTextures[uuid];
+    } else {
+      return null;
+    }
   }
 }

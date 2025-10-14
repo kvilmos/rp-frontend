@@ -1,29 +1,68 @@
-import { AfterViewInit, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
-import { BlueprintControl } from './blueprint_control';
-import { Blueprint } from './blueprint';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  HostListener,
+  inject,
+  ViewChild,
+} from '@angular/core';
+import { BlueprintController } from './blueprint_control';
+import {
+  faArrowLeft,
+  faArrowsUpDownLeftRight,
+  faCube,
+  faHammer,
+  faPenRuler,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { DesignBuilder } from '../plan_builder';
+import { NgClass } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'rp-blueprint-view',
   templateUrl: 'blueprint-view.html',
   styleUrl: 'blueprint-view.scss',
-  imports: [],
+  imports: [FontAwesomeModule, NgClass],
 })
 export class RpBlueprintView implements AfterViewInit {
-  @ViewChild('blueprintCanvas') private canvasRef!: ElementRef<HTMLCanvasElement>;
-  private blueprint: Blueprint;
-  public blueprintCtrl!: BlueprintControl;
+  @ViewChild('blueprintCanvas') private bpCanvasRef!: ElementRef<HTMLCanvasElement>;
+  @ViewChild('designCanvas') private designCanvasRef!: ElementRef<HTMLCanvasElement>;
 
-  constructor() {
-    this.blueprint = new Blueprint();
-  }
+  public is3dViewMain = false;
+
+  public iconBack = faArrowLeft;
+  public iconMove = faArrowsUpDownLeftRight;
+  public iconDraw = faPenRuler;
+  public iconDelete = faHammer;
+  public iconDesign = faCube;
+
+  public modeMove = BLUEPRINT.MODE_MOVE;
+  public modeDraw = BLUEPRINT.MODE_DRAW;
+  public modeDelete = BLUEPRINT.MODE_DELETE;
+
+  public readonly bpController = inject(BlueprintController);
+  private readonly bpBuilder = inject(DesignBuilder);
+  constructor() {}
 
   public ngAfterViewInit(): void {
-    this.blueprintCtrl = new BlueprintControl(this.canvasRef, this.blueprint);
+    this.bpController.init(this.bpCanvasRef);
+    this.bpBuilder.init(this.designCanvasRef);
+  }
+
+  public setMode(mode: number): void {
+    this.bpController.setMode(mode);
+  }
+
+  public setView(): void {
+    this.is3dViewMain = !this.is3dViewMain;
+    this.handleWindowResize();
   }
 
   @HostListener('window:resize')
   public handleWindowResize() {
-    this.blueprintCtrl.view.handleWindowResize();
+    this.bpController.view.handleWindowResize();
+    this.bpBuilder.handleResize();
   }
 }

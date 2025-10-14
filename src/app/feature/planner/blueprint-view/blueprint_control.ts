@@ -1,11 +1,14 @@
-import { ElementRef } from '@angular/core';
+import { ElementRef, inject, Injectable } from '@angular/core';
 import { BlueprintCanvas } from './blueprint_canvas';
-import { Blueprint } from './blueprint';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
 import { Corner } from './corner';
-import { Wall } from './wall';
+import { Wall } from '../wall';
+import { Blueprint } from './blueprint';
 
-export class BlueprintControl {
+@Injectable({
+  providedIn: 'root',
+})
+export class BlueprintController {
   public mode = BLUEPRINT.MODE_DRAW;
 
   public originX = 0;
@@ -30,10 +33,9 @@ export class BlueprintControl {
   public activeCorner: Corner | null = null;
   public lastNode: Corner | null = null;
 
-  public view: BlueprintCanvas;
-  private blueprint: Blueprint;
+  public view!: BlueprintCanvas;
 
-  // public modeResetCallbacks = new Callbacks();
+  private readonly bpService = inject(Blueprint);
 
   // Const?
   private cmPerFoot = 30.48;
@@ -41,18 +43,16 @@ export class BlueprintControl {
   private cmPerPixel = this.cmPerFoot * (1.0 / this.pixelsPerFoot);
   private pixelsPerCm = 1.0 / this.cmPerPixel;
 
-  constructor(ref: ElementRef<HTMLCanvasElement>, blueprint: Blueprint) {
-    this.view = new BlueprintCanvas(ref, this, blueprint);
-    this.blueprint = blueprint;
+  constructor() {}
 
-    // after load?
+  public init(ref: ElementRef<HTMLCanvasElement>): void {
+    this.view = new BlueprintCanvas(ref, this, this.bpService);
     this.reset();
   }
 
   public setMode(mode: number) {
     this.lastNode = null;
     this.mode = mode;
-    // this.modeResetCallbacks.fire(mode);
     this.updateTarget();
   }
 
@@ -115,8 +115,8 @@ export class BlueprintControl {
 
     // hover
     if (this.mode !== BLUEPRINT.MODE_DRAW && !this.mouseDown) {
-      const hoverCorner = this.blueprint.overlappedCorner(this.mouseX, this.mouseY);
-      const hoverWall = this.blueprint.overlappedWall(this.mouseX, this.mouseY);
+      const hoverCorner = this.bpService.overlappedCorner(this.mouseX, this.mouseY);
+      const hoverWall = this.bpService.overlappedWall(this.mouseX, this.mouseY);
       let draw = false;
       if (hoverCorner !== this.activeCorner) {
         this.activeCorner = hoverCorner;
@@ -159,6 +159,7 @@ export class BlueprintControl {
         this.lastX = this.rawMouseX;
         this.lastY = this.rawMouseY;
       }
+      this.bpService.update();
       this.view.draw();
     }
   }
@@ -167,9 +168,9 @@ export class BlueprintControl {
     this.mouseDown = false;
 
     if (this.mode === BLUEPRINT.MODE_DRAW && !this.mouseMoved) {
-      const corner = this.blueprint.newCorner(this.targetX, this.targetY);
+      const corner = this.bpService.newCorner(this.targetX, this.targetY);
       if (this.lastNode) {
-        this.blueprint.newWall(this.lastNode, corner);
+        this.bpService.newWall(this.lastNode, corner);
       }
       if (corner.mergeWithIntersected() && this.lastNode != null) {
         this.setMode(BLUEPRINT.MODE_MOVE);
@@ -187,7 +188,7 @@ export class BlueprintControl {
   private resetOrigin(): void {
     const centerX = this.view.canvasElement.clientWidth / 2.0;
     const centerY = this.view.canvasElement.clientHeight / 2.0;
-    const blueprintCenter = this.blueprint.getCenter();
+    const blueprintCenter = this.bpService.getCenter();
     this.originX = blueprintCenter.x * this.pixelsPerCm - centerX;
     this.originY = blueprintCenter.z * this.pixelsPerCm - centerY;
   }

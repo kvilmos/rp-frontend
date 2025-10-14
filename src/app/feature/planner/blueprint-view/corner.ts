@@ -1,12 +1,13 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
-import { Blueprint } from './blueprint';
-import { Wall } from './wall';
+import { Wall } from '../wall';
 import { closestPointOnLine, distance } from '../utils';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
 import { Subject } from 'rxjs';
+import { Blueprint } from './blueprint';
 
 export class Corner {
   public id: string;
+
   public x: number;
   public y: number;
 
@@ -27,20 +28,18 @@ export class Corner {
 
   public snapToAxis(tolerance: number): { x: boolean; y: boolean } {
     // try to snap this corner to an axis
-    var snapped = {
+    const snapped = {
       x: false,
       y: false,
     };
 
-    var scope = this;
-
     this.adjacentCorners().forEach((corner) => {
-      if (Math.abs(corner.x - scope.x) < tolerance) {
-        scope.x = corner.x;
+      if (Math.abs(corner.x - this.x) < tolerance) {
+        this.x = corner.x;
         snapped.x = true;
       }
-      if (Math.abs(corner.y - scope.y) < tolerance) {
-        scope.y = corner.y;
+      if (Math.abs(corner.y - this.y) < tolerance) {
+        this.y = corner.y;
         snapped.y = true;
       }
     });
@@ -51,16 +50,14 @@ export class Corner {
     this.x = newX;
     this.y = newY;
     this.mergeWithIntersected();
-    // this.moved_callbacks.fire(this.x, this.y);
-    /*
-      this.wallStarts.forEach((wall) => {
-        wall.fireMoved();
-      });
 
-      this.wallEnds.forEach((wall) => {
-        wall.fireMoved();
-      });
-    */
+    this.wallStarts.forEach((wall) => {
+      wall.fireMoved();
+    });
+
+    this.wallEnds.forEach((wall) => {
+      wall.fireMoved();
+    });
   }
 
   public relativeMove(dx: number, dy: number) {
@@ -96,10 +93,9 @@ export class Corner {
 
   public mergeWithIntersected(): boolean {
     const corners = this.blueprint.getCorners();
-    console.log('corners count: ', corners.length);
     for (let i = 0; i < corners.length; i++) {
       const corner = corners[i];
-      if (this.distanceFromCorner(corner) < BLUEPRINT.CORNER_TOLERANCE && corner != this) {
+      if (this.distanceFromCorner(corner) < BLUEPRINT.CORNER_TOLERANCE && corner !== this) {
         this.combineWithCorner(corner);
 
         return true;
@@ -108,10 +104,10 @@ export class Corner {
 
     const walls = this.blueprint.getWalls();
     for (var i = 0; i < walls.length; i++) {
-      var wall = walls[i];
+      const wall = walls[i];
       if (this.distanceFromWall(wall) < BLUEPRINT.CORNER_TOLERANCE && !this.isWallConnected(wall)) {
         // update position to be on wall
-        var intersection = closestPointOnLine(
+        const intersection = closestPointOnLine(
           this.x,
           this.y,
           wall.getStart().x,
@@ -162,9 +158,6 @@ export class Corner {
   public detachWall(wall: Wall) {
     this.wallStarts = this.wallStarts.filter((w: Wall) => w !== wall);
     this.wallEnds = this.wallEnds.filter((w: Wall) => w !== wall);
-
-    // removeValue(this.wallStarts, wall);
-    // removeValue(this.wallEnds, wall);
     if (this.wallStarts.length == 0 && this.wallEnds.length == 0) {
       this.remove();
     }
@@ -192,19 +185,21 @@ export class Corner {
       }
     }
   }
+
   private isWallConnected(wall: Wall): boolean {
     for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i] === wall) {
+      if (this.wallStarts[i] == wall) {
         return true;
       }
     }
     for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i] === wall) {
+      if (this.wallEnds[i] == wall) {
         return true;
       }
     }
     return false;
   }
+
   public distanceFromWall(wall: Wall): number {
     return wall.distanceFrom(this.x, this.y);
   }

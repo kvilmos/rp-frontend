@@ -1,20 +1,25 @@
 import { ElementRef } from '@angular/core';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { BlueprintControl } from './blueprint_control';
-import { Blueprint } from './blueprint';
+import { BlueprintController } from './blueprint_control';
 import { Corner } from './corner';
-import { Wall } from './wall';
+import { Wall } from '../wall';
 import { Room } from '../Room';
 import { HalfEdge } from '../HalfEdge';
+import { Blueprint } from './blueprint';
+import { cmToMeasure } from '../utils';
 
 export class BlueprintCanvas {
   public canvasElement!: HTMLCanvasElement;
 
   private ctx!: CanvasRenderingContext2D;
-  private blueprintCtrl: BlueprintControl;
   private blueprint: Blueprint;
+  private blueprintCtrl: BlueprintController;
 
-  constructor(ref: ElementRef<HTMLCanvasElement>, control: BlueprintControl, blueprint: Blueprint) {
+  constructor(
+    ref: ElementRef<HTMLCanvasElement>,
+    control: BlueprintController,
+    blueprint: Blueprint
+  ) {
     const ctx = ref.nativeElement.getContext('2d');
     this.blueprintCtrl = control;
     this.blueprint = blueprint;
@@ -52,6 +57,10 @@ export class BlueprintCanvas {
         this.blueprintCtrl.lastNode
       );
     }
+
+    for (let i = 0; i < walls.length; i++) {
+      this.drawWallLabels(walls[i]);
+    }
   }
 
   private calculateGridOffset(n: number): number {
@@ -71,23 +80,35 @@ export class BlueprintCanvas {
     const offsetY = this.calculateGridOffset(-this.blueprintCtrl.originY);
     const width = this.canvasElement.width;
     const height = this.canvasElement.height;
+
     for (let x = 0; x <= width / BLUEPRINT.GRID_SPACING; x++) {
+      // make static
+      let gridWidth = BLUEPRINT.GRID_WIDTH;
+      if (x % 5 === 0) {
+        gridWidth += 1;
+      }
+
       this.drawLine(
         BLUEPRINT.GRID_SPACING * x + offsetX,
         0,
         BLUEPRINT.GRID_SPACING * x + offsetX,
         height,
-        BLUEPRINT.GRID_WIDTH,
+        gridWidth,
         BLUEPRINT.GRID_COLOR
       );
     }
     for (let y = 0; y <= height / BLUEPRINT.GRID_SPACING; y++) {
+      let gridWidth = BLUEPRINT.GRID_WIDTH;
+      if (y % 5 === 0) {
+        gridWidth += 1;
+      }
+
       this.drawLine(
         0,
         BLUEPRINT.GRID_SPACING * y + offsetY,
         width,
         BLUEPRINT.GRID_SPACING * y + offsetY,
-        BLUEPRINT.GRID_WIDTH,
+        gridWidth,
         BLUEPRINT.GRID_COLOR
       );
     }
@@ -99,6 +120,45 @@ export class BlueprintCanvas {
       room.corners.map((corner) => this.blueprintCtrl.convertY(corner.y)),
       true,
       BLUEPRINT.ROOM_COLOR
+    );
+  }
+
+  private drawWallLabels(wall: Wall) {
+    if (wall.backEdge && wall.frontEdge) {
+      if (wall.backEdge.interiorDistance < wall.frontEdge.interiorDistance) {
+        this.drawEdgeLabel(wall.backEdge);
+      } else {
+        this.drawEdgeLabel(wall.frontEdge);
+      }
+    } else if (wall.backEdge) {
+      this.drawEdgeLabel(wall.backEdge);
+    } else if (wall.frontEdge) {
+      this.drawEdgeLabel(wall.frontEdge);
+    }
+  }
+
+  private drawEdgeLabel(edge: HalfEdge) {
+    var pos = edge.interiorCenter();
+    var length = edge.interiorDistance();
+    if (length < 60) {
+      return;
+    }
+    this.ctx.font = 'normal 12px Arial';
+    this.ctx.fillStyle = '#000000';
+    this.ctx.textBaseline = 'middle';
+    this.ctx.textAlign = 'center';
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.lineWidth = 4;
+
+    this.ctx.strokeText(
+      cmToMeasure(length),
+      this.blueprintCtrl.convertX(pos.x),
+      this.blueprintCtrl.convertY(pos.y)
+    );
+    this.ctx.fillText(
+      cmToMeasure(length),
+      this.blueprintCtrl.convertX(pos.x),
+      this.blueprintCtrl.convertY(pos.y)
     );
   }
 
@@ -117,7 +177,7 @@ export class BlueprintCanvas {
       this.blueprintCtrl.convertY(wall.getStartY()),
       this.blueprintCtrl.convertX(wall.getEndX()),
       this.blueprintCtrl.convertY(wall.getEndY()),
-      BLUEPRINT.WALL_WIDTH, //hover ? wallWidthHover : wallWidth,
+      BLUEPRINT.WALL_WIDTH,
       color
     );
 
@@ -133,8 +193,6 @@ export class BlueprintCanvas {
     let color = BLUEPRINT.EDGE_COLOR;
     if (hover && this.blueprintCtrl.mode === BLUEPRINT.MODE_DELETE) {
       color = BLUEPRINT.DELETE_COLOR;
-    } else if (hover) {
-      color = BLUEPRINT.EDGE_COLOR_HOVER;
     }
 
     const corners = edge.corners() as Corner[];
@@ -152,15 +210,25 @@ export class BlueprintCanvas {
   private drawCorner(corner: Corner) {
     const hover = corner === this.blueprintCtrl.activeCorner;
     let color = BLUEPRINT.CORNER_COLOR;
+    let width = BLUEPRINT.CORNER_RADIUS;
     if (hover && this.blueprintCtrl.mode === BLUEPRINT.MODE_DELETE) {
       color = BLUEPRINT.DELETE_COLOR;
     } else if (hover) {
       color = BLUEPRINT.CORNER_COLOR_HOVER;
+      width = BLUEPRINT.CORNER_RADIUS_HOVER;
     }
+    // corner edge
     this.drawCircle(
       this.blueprintCtrl.convertX(corner.x),
       this.blueprintCtrl.convertY(corner.y),
-      BLUEPRINT.CORNER_RADIUS, //hover ? cornerRadiusHover : cornerRadius,
+      width + 1,
+      BLUEPRINT.EDGE_COLOR
+    );
+
+    this.drawCircle(
+      this.blueprintCtrl.convertX(corner.x),
+      this.blueprintCtrl.convertY(corner.y),
+      width,
       color
     );
   }

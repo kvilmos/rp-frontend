@@ -1,5 +1,5 @@
 import { BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from 'three';
-import { Wall } from './blueprint-view/wall';
+import { Wall } from './wall';
 import { Room } from './Room';
 import { getAngle, angle2pi, distance } from './utils';
 import { Corner } from './blueprint-view/corner';
@@ -10,7 +10,7 @@ export class HalfEdge {
 
   private room: Room | null = null;
   public wall: Wall;
-  private front: boolean;
+  public front: boolean;
 
   public offset: number;
   public height: number;
@@ -18,8 +18,8 @@ export class HalfEdge {
   public plane: Mesh | null = null;
   public interiorTransform = new Matrix4();
   public invInteriorTransform = new Matrix4();
-  private exteriorTransform = new Matrix4();
-  private invExteriorTransform = new Matrix4();
+  public exteriorTransform = new Matrix4();
+  public invExteriorTransform = new Matrix4();
 
   constructor(wall: Wall, front: boolean, room?: Room) {
     this.room = room ?? null;
@@ -36,7 +36,19 @@ export class HalfEdge {
     }
   }
 
-  //public generatePlane = function () {
+  public interiorDistance(): number {
+    const start = this.interiorStart();
+    const end = this.interiorEnd();
+    return distance(start.x, start.y, end.x, end.y);
+  }
+
+  public interiorCenter(): { x: number; y: number } {
+    return {
+      x: (this.interiorStart().x + this.interiorEnd().x) / 2.0,
+      y: (this.interiorStart().y + this.interiorEnd().y) / 2.0,
+    };
+  }
+
   public generatePlane = () => {
     function transformCorner(corner: Corner) {
       return new Vector3(corner.x, 0, corner.y);
@@ -218,32 +230,6 @@ export class HalfEdge {
       v2endX = v1.getEnd().x + (v1.getEnd().x - v1.getStart().x);
       v2endY = v1.getEnd().y + (v1.getEnd().y - v1.getStart().y);
     }
-    /*
-    if (!v1 && v2) {
-      v1startX = v2.getStart().x - (v2.getEnd().x - v2.getStart().x);
-      v1startY = v2.getStart().y - (v2.getEnd().y - v2.getStart().y);
-      v1endX = v2.getStart().x;
-      v1endY = v2.getStart().y;
-      } else if (v1) {
-        v1startX = <number>v1.getStart().x;
-        v1startY = <number>v1.getStart().y;
-        v1endX = v1.getEnd().x;
-        v1endY = v1.getEnd().y;
-        }
-        
-        
-        if (!v2 && v1) {
-          v2startX = v1.getEnd().x;
-          v2startY = v1.getEnd().y;
-          v2endX = v1.getEnd().x + (v1.getEnd().x - v1.getStart().x);
-          v2endY = v1.getEnd().y + (v1.getEnd().y - v1.getStart().y);
-          } else if (v2) {
-            v2startX = v2.getStart().x;
-            v2startY = v2.getStart().y;
-            v2endX = v2.getEnd().x;
-            v2endY = v2.getEnd().y;
-            }
-            */
 
     const theta = angle2pi(v1startX - v1endX, v1startY - v1endY, v2endX - v1endX, v2endY - v1endY);
 

@@ -1,14 +1,20 @@
 import { DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } from 'three';
-import { Blueprint } from './blueprint-view/blueprint';
 import { Corner } from './blueprint-view/corner';
 import { HalfEdge } from './HalfEdge';
+import { Blueprint } from './blueprint-view/blueprint';
+import { map } from './utils';
+
+const defaultRoomTexture = {
+  url: 'rooms/textures/hardwood.png',
+  scale: 400,
+};
 
 export class Room {
   private blueprint: Blueprint;
   public corners: Corner[];
 
   /** floor plane for intersection testing */
-  public floorPlane: Mesh | null = null;
+  public floorMesh: Mesh | null = null;
   private edgePointer: HalfEdge | null = null;
 
   public interiorCorners: Corner[] = [];
@@ -22,6 +28,14 @@ export class Room {
     this.generatePlane();
   }
 
+  public getUuid(): string {
+    const cornerUuids = map(this.corners, function (c: Corner) {
+      return c.id;
+    });
+    cornerUuids.sort();
+    return cornerUuids.join();
+  }
+
   private generatePlane() {
     const points: Vector2[] = [];
 
@@ -31,10 +45,10 @@ export class Room {
 
     const shape = new Shape(points);
     const geometry = new ShapeGeometry(shape);
-    this.floorPlane = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
-    this.floorPlane.visible = false;
-    this.floorPlane.rotation.set(Math.PI / 2, 0, 0);
-    (<any>this.floorPlane).room = this; // js monkey patch ???
+    this.floorMesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
+    this.floorMesh.visible = false;
+    this.floorMesh.rotation.set(Math.PI / 2, 0, 0);
+    (<any>this.floorMesh).room = this; // js monkey patch ???
   }
 
   private updateInteriorCorners() {
@@ -61,7 +75,6 @@ export class Room {
       const firstCorner = this.corners[i];
       const secondCorner = this.corners[(i + 1) % this.corners.length];
 
-      // find if wall is heading in that direction
       const wallTo = firstCorner.wallTo(secondCorner);
       const wallFrom = firstCorner.wallFrom(secondCorner);
 
@@ -71,16 +84,15 @@ export class Room {
       } else if (wallFrom) {
         edge = new HalfEdge(wallFrom, false, this);
       } else {
-        // something horrible has happened
         console.log('ROOM:updateWalls() corners are not connected by a wall, uh oh');
       }
 
-      if (i == 0) {
+      if (i === 0) {
         firstEdge = edge;
       } else {
         edge!.prev = prevEdge;
         prevEdge!.next = edge;
-        if (i + 1 == this.corners.length) {
+        if (i + 1 === this.corners.length) {
           firstEdge!.prev = edge;
           edge!.next = firstEdge;
         }
@@ -89,5 +101,11 @@ export class Room {
     }
 
     this.edgePointer = firstEdge;
+  }
+
+  public getTexture() {
+    var uuid = this.getUuid();
+    var tex = this.blueprint.getFloorTexture(uuid);
+    return tex || defaultRoomTexture;
   }
 }

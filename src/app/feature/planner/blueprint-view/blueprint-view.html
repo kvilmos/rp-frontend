@@ -1,9 +1,41 @@
-<div class="blueprint">
+<div>
+  <div class="nav">
+    <fa-icon class="nav-back" [icon]="iconBack"></fa-icon>
+    <div class="nav-title">Room Editor</div>
+  </div>
+</div>
+<div
+  [ngClass]="{
+    blueprint: !is3dViewMain,
+    design: is3dViewMain
+  }"
+>
   <canvas
     #blueprintCanvas
-    (mousedown)="blueprintCtrl.onMouseDown()"
-    (mouseup)="blueprintCtrl.onMouseUp()"
-    (mousemove)="blueprintCtrl.onMouseMove($event)"
-    class="blueprintCanvas"
+    (mousedown)="bpController.onMouseDown()"
+    (mouseup)="bpController.onMouseUp()"
+    (mousemove)="bpController.onMouseMove($event)"
   ></canvas>
+</div>
+<div
+  [ngClass]="{
+    design: !is3dViewMain,
+    blueprint: is3dViewMain
+  }"
+>
+  <canvas #designCanvas></canvas>
+  <button (click)="setView()">
+    <fa-icon [icon]="iconDesign" class="fa-lg icon"></fa-icon> Change View
+  </button>
+</div>
+<div class="controls">
+  <button (click)="setMode(modeMove)">
+    <fa-icon [icon]="iconMove" class="fa-lg icon"></fa-icon> Move walls
+  </button>
+  <button (click)="setMode(modeDraw)">
+    <fa-icon [icon]="iconDraw" class="fa-lg icon"></fa-icon> Draw walls
+  </button>
+  <button (click)="setMode(modeDelete)">
+    <fa-icon [icon]="iconDelete" class="fa-lg icon"></fa-icon> Delete walls
+  </button>
 </div>

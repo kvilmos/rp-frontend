@@ -161,3 +161,16 @@ export function isClockwise(points: any[][]): boolean {
   }
   return tSum >= 0;
 }
+
+export function hasValue<T>(array: T[], value: T): boolean {
+  for (var tI = 0; tI < array.length; tI++) {
+    if (array[tI] === value) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function cmToMeasure(cm: number): string {
+  return '' + Math.round(10 * cm) / 1000 + ' m';
+}

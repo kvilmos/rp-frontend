@@ -1,10 +1,15 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
-import { Corner } from './corner';
-import { Callbacks } from '../callbacks';
-import { pointDistanceFromLine } from '../utils';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { HalfEdge } from '../HalfEdge';
+import { Corner } from './blueprint-view/corner';
+import { pointDistanceFromLine } from './utils';
+import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { HalfEdge } from './HalfEdge';
 import { Subject } from 'rxjs';
+
+const defaultWallTexture = {
+  url: 'rooms/textures/wallmap.png',
+  stretch: true,
+  scale: 0,
+};
 
 export class Wall {
   public id: string;
@@ -13,6 +18,10 @@ export class Wall {
 
   public frontEdge: HalfEdge | null = null;
   public backEdge: HalfEdge | null = null;
+
+  public frontTexture = defaultWallTexture;
+  public backTexture = defaultWallTexture;
+
   public orphan = false;
 
   private readonly deleteSubject = new Subject<Wall>();
@@ -20,11 +29,8 @@ export class Wall {
   private readonly moveSubject = new Subject<Wall>();
   public readonly onMove$ = this.moveSubject.asObservable();
 
-  private moved_callbacks = new Callbacks();
-  // private deleted_callbacks = new Callbacks();
-
-  public thickness = BLUEPRINT.WALL_THICKNESS; // Configuration.getNumericValue(configWallThickness);
-  public height = BLUEPRINT.WALL_HEIGHT; //Configuration.getNumericValue(configWallHeight);
+  public thickness = BLUEPRINT.WALL_THICKNESS;
+  public height = BLUEPRINT.WALL_HEIGHT;
 
   constructor(start: Corner, end: Corner) {
     this.id = generateUUID();
@@ -91,7 +97,6 @@ export class Wall {
   }
 
   public snapToAxis(tolerance: number) {
-    // order here is important, but unfortunately arbitrary
     this.start.snapToAxis(tolerance);
     this.end.snapToAxis(tolerance);
   }
@@ -102,14 +107,13 @@ export class Wall {
   }
 
   public fireMoved() {
-    this.moved_callbacks.fire();
+    this.moveSubject.next(this);
   }
 
   public remove() {
     this.start.detachWall(this);
     this.end.detachWall(this);
     this.deleteSubject.next(this);
-    // this.deleted_callbacks.fire(this);
   }
 
   public destroy() {
