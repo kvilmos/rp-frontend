@@ -15,7 +15,6 @@ import {
   PerspectiveCamera,
   WebGLRenderer,
   GridHelper,
-  Color,
   AmbientLight,
   DirectionalLight,
   Object3D,
@@ -74,7 +73,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
 
   private createPreviewCanvas(): void {
     this.mainScene = new Scene();
-    this.mainScene.background = new Color(PREVIEW.BACKGROUND_COLOR_LIGHT);
+    this.mainScene.background = PREVIEW.BACKGROUND_COLOR_LIGHT;
     this.mainGrid = new GridHelper(
       PREVIEW.GRID_SIZE,
       PREVIEW.GRID_DIVISION,

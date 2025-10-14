@@ -41,24 +41,24 @@
   width: 10rem;
 }
 
-button {
+.bp-button {
   display: flex;
   flex-direction: row;
   align-items: center;
   border-radius: 2em;
   cursor: pointer;
 
-  background-color: var(--button-primary-background-color);
-  color: var(--button-primary-color);
+  background-color: var(--button-secondary-background-color);
+  color: var(--button-secondary-color);
 
   border: none;
   border-style: solid;
   border-width: 1px;
-  border-color: var(--button-primary-border-color);
+  border-color: var(--button-secondary-border-color);
 
   transition: background-color 0.2s ease-in-out, transform 0.1s ease;
   &:hover {
-    background-color: var(--button-primary-background-color_hover);
+    background-color: var(--button-secondary-background-color_hover);
   }
 
   &:active {

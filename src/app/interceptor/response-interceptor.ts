@@ -8,7 +8,7 @@ export const responseInterceptor: HttpInterceptorFn = (req, next) => {
       if (event instanceof HttpResponse) {
         const body = event.body as ResponseFrame<any>;
 
-        if (body && typeof body.success == 'boolean') {
+        if (body && typeof body.success === 'boolean') {
           if (body.success) {
             return event.clone({ body: body.data });
           } else {

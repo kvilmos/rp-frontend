@@ -4,9 +4,7 @@ import { BlueprintScene } from './blueprint_scene';
 import {
   CameraHelper,
   DirectionalLight,
-  GridHelper,
   HemisphereLight,
-  ImageUtils,
   PCFSoftShadowMap,
   PerspectiveCamera,
   Vector3,

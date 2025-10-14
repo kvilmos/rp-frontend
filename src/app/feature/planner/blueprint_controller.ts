@@ -1,10 +1,12 @@
 import { ElementRef, inject, Injectable } from '@angular/core';
-import { BlueprintView } from './blueprint-view/blueprint_view';
+import { BlueprintView } from './blueprint_view';
 import { BLUEPRINT } from '../../common/constants/planner-constants';
 import { Corner } from './corner';
 import { Wall } from './wall';
 import { Blueprint } from './blueprint';
 
+const cmPerPixel = 1.0;
+const pixelsPerCm = 1.0;
 @Injectable({
   providedIn: 'root',
 })
@@ -36,13 +38,6 @@ export class BlueprintController {
   public view!: BlueprintView;
 
   private readonly bpService = inject(Blueprint);
-
-  // Const?
-  private cmPerFoot = 30.48;
-  private pixelsPerFoot = 15.0;
-  private cmPerPixel = this.cmPerFoot * (1.0 / this.pixelsPerFoot);
-  private pixelsPerCm = 1.0 / this.cmPerPixel;
-
   constructor() {}
 
   public init(ref: ElementRef<HTMLCanvasElement>): void {
@@ -100,11 +95,11 @@ export class BlueprintController {
     this.rawMouseY = event.clientY;
 
     this.mouseX =
-      (event.clientX - this.view.canvasElement.getBoundingClientRect().left) * this.cmPerPixel +
-      this.originX * this.cmPerPixel;
+      (event.clientX - this.view.canvasElement.getBoundingClientRect().left) * cmPerPixel +
+      this.originX * cmPerPixel;
     this.mouseY =
-      (event.clientY - this.view.canvasElement.getBoundingClientRect().top) * this.cmPerPixel +
-      this.originY * this.cmPerPixel;
+      (event.clientY - this.view.canvasElement.getBoundingClientRect().top) * cmPerPixel +
+      this.originY * cmPerPixel;
 
     if (
       this.mode === BLUEPRINT.MODE_DRAW ||
@@ -152,8 +147,8 @@ export class BlueprintController {
         this.activeCorner.snapToAxis(BLUEPRINT.SNAP_TOLERANCE);
       } else if (this.activeWall) {
         this.activeWall.relativeMove(
-          (this.rawMouseX - this.lastX) * this.cmPerPixel,
-          (this.rawMouseY - this.lastY) * this.cmPerPixel
+          (this.rawMouseX - this.lastX) * cmPerPixel,
+          (this.rawMouseY - this.lastY) * cmPerPixel
         );
         this.activeWall.snapToAxis(BLUEPRINT.SNAP_TOLERANCE);
         this.lastX = this.rawMouseX;
@@ -172,7 +167,7 @@ export class BlueprintController {
       if (this.lastNode) {
         this.bpService.newWall(this.lastNode, corner);
       }
-      if (corner.mergeWithIntersected() && this.lastNode != null) {
+      if (corner.mergeWithIntersected() && this.lastNode !== null) {
         this.setMode(BLUEPRINT.MODE_MOVE);
       }
 
@@ -189,15 +184,15 @@ export class BlueprintController {
     const centerX = this.view.canvasElement.clientWidth / 2.0;
     const centerY = this.view.canvasElement.clientHeight / 2.0;
     const blueprintCenter = this.bpService.getCenter();
-    this.originX = blueprintCenter.x * this.pixelsPerCm - centerX;
-    this.originY = blueprintCenter.z * this.pixelsPerCm - centerY;
+    this.originX = blueprintCenter.x * pixelsPerCm - centerX;
+    this.originY = blueprintCenter.z * pixelsPerCm - centerY;
   }
 
   public convertX(x: number): number {
-    return (x - this.originX * this.cmPerPixel) * this.pixelsPerCm;
+    return (x - this.originX * cmPerPixel) * pixelsPerCm;
   }
 
   public convertY(y: number): number {
-    return (y - this.originY * this.cmPerPixel) * this.pixelsPerCm;
+    return (y - this.originY * cmPerPixel) * pixelsPerCm;
   }
 }

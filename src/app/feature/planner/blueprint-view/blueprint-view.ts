@@ -16,15 +16,17 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { DesignBuilder } from '../plan_builder';
+import { DesignBuilder } from '../designe_builder';
 import { NgClass } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'rp-blueprint-view',
   templateUrl: 'blueprint-view.html',
   styleUrl: 'blueprint-view.scss',
-  imports: [FontAwesomeModule, NgClass],
+  imports: [FontAwesomeModule, NgClass, TranslatePipe],
 })
 export class RpBlueprintView implements AfterViewInit {
   @ViewChild('blueprintCanvas') private bpCanvasRef!: ElementRef<HTMLCanvasElement>;
@@ -42,9 +44,14 @@ export class RpBlueprintView implements AfterViewInit {
   public modeDraw = BLUEPRINT.MODE_DRAW;
   public modeDelete = BLUEPRINT.MODE_DELETE;
 
-  public readonly bpController = inject(BlueprintController);
   private readonly bpBuilder = inject(DesignBuilder);
+  public readonly bpController = inject(BlueprintController);
+  private readonly router = inject(Router);
   constructor() {}
+
+  public onClickBack(): void {
+    this.router.navigate(['']);
+  }
 
   public ngAfterViewInit(): void {
     this.bpController.init(this.bpCanvasRef);

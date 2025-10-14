@@ -14,7 +14,7 @@ import {
   Vector3,
 } from 'three';
 import { BlueprintScene } from './blueprint_scene';
-import { HalfEdge } from './HalfEdge';
+import { HalfEdge } from './half_edge';
 import { Wall } from './wall';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { DESIGN } from '../../common/constants/planner-constants';

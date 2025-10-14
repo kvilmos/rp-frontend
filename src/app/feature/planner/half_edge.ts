@@ -1,8 +1,8 @@
 import { BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { Wall } from './wall';
-import { Room } from './Room';
 import { getAngle, angle2pi, distance } from './utils';
 import { Corner } from './corner';
+import { Room } from './room';
 
 export class HalfEdge {
   public next: HalfEdge | null = null;
@@ -132,7 +132,7 @@ export class HalfEdge {
     invTransform.copy(transform).invert;
   }
 
-  private getStart() {
+  private getStart(): Corner {
     if (this.front) {
       return this.wall.getStart();
     } else {
@@ -140,7 +140,7 @@ export class HalfEdge {
     }
   }
 
-  private getEnd() {
+  private getEnd(): Corner {
     if (this.front) {
       return this.wall.getEnd();
     } else {

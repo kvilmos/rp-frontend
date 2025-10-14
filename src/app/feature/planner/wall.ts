@@ -2,7 +2,7 @@ import { generateUUID } from 'three/src/math/MathUtils.js';
 import { Corner } from './corner';
 import { pointDistanceFromLine } from './utils';
 import { BLUEPRINT } from '../../common/constants/planner-constants';
-import { HalfEdge } from './HalfEdge';
+import { HalfEdge } from './half_edge';
 import { Subject } from 'rxjs';
 
 const defaultWallTexture = {

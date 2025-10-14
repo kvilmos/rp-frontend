@@ -4,11 +4,11 @@ import { Vector3 } from 'three';
 
 import { Subject, takeUntil } from 'rxjs';
 import { BLUEPRINT } from '../../common/constants/planner-constants';
-import { HalfEdge } from './HalfEdge';
-import { Room } from './Room';
+import { HalfEdge } from './half_edge';
 import { angle2pi, cycle_OnTest, removeIf, isClockwise, map, hasValue } from './utils';
 import { Corner } from './corner';
 import { Wall } from './wall';
+import { Room } from './room';
 
 @Injectable({
   providedIn: 'root',
@@ -69,11 +69,11 @@ export class Blueprint {
     return this.rooms;
   }
 
-  public getCenter() {
+  public getCenter(): Vector3 {
     return this.getDimensions(true);
   }
 
-  public getSize() {
+  public getSize(): Vector3 {
     return this.getDimensions(false);
   }
 
@@ -91,7 +91,7 @@ export class Blueprint {
       if (corner.y > zMax) zMax = corner.y;
     }
 
-    if (xMin == Infinity || xMax == -Infinity || zMin == Infinity || zMax == -Infinity) {
+    if (xMin === Infinity || xMax === -Infinity || zMin === Infinity || zMax === -Infinity) {
       return new Vector3();
     }
     if (center) {
@@ -100,7 +100,7 @@ export class Blueprint {
     return new Vector3(xMax - xMin, 0, zMax - zMin);
   }
 
-  public update() {
+  public update(): void {
     for (let i = 0; i < this.walls.length; i++) {
       this.walls[i].resetFrontBack();
     }
@@ -117,7 +117,7 @@ export class Blueprint {
     this.updateRoomSubject.next('update');
   }
 
-  private updateFloorTextures() {
+  private updateFloorTextures(): void {
     var uuids = map(this.rooms, function (room: Room) {
       return room.getUuid();
     });
@@ -128,7 +128,7 @@ export class Blueprint {
     }
   }
 
-  private assignOrphanEdges() {
+  private assignOrphanEdges(): void {
     const orphanWalls = [];
 
     for (let i = 0; i < this.walls.length; i++) {
@@ -297,7 +297,7 @@ export class Blueprint {
     return edges;
   }
 
-  public destroy() {
+  public destroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }

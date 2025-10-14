@@ -6,7 +6,6 @@ import { Scene } from 'three';
 })
 export class BlueprintScene {
   private scene: Scene;
-  private item = [];
   public needsUpdate = false;
 
   constructor() {

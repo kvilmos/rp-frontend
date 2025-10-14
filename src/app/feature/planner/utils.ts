@@ -48,7 +48,7 @@ export function closestPointOnLine(
 
   let tXx, tYy;
 
-  if (tParam < 0 || (x1 == x2 && y1 == y2)) {
+  if (tParam < 0 || (x1 === x2 && y1 === y2)) {
     tXx = x1;
     tYy = y1;
   } else if (tParam > 1) {
@@ -152,7 +152,7 @@ export function isClockwise(points: any[][]): boolean {
   for (var tI = 0; tI < tNewPoints.length; tI++) {
     var tC1 = tNewPoints[tI];
     var tC2: any;
-    if (tI == tNewPoints.length - 1) {
+    if (tI === tNewPoints.length - 1) {
       tC2 = tNewPoints[0];
     } else {
       tC2 = tNewPoints[tI + 1];

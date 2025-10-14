@@ -1,12 +1,12 @@
 import { ElementRef } from '@angular/core';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { BlueprintController } from '../blueprint_controller';
-import { Corner } from '../corner';
-import { Wall } from '../wall';
-import { Room } from '../Room';
-import { HalfEdge } from '../HalfEdge';
-import { Blueprint } from '../blueprint';
-import { cmToMeasure } from '../utils';
+import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { BlueprintController } from './blueprint_controller';
+import { Corner } from './corner';
+import { Wall } from './wall';
+import { Room } from './room';
+import { HalfEdge } from './half_edge';
+import { Blueprint } from './blueprint';
+import { cmToMeasure } from './utils';
 
 export class BlueprintView {
   public canvasElement!: HTMLCanvasElement;
@@ -82,33 +82,23 @@ export class BlueprintView {
     const height = this.canvasElement.height;
 
     for (let x = 0; x <= width / BLUEPRINT.GRID_SPACING; x++) {
-      // make static
-      let gridWidth = BLUEPRINT.GRID_WIDTH;
-      if (x % 5 === 0) {
-        gridWidth += 1;
-      }
-
       this.drawLine(
         BLUEPRINT.GRID_SPACING * x + offsetX,
         0,
         BLUEPRINT.GRID_SPACING * x + offsetX,
         height,
-        gridWidth,
+        BLUEPRINT.GRID_WIDTH,
         BLUEPRINT.GRID_COLOR
       );
     }
-    for (let y = 0; y <= height / BLUEPRINT.GRID_SPACING; y++) {
-      let gridWidth = BLUEPRINT.GRID_WIDTH;
-      if (y % 5 === 0) {
-        gridWidth += 1;
-      }
 
+    for (let y = 0; y <= height / BLUEPRINT.GRID_SPACING; y++) {
       this.drawLine(
         0,
         BLUEPRINT.GRID_SPACING * y + offsetY,
         width,
         BLUEPRINT.GRID_SPACING * y + offsetY,
-        gridWidth,
+        BLUEPRINT.GRID_WIDTH,
         BLUEPRINT.GRID_COLOR
       );
     }
@@ -140,15 +130,15 @@ export class BlueprintView {
   private drawEdgeLabel(edge: HalfEdge) {
     var pos = edge.interiorCenter();
     var length = edge.interiorDistance();
-    if (length < 60) {
+    if (length < BLUEPRINT.LABEL_LENGTH_THRESHOLD) {
       return;
     }
-    this.ctx.font = 'normal 12px Arial';
-    this.ctx.fillStyle = '#000000';
-    this.ctx.textBaseline = 'middle';
-    this.ctx.textAlign = 'center';
-    this.ctx.strokeStyle = '#ffffff';
-    this.ctx.lineWidth = 4;
+    this.ctx.font = BLUEPRINT.LABEL_FONT;
+    this.ctx.fillStyle = BLUEPRINT.LABEL_COLOR;
+    this.ctx.textBaseline = BLUEPRINT.LABEL_BASELINE;
+    this.ctx.textAlign = BLUEPRINT.LABEL_ALIGN;
+    this.ctx.strokeStyle = BLUEPRINT.LABEL_STROKE_COLOR;
+    this.ctx.lineWidth = BLUEPRINT.LABEL_STROKE_WIDTH;
 
     this.ctx.strokeText(
       cmToMeasure(length),
@@ -177,7 +167,7 @@ export class BlueprintView {
       this.blueprintCtrl.convertY(wall.getStartY()),
       this.blueprintCtrl.convertX(wall.getEndX()),
       this.blueprintCtrl.convertY(wall.getEndY()),
-      BLUEPRINT.WALL_WIDTH,
+      hover ? BLUEPRINT.WALL_WIDTH_HOVER : BLUEPRINT.WALL_WIDTH,
       color
     );
 

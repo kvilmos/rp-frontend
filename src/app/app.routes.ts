@@ -5,6 +5,7 @@ import { Home } from './feature/home/home';
 import { authGuard } from './guard/auth-guard';
 import { NotFound } from './core/not-found/not-found';
 import { loggedInGuard } from './guard/logged-in-guard';
+import { RpBlueprintView } from './feature/planner/blueprint-view/blueprint-view';
 
 export const routes: Routes = [
   {
@@ -20,6 +21,11 @@ export const routes: Routes = [
   {
     path: 'furniture-upload',
     component: FurnitureUpload,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'planner',
+    component: RpBlueprintView,
     canActivate: [authGuard],
   },
   {

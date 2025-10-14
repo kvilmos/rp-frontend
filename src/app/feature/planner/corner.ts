@@ -60,7 +60,7 @@ export class Corner {
     });
   }
 
-  public relativeMove(dx: number, dy: number) {
+  public relativeMove(dx: number, dy: number): void {
     this.move(this.x + dx, this.y + dy);
   }
 
@@ -75,11 +75,11 @@ export class Corner {
     return retArray;
   }
 
-  public attachStart(wall: Wall) {
+  public attachStart(wall: Wall): void {
     this.wallStarts.push(wall);
   }
 
-  public attachEnd(wall: Wall) {
+  public attachEnd(wall: Wall): void {
     this.wallEnds.push(wall);
   }
 
@@ -130,7 +130,7 @@ export class Corner {
     return false;
   }
 
-  private combineWithCorner(corner: Corner) {
+  private combineWithCorner(corner: Corner): void {
     this.x = corner.x;
     this.y = corner.y;
 
@@ -155,15 +155,15 @@ export class Corner {
     return distance(x, y, this.x, this.y);
   }
 
-  public detachWall(wall: Wall) {
+  public detachWall(wall: Wall): void {
     this.wallStarts = this.wallStarts.filter((w: Wall) => w !== wall);
     this.wallEnds = this.wallEnds.filter((w: Wall) => w !== wall);
-    if (this.wallStarts.length == 0 && this.wallEnds.length == 0) {
+    if (this.wallStarts.length === 0 && this.wallEnds.length === 0) {
       this.remove();
     }
   }
 
-  private removeDuplicateWalls() {
+  private removeDuplicateWalls(): void {
     const wallEndPoints: { [key: string]: boolean } = {};
     const wallStartPoints: { [key: string]: boolean } = {};
     for (let i = this.wallStarts.length - 1; i >= 0; i--) {
@@ -188,12 +188,12 @@ export class Corner {
 
   private isWallConnected(wall: Wall): boolean {
     for (let i = 0; i < this.wallStarts.length; i++) {
-      if (this.wallStarts[i] == wall) {
+      if (this.wallStarts[i] === wall) {
         return true;
       }
     }
     for (let i = 0; i < this.wallEnds.length; i++) {
-      if (this.wallEnds[i] == wall) {
+      if (this.wallEnds[i] === wall) {
         return true;
       }
     }
@@ -222,26 +222,22 @@ export class Corner {
     return null;
   }
 
-  public remove() {
+  public remove(): void {
     this.deleteSubject.next(this);
   }
 
-  public removeAll() {
-    console.log('removeAll?');
-
+  public removeAll(): void {
     for (let i = 0; i < this.wallStarts.length; i++) {
       this.wallStarts[i].remove();
-      console.log('wallStarts?');
     }
     for (let i = 0; i < this.wallEnds.length; i++) {
       this.wallEnds[i].remove();
-      console.log('wallEnds?');
     }
 
     this.remove();
   }
 
-  public destroy() {
+  public destroy(): void {
     this.deleteSubject.complete();
   }
 }
