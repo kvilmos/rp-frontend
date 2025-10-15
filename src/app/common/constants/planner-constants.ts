@@ -1,0 +1,61 @@
+import { Color } from 'three';
+
+export const PLANNER = {};
+
+export const BLUEPRINT = {
+  DEFAULT_TOLERANCE: 10.0,
+  DELETE_COLOR: '#fc7676',
+
+  CORNER_COLOR: '#BAADA0',
+  CORNER_COLOR_HOVER: '#685a4c',
+  CORNER_RADIUS: 6,
+  CORNER_RADIUS_HOVER: 7,
+  CORNER_TOLERANCE: 20,
+
+  EDGE_COLOR: '#888888',
+  EDGE_WIDTH: 1,
+
+  GRID_SPACING: 20,
+  GRID_WIDTH: 1,
+  GRID_COLOR: '#ccc',
+
+  MODE_MOVE: 1,
+  MODE_DRAW: 2,
+  MODE_DELETE: 3,
+
+  LABEL_ALIGN: 'center' as CanvasTextAlign,
+  LABEL_BASELINE: 'middle' as CanvasTextBaseline,
+  LABEL_COLOR: '#000000',
+  LABEL_FONT: 'normal 12px Arial',
+  LABEL_LENGTH_THRESHOLD: 60,
+  LABEL_STROKE_COLOR: '#ffffff',
+  LABEL_STROKE_WIDTH: 4,
+
+  ROOM_COLOR: '#ffffff',
+
+  SNAP_TOLERANCE: 25,
+
+  WALL_COLOR: '#dddddd',
+  WALL_COLOR_HOVER: '#685a4c',
+  WALL_WIDTH: 5,
+  WALL_WIDTH_HOVER: 10,
+  WALL_HEIGHT: 250,
+  WALL_THICKNESS: 10,
+};
+
+export const DESIGN = {
+  BACKGROUND_COLOR_LIGHT: new Color(0xeeeeee),
+  BACKGROUND_COLOR_DARK: new Color(0x323231),
+
+  CAMERA_FOV: 70,
+  CAMERA_NEAR_PLANE: 0.01,
+  CAMERA_FAR_PLANE: 100,
+
+  EDGE_FILLER_COLOR: 0xdddddd,
+  EDGE_SIDE_COLOR: 0xcccccc,
+  EDGE_BASE_COLOR: 0xdddddd,
+
+  GRID_SIZE: 5,
+  GRID_DIVISION: 50,
+  GRID_PRIMARY_COLOR: 0xcfceca,
+};

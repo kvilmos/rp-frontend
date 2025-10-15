@@ -1,0 +1,36 @@
+<div>
+  <div class="nav">
+    <fa-icon class="nav-back" [icon]="iconBack" (click)="onClickBack()"></fa-icon>
+    <div class="nav-title">{{ 'blueprint.editorTitle' | translate }}</div>
+  </div>
+</div>
+<div class="blueprint" [ngClass]="">
+  <canvas
+    #blueprintCanvas
+    (mousedown)="bpController.onMouseDown()"
+    (mouseup)="bpController.onMouseUp()"
+    (mousemove)="bpController.onMouseMove($event)"
+    class="blueprintCanvas"
+  ></canvas>
+</div>
+<div class="design">
+  <canvas #designCanvas></canvas>
+  <button (click)="setView()" class="bp-button">
+    <fa-icon [icon]="iconDesign" class="fa-lg icon"></fa-icon>
+    {{ 'blueprint.button.changeView' | translate }}
+  </button>
+</div>
+<div class="controls">
+  <button (click)="setMode(modeMove)" class="bp-button">
+    <fa-icon [icon]="iconMove" class="fa-lg icon"></fa-icon>
+    {{ 'blueprint.button.move' | translate }}
+  </button>
+  <button (click)="setMode(modeDraw)" class="bp-button">
+    <fa-icon [icon]="iconDraw" class="fa-lg icon"></fa-icon>
+    {{ 'blueprint.button.draw' | translate }}
+  </button>
+  <button (click)="setMode(modeDelete)" class="bp-button">
+    <fa-icon [icon]="iconDelete" class="fa-lg icon"></fa-icon>
+    {{ 'blueprint.button.delete' | translate }}
+  </button>
+</div>
