@@ -1,0 +1,18 @@
+<div>filter</div>
+@if (furnitureList && furnitureList.furniture.length > 0) {
+<div class="grid-view">
+  @for (item of furnitureList.furniture; track $index) {
+  <div class="item">
+    <img [src]="item.thumbnailUrl" [alt]="item.name" (click)="onSelectFurniture(item)" />
+    <div class="details">{{ item.name }}</div>
+  </div>
+  }
+</div>
+<div class="paginator">
+  {{ furnitureList.prevPage }}
+  {{ furnitureList.currPage }}
+  {{ furnitureList.nextPage }}
+</div>
+} @else {
+<div>no item</div>
+}
