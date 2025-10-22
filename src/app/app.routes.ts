@@ -6,11 +6,18 @@ import { authGuard } from './guard/auth-guard';
 import { NotFound } from './core/not-found/not-found';
 import { loggedInGuard } from './guard/logged-in-guard';
 import { RpBlueprintView } from './feature/planner/blueprint-view/blueprint-view';
+import { RpFurnitureList } from './feature/furniture/furniture-list/furniture-list';
+import { MainLayout } from './layout/main-layout/main-layout';
 
 export const routes: Routes = [
   {
     path: '',
-    component: Home,
+    component: MainLayout,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: 'home', component: Home },
+      { path: 'furniture/page/:page', component: RpFurnitureList },
+    ],
     canActivate: [authGuard],
   },
   {
@@ -31,5 +38,6 @@ export const routes: Routes = [
   {
     path: '**',
     component: NotFound,
+    canActivate: [loggedInGuard],
   },
 ];

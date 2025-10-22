@@ -1,0 +1,21 @@
+<div class="selector-panel">
+  @if (furnitureList && furnitureList.length > 0) {
+  <div class="grid-view">
+    @for (item of furnitureList; track item.id) {
+    <div class="item">
+      <picture (click)="onSelectFurniture(item)">
+        <img [src]="item.thumbnailUrl" [alt]="item.name" />
+      </picture>
+    </div>
+    }
+  </div>
+  } @else if (!loading) {
+  <p>There is no furniture. :c</p>
+  } @if (hasNextPage) {
+  <div class="load-trigger" #loadTrigger>
+    loading... @if(loading) {
+    <p>loading ...</p>
+    }
+  </div>
+  }
+</div>

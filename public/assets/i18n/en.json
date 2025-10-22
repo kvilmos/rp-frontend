@@ -25,8 +25,11 @@
   },
   "common": {
     "cancel": "Cancel",
-    "submit": "Submit"
+    "submit": "Submit",
+    "pageNext": "Next",
+    "pagePrevious": "Previous"
   },
+
   "furniture": {
     "chooseFile": "Choose File",
     "fileName": "File name",
@@ -75,5 +78,10 @@
       "dropFile": "Drop files here or",
       "supportedFormats": "Supports"
     }
+  },
+  "sorting": {
+    "latest": "Latest",
+    "oldest": "Oldest",
+    "sorting": "Sorting"
   }
 }
