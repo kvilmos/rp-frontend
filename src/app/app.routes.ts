@@ -16,7 +16,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
-      { path: 'furniture', component: rpFurnitureList },
+      { path: 'furniture/page/:page', component: rpFurnitureList },
     ],
     canActivate: [authGuard],
   },

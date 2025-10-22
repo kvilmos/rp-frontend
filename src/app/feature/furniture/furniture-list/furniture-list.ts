@@ -1,45 +1,51 @@
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectorRef, Component, EventEmitter, inject, Output } from '@angular/core';
 import { Furniture } from '../furniture';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, switchMap } from 'rxjs';
 import { FurniturePage } from '../furniture-page';
+import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   standalone: true,
   selector: 'rp-furniture-list',
   templateUrl: 'furniture-list.html',
   styleUrl: 'furniture-list.scss',
-  imports: [],
+  imports: [RouterLink, TranslatePipe],
 })
 export class rpFurnitureList {
   @Output() onSelect = new EventEmitter<Furniture>();
 
   public furnitureList!: FurniturePage;
-  private furnitureSub!: Subscription;
+  private routeSub!: Subscription;
 
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
   constructor() {}
 
   public ngOnInit(): void {
-    console.log('Komponens inicializálva, most iratkozunk fel.');
-    this.furnitureSub = this.getFurniture().subscribe({
-      next: (data: FurniturePage) => {
-        console.log('Adat sikeresen megérkezett:', data);
-        this.furnitureList = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Hiba történt az API hívás során:', err);
-      },
-      complete: () => {
-        console.log('API hívás befejeződött.');
-      },
-    });
+    this.routeSub = this.route.paramMap
+      .pipe(
+        switchMap((params: ParamMap) => {
+          const pageParam = params.get('page');
+          const page = pageParam ? Number.parseInt(pageParam, 10) : 1;
+          return this.getFurniture(page);
+        })
+      )
+      .subscribe({
+        next: (data: FurniturePage) => {
+          this.furnitureList = data;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Hiba történt az API hívás során:', err);
+        },
+      });
   }
 
-  private getFurniture(): Observable<FurniturePage> {
-    return this.http.get<FurniturePage>('/api/furniture/page/1');
+  public getFurniture(page: number): Observable<FurniturePage> {
+    return this.http.get<FurniturePage>(`/api/furniture/page/${page}`);
   }
 
   public onSelectFurniture(furniture: Furniture) {
@@ -47,8 +53,8 @@ export class rpFurnitureList {
   }
 
   public ngOnDestroy(): void {
-    if (this.furnitureSub) {
-      this.furnitureSub.unsubscribe();
+    if (this.routeSub) {
+      this.routeSub.unsubscribe();
     }
   }
 }

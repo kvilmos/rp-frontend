@@ -33,3 +33,30 @@
   margin-bottom: 0.4em;
   font-weight: 600;
 }
+.pagination {
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+}
+
+.pagination * {
+  padding: 1em;
+  text-decoration: none;
+  border: solid 1px rgb(188, 188, 188);
+  border-radius: 5px;
+  transition: color 0.2s;
+  color: #000;
+}
+.current-page {
+  background-color: rgb(227, 227, 227);
+  color: #c0c0c0;
+}
+
+.pagination a:visited {
+  text-decoration: none;
+}
+
+.pagination a:hover {
+  color: #8bb1ff;
+}

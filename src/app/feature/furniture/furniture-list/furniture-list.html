@@ -8,10 +8,40 @@
   </div>
   }
 </div>
-<div class="paginator">
-  {{ furnitureList.prevPage }}
-  {{ furnitureList.currPage }}
-  {{ furnitureList.nextPage }}
+<div class="pagination">
+  @if (furnitureList.prevPage >= 1) {
+  <a [routerLink]="['/furniture/page', furnitureList.prevPage]">{{
+    'common.pagePrevious' | translate
+  }}</a>
+  }@else{
+  <span class="current-page">Previous</span>
+  } @if (furnitureList.currPage >3 ){
+  <a [routerLink]="'/furniture/page/1'">1</a>
+  <span>...</span>
+  } @if (furnitureList.prevPage-1 >= 1) {
+  <a [routerLink]="['/furniture/page', furnitureList.prevPage - 1]">{{
+    furnitureList.prevPage - 1
+  }}</a
+  >} @if (furnitureList.prevPage >= 1) {
+  <a [routerLink]="['/furniture/page', furnitureList.prevPage]">{{ furnitureList.prevPage }}</a>
+  }
+  <span class="current-page">{{ furnitureList.currPage }}</span>
+  @if (furnitureList.nextPage <= furnitureList.totalPages) {
+  <a [routerLink]="['/furniture/page', furnitureList.nextPage]">{{ furnitureList.nextPage }}</a>
+  } @if (furnitureList.nextPage+1 <= furnitureList.totalPages) {
+  <a [routerLink]="['/furniture/page', furnitureList.nextPage + 1]">{{
+    furnitureList.nextPage + 1
+  }}</a>
+  } @if (furnitureList.currPage < furnitureList.totalPages-2){
+  <span>...</span>
+  <a [routerLink]="['/furniture/page', furnitureList.totalPages]">{{ furnitureList.totalPages }}</a>
+  } @if (furnitureList.nextPage <= furnitureList.totalPages) {
+  <a [routerLink]="['/furniture/page', furnitureList.nextPage]">{{
+    'common.pageNext' | translate
+  }}</a>
+  }@else {
+  <span class="current-page">Next</span>
+  }
 </div>
 } @else {
 <div>no item</div>

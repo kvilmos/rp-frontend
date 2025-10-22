@@ -4,6 +4,6 @@ export interface FurniturePage {
   nextPage: number;
   prevPage: number;
   currPage: number;
-  totalPage: number;
+  totalPages: number;
   furniture: Furniture[];
 }

@@ -25,7 +25,9 @@
   },
   "common": {
     "cancel": "Cancel",
-    "submit": "Submit"
+    "submit": "Submit",
+    "pageNext": "Next",
+    "pagePrevious": "Previous"
   },
   "furniture": {
     "chooseFile": "Choose File",
