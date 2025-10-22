@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Furniture } from '../furniture';
-import { FurniturePage } from '../furniture-page';
+import { FurniturePage } from '../furniture_page';
 
 @Component({
   standalone: true,

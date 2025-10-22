@@ -1,4 +1,11 @@
-<div>filter</div>
+<div class="filter">
+  {{ 'sorting.sorting' | translate }}
+  <select [(ngModel)]="activeFilters.sortByCreateAt" (ngModelChange)="setSorting($event)">
+    <option class="filter-option" [value]="'latest'">{{ 'sorting.latest' | translate }}</option>
+    <option class="filter-option" [ngValue]="'oldest'">{{ 'sorting.oldest' | translate }}</option>
+  </select>
+</div>
+
 @if (furnitureList && furnitureList.furniture.length > 0) {
 <div class="grid-view">
   @for (item of furnitureList.furniture; track $index) {
@@ -10,35 +17,54 @@
 </div>
 <div class="pagination">
   @if (furnitureList.prevPage >= 1) {
-  <a [routerLink]="['/furniture/page', furnitureList.prevPage]">{{
-    'common.pagePrevious' | translate
-  }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.prevPage]"
+    >{{ 'common.pagePrevious' | translate }}</a
+  >
   }@else{
   <span class="current-page">Previous</span>
   } @if (furnitureList.currPage >3 ){
-  <a [routerLink]="'/furniture/page/1'">1</a>
+  <a [queryParamsHandling]="'preserve'" [routerLink]="'/furniture/page/1'">1</a>
   <span>...</span>
   } @if (furnitureList.prevPage-1 >= 1) {
-  <a [routerLink]="['/furniture/page', furnitureList.prevPage - 1]">{{
-    furnitureList.prevPage - 1
-  }}</a
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.prevPage - 1]"
+    >{{ furnitureList.prevPage - 1 }}</a
   >} @if (furnitureList.prevPage >= 1) {
-  <a [routerLink]="['/furniture/page', furnitureList.prevPage]">{{ furnitureList.prevPage }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.prevPage]"
+    >{{ furnitureList.prevPage }}</a
+  >
   }
   <span class="current-page">{{ furnitureList.currPage }}</span>
   @if (furnitureList.nextPage <= furnitureList.totalPages) {
-  <a [routerLink]="['/furniture/page', furnitureList.nextPage]">{{ furnitureList.nextPage }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.nextPage]"
+    >{{ furnitureList.nextPage }}</a
+  >
   } @if (furnitureList.nextPage+1 <= furnitureList.totalPages) {
-  <a [routerLink]="['/furniture/page', furnitureList.nextPage + 1]">{{
-    furnitureList.nextPage + 1
-  }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.nextPage + 1]"
+    >{{ furnitureList.nextPage + 1 }}</a
+  >
   } @if (furnitureList.currPage < furnitureList.totalPages-2){
   <span>...</span>
-  <a [routerLink]="['/furniture/page', furnitureList.totalPages]">{{ furnitureList.totalPages }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.totalPages]"
+    >{{ furnitureList.totalPages }}</a
+  >
   } @if (furnitureList.nextPage <= furnitureList.totalPages) {
-  <a [routerLink]="['/furniture/page', furnitureList.nextPage]">{{
-    'common.pageNext' | translate
-  }}</a>
+  <a
+    [queryParamsHandling]="'preserve'"
+    [routerLink]="['/furniture/page', furnitureList.nextPage]"
+    >{{ 'common.pageNext' | translate }}</a
+  >
   }@else {
   <span class="current-page">Next</span>
   }
