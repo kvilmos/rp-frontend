@@ -3,7 +3,7 @@
 <div class="grid-view">
   @for (item of furnitureList.furniture; track $index) {
   <div class="item">
-    <img [src]="item.thumbnailUrl" [alt]="item.name" (click)="onSelectFurniture(item)" />
+    <img [src]="item.thumbnailUrl" [alt]="item.name" />
     <div class="details">{{ item.name }}</div>
   </div>
   }

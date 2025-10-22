@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { ChangeDetectorRef, Component, EventEmitter, inject, Output } from '@angular/core';
-import { Furniture } from '../furniture';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { Observable, Subscription, switchMap } from 'rxjs';
 import { FurniturePage } from '../furniture-page';
 import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
@@ -13,9 +12,7 @@ import { TranslatePipe } from '@ngx-translate/core';
   styleUrl: 'furniture-list.scss',
   imports: [RouterLink, TranslatePipe],
 })
-export class rpFurnitureList {
-  @Output() onSelect = new EventEmitter<Furniture>();
-
+export class RpFurnitureList {
   public furnitureList!: FurniturePage;
   private routeSub!: Subscription;
 
@@ -39,17 +36,13 @@ export class rpFurnitureList {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Hiba történt az API hívás során:', err);
+          console.error(err);
         },
       });
   }
 
   public getFurniture(page: number): Observable<FurniturePage> {
     return this.http.get<FurniturePage>(`/api/furniture/page/${page}`);
-  }
-
-  public onSelectFurniture(furniture: Furniture) {
-    this.onSelect.emit(furniture);
   }
 
   public ngOnDestroy(): void {
