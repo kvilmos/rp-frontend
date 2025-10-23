@@ -14,14 +14,15 @@ import { Room } from './room';
   providedIn: 'root',
 })
 export class Blueprint {
+  public id!: number;
   private corners: Corner[] = [];
   private walls: Wall[] = [];
   private rooms: Room[] = [];
   private floorTextures: { [key: string]: boolean } = {};
 
+  private readonly destroy$ = new Subject<void>();
   private readonly updateRoomSubject = new Subject();
   public readonly onUpdateRoom$ = this.updateRoomSubject.asObservable();
-  private readonly destroy$ = new Subject<void>();
 
   constructor() {}
 

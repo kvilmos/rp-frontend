@@ -41,12 +41,20 @@ export class Wall {
     this.end.attachEnd(this);
   }
 
+  public getStartId(): string {
+    return this.start.id;
+  }
+
   public getStartX(): number {
     return this.start.getX();
   }
 
   public getStartY(): number {
     return this.start.getY();
+  }
+
+  public getEndId(): string {
+    return this.end.id;
   }
 
   public getEndX(): number {

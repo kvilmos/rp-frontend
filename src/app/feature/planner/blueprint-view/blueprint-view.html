@@ -34,7 +34,7 @@
       <hr class="line" />
       <div class="tools">
         <fa-icon class="fa-xl" [icon]="iconView" (click)="setView()"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconSave"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
         <fa-icon class="fa-xl" [icon]="iconDeleteBp"></fa-icon>
       </div>
     </div>
@@ -42,17 +42,17 @@
       <div class="title-tools">{{ 'blueprint.titleBlueprint' | translate }}</div>
       <hr class="line" />
       <div class="tools">
-        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setMode(modeMove)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDraw" (click)="setMode(modeDraw)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDelWalls" (click)="setMode(modeDelete)"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setBlueprintTool(bpMove)"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconDraw" (click)="setBlueprintTool(bpDraw)"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconDelWalls" (click)="setBlueprintTool(bpDel)"></fa-icon>
       </div>
     </div>
     <div class="design-tools">
       <div class="title-tools">{{ 'blueprint.titleDesign' | translate }}</div>
       <hr class="line" />
       <div class="tools">
-        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setDesignSate(designMove)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDelItem" (click)="setDesignSate(designDelete)"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setDesignTool(designMove)"></fa-icon>
+        <fa-icon class="fa-xl" [icon]="iconDelItem" (click)="setDesignTool(designDelete)"></fa-icon>
       </div>
       <div class="item-selector">
         <rp-furniture-selector (onSelect)="onSelectFurniture($event)"></rp-furniture-selector>
