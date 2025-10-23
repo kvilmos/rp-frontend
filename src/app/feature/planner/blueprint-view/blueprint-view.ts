@@ -19,12 +19,12 @@ import {
   faSave,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { DesignBuilder } from '../designe_builder';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { DesignBuilder } from '../design_builder';
 import { NgClass } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Furniture } from '../../furniture/furniture';
 import { BlueprintScene } from '../blueprint_scene';
 import { Vector3 } from 'three';
@@ -72,7 +72,6 @@ export class RpBlueprintView implements AfterViewInit {
   public readonly designController = inject(DesignController);
   private readonly designBuilder = inject(DesignBuilder);
 
-  private readonly router = inject(Router);
   constructor() {}
 
   public ngAfterViewInit(): void {
