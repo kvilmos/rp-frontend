@@ -12,18 +12,22 @@ import {
 } from 'three';
 import { DESIGN } from '../../common/constants/planner-constants';
 import { Floor } from './floor';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Edge } from './edge';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class DesignBuilder implements OnDestroy {
-  private renderer!: WebGLRenderer;
-  private camera!: PerspectiveCamera;
-  private animationFrameId!: number;
+  public renderer!: WebGLRenderer;
   private canvas!: HTMLCanvasElement;
-  private controls!: OrbitControls;
+  private animationFrameId!: number;
+
+  public camera!: PerspectiveCamera;
+  public cameraController!: OrbitControls;
+
+  /*public heightMargin = 0;
+  public widthMargin = 0;
+  public elementHeight = 0;
+  public elementWidth = 0;*/
 
   private dirLight!: DirectionalLight;
   private hemisphereLight!: HemisphereLight;
@@ -34,7 +38,6 @@ export class DesignBuilder implements OnDestroy {
   private readonly scene = inject(BlueprintScene);
   private readonly blueprint = inject(Blueprint);
   private readonly zone = inject(NgZone);
-
   constructor() {}
 
   public init(canvasRef: ElementRef<HTMLCanvasElement>) {
@@ -50,33 +53,28 @@ export class DesignBuilder implements OnDestroy {
     this.renderer.shadowMap.type = PCFSoftShadowMap;
     this.scene.getScene().background = DESIGN.BACKGROUND_COLOR_LIGHT;
 
-    // skyBox
-    // controller
-
-    this.controls = new OrbitControls(this.camera, this.canvas);
-    this.camera.position.set(0, 2000, 0);
-
-    this.handleResize();
-    this.centerCamera();
-
-    this.blueprint.onUpdateRoom$.pipe().subscribe((data) => {
-      console.log('onUpdateRoom', data);
-      this.loadBlueprint();
-      this.updateShadowCamera();
-    });
-
     this.loadLights();
     this.loadBlueprint();
 
-    this.controls.addEventListener('change', () => {
+    // skyBox
+
+    this.cameraController = new OrbitControls(this.camera, this.canvas);
+    this.cameraController.addEventListener('change', () => {
       for (let i = 0; i < this.floorMeshes.length; i++) {
         this.edgeMeshes[i].updateVisibility();
       }
     });
 
-    this.startRenderingLoop();
+    this.camera.position.set(0, 2000, 0);
+    this.handleResize();
+    this.centerCamera();
 
-    // mouse-canvas related controls
+    this.blueprint.onUpdateRoom$.pipe().subscribe((_) => {
+      this.loadBlueprint();
+      this.updateShadowCamera();
+    });
+
+    this.startRenderingLoop();
   }
 
   public loadLights(): void {
@@ -143,32 +141,54 @@ export class DesignBuilder implements OnDestroy {
 
     const edges = this.blueprint.wallEdges();
     for (let i = 0; i < edges.length; i++) {
-      const edge = new Edge(this.scene, edges[i], this.controls);
+      const edge = new Edge(this.scene, edges[i], this.cameraController);
       this.edgeMeshes.push(edge);
     }
 
     this.scene.needsUpdate = true;
   }
 
-  private centerCamera() {
+  private centerCamera(): void {
     const yOffset = 1500.0;
 
     const pan = this.blueprint.getCenter();
     pan.y = yOffset;
     const distance = this.blueprint.getSize().z * 1.5;
 
-    var offset = pan.clone().add(new Vector3(0, distance, distance));
+    const offset = pan.clone().add(new Vector3(0, distance, distance));
     this.camera.position.copy(offset);
 
-    // this.controls.update();
+    this.cameraController.update();
   }
+
+  /*
+  public projectVector(vec3: Vector3, ignoreMargin: boolean = false): Vector2 {
+    const widthHalf = this.elementWidth / 2;
+    const heightHalf = this.elementHeight / 2;
+
+    const vector = new Vector3();
+    vector.copy(vec3);
+    vector.project(this.camera);
+
+    const vec2 = new Vector2();
+    vec2.x = vector.x * widthHalf + widthHalf;
+    vec2.y = -(vector.y * heightHalf) + heightHalf;
+
+    if (!ignoreMargin) {
+      vec2.x += this.widthMargin;
+      vec2.y += this.heightMargin;
+    }
+    
+    return vec2;
+  }
+  */
 
   public startRenderingLoop(): void {
     this.zone.runOutsideAngular(() => {
       const render = () => {
         this.renderer.render(this.scene.getScene(), this.camera);
         this.animationFrameId = requestAnimationFrame(render);
-        this.controls.update();
+        this.cameraController.update();
       };
       render();
     });
@@ -183,17 +203,23 @@ export class DesignBuilder implements OnDestroy {
   public handleResize(): void {
     const parent = this.canvas.parentElement;
     if (parent) {
-      const width = parent.clientHeight;
-      const height = parent.clientWidth;
+      const width = parent.clientWidth;
+      const height = parent.clientHeight;
+
+      /*this.heightMargin = this.canvas.offsetTop;
+      this.widthMargin = this.canvas.offsetLeft;
+
+      this.elementWidth = this.canvas.width;
+      this.elementHeight = window.innerHeight - this.heightMargin;*/
+
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
+
       this.renderer.setSize(width, height);
     }
     if (this.camera && this.renderer) {
     }
   }
 
-  public ngOnDestroy(): void {
-    this.stopRenderingLoop();
-  }
+  public ngOnDestroy(): void {}
 }

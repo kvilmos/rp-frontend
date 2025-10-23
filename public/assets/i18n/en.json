@@ -15,19 +15,16 @@
     "signUp": "Sign Up"
   },
   "blueprint": {
-    "editorTitle": "Room Editor",
-    "button": {
-      "changeView": "Change View",
-      "delete": "Delete walls",
-      "draw": "Draw walls",
-      "move": "Move walls"
-    }
+    "titleBlueprint": "Blueprint",
+    "titleDesign": "Design",
+    "titlePage": "Room Editor",
+    "titleTools": "Toolbar"
   },
   "common": {
     "cancel": "Cancel",
-    "submit": "Submit",
     "pageNext": "Next",
-    "pagePrevious": "Previous"
+    "pagePrevious": "Previous",
+    "submit": "Submit"
   },
 
   "furniture": {
