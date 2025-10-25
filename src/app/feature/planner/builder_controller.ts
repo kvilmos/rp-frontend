@@ -1,9 +1,6 @@
 import { BlueprintScene } from './blueprint_scene';
 import {
-  BufferGeometry,
   Intersection,
-  Line,
-  LineBasicMaterial,
   Mesh,
   MeshBasicMaterial,
   Object3D,
@@ -18,21 +15,13 @@ import { Item } from './item';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ElementRef, inject, Injectable } from '@angular/core';
 
+const LAYER_FURNITURE = 0;
 export enum ControllerState {
   UNSELECTED,
   SELECTED,
   DRAGGING,
   ROTATING,
   DELETE,
-}
-
-const LAYER_FURNITURE = 0;
-
-function createRaycastDebugger(start: Vector3, end: Vector3): Line {
-  const geometry = new BufferGeometry().setFromPoints([start, end]);
-  const material = new LineBasicMaterial({ color: 0xff00ff });
-  const line = new Line(geometry, material);
-  return line;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -113,9 +102,13 @@ export class DesignController {
   private onExit(state: number): void {
     switch (state) {
       case ControllerState.UNSELECTED:
+        break;
       case ControllerState.SELECTED:
+        break;
       case ControllerState.DRAGGING:
+        break;
       case ControllerState.ROTATING:
+        break;
     }
   }
 
@@ -191,7 +184,7 @@ export class DesignController {
     }
   }
 
-  public mouseDownEvent(event: MouseEvent): void {
+  public mouseDownEvent(): void {
     this.mouseMoved = false;
     this.mouseDown = true;
 
@@ -240,7 +233,7 @@ export class DesignController {
     }
   }
 
-  public mouseUpEvent(event: MouseEvent): void {
+  public mouseUpEvent(): void {
     this.mouseDown = false;
 
     switch (this.state) {

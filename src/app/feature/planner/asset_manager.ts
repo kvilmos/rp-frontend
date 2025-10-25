@@ -8,8 +8,8 @@ import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 })
 export class AssetManager {
   private readonly loader = new GLTFLoader();
-
   private readonly modelCache = new Map<number, Group>();
+  constructor() {}
 
   public async getModel(furniture: Furniture): Promise<Group> {
     if (this.modelCache.has(furniture.id)) {

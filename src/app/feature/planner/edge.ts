@@ -39,16 +39,11 @@ export class Edge {
     this.wall = edge.wall;
     this.front = edge.front;
 
-    // missing event handler: redraw
-    // missing event handler: camera
-
     this.updateMesh();
     this.addToScene();
   }
 
   public remove(): void {
-    // this.edge.redrawCallbacks.remove(redraw);
-    // this.controls.cameraMovedCallbacks.remove(updateVisibility);
     this.removeFromScene();
   }
 
@@ -263,20 +258,7 @@ export class Edge {
     this.edgeMeshes.forEach((plane) => {
       plane.visible = this.visible;
     });
-
-    // this.updateObjectVisibility();
   }
-
-  /*
-    private updateObjectVisibility(): void {
-      this.wall.items.forEach((item) => {
-        item.updateEdgeVisibility(this.visible, this.front);
-      });
-      this.wall.onItems.forEach((item) => {
-        item.updateEdgeVisibility(this.visible, this.front);
-      });
-    }
-  */
 
   private toVec2(pos: { x: number; y: number }): Vector2 {
     return new Vector2(pos.x, pos.y);

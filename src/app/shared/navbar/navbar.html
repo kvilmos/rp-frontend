@@ -3,8 +3,9 @@
     <a class="title" routerLink="/home">Room Planner</a>
     <div class="anchors">
       <a routerLink="/furniture/page/1">Furniture list</a>
+      <a routerLink="/blueprint/page/1">Blueprint list</a>
       <a routerLink="/furniture-upload">upload furniture</a>
-      <a routerLink="/planner">Room Editor</a>
+      <button (click)="onCreateBlueprint()">New Blueprint</button>
     </div>
   </div>
   <button (click)="onClickLogout()">log out</button>

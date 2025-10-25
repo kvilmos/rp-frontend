@@ -20,9 +20,9 @@
     <div class="blueprint" [ngClass]="{ hidden: showBp }">
       <canvas
         #designCanvas
-        (mousedown)="designController.mouseDownEvent($event)"
-        (mouseup)="designController.mouseUpEvent($event)"
-        (mousemove)="designController.mouseMoveEvent($event)"
+        (mousedown)="designBuilder.onMouseDown()"
+        (mouseup)="designBuilder.onMouseUp()"
+        (mousemove)="designBuilder.onMouseMove($event)"
       >
       </canvas>
     </div>

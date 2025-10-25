@@ -4,6 +4,8 @@ import {
   ElementRef,
   HostListener,
   inject,
+  OnDestroy,
+  OnInit,
   ViewChild,
 } from '@angular/core';
 import { BlueprintController } from '../blueprint_controller';
@@ -14,24 +16,27 @@ import {
   faCube,
   faEraser,
   faHammer,
+  faL,
   faPencil,
   faPenRuler,
   faSave,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DesignBuilder } from '../design_builder';
 import { NgClass } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Furniture } from '../../furniture/furniture';
 import { BlueprintScene } from '../blueprint_scene';
 import { Vector3 } from 'three';
-import { PlaceholderItem } from '../placeholder_item';
-import { ControllerState, DesignController } from '../builder_controller';
+import { ControllerState } from '../builder_controller';
 import { RpFurnitureSelector } from '../../furniture/furniture-selector/furniture-selector';
 import { BlueprintApiService } from '../blueprint-api-service';
+import { Blueprint } from '../blueprint';
+import { CompleteBlueprint } from '../blueprint_load';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { CornerSave, WallSave, ItemSave, BlueprintSave } from '../save_blueprint';
 
 @Component({
   standalone: true,
@@ -40,7 +45,7 @@ import { BlueprintApiService } from '../blueprint-api-service';
   styleUrl: 'blueprint-view.scss',
   imports: [FontAwesomeModule, NgClass, TranslatePipe, RpFurnitureSelector, RouterLink],
 })
-export class RpBlueprintView implements AfterViewInit {
+export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('blueprintCanvas') private bpCanvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('designCanvas') private designCanvasRef!: ElementRef<HTMLCanvasElement>;
 
@@ -62,26 +67,46 @@ export class RpBlueprintView implements AfterViewInit {
   public bpDel = BLUEPRINT.MODE_DELETE;
   public designMove = ControllerState.UNSELECTED;
   public designDelete = ControllerState.DELETE;
-
   public readonly bpController = inject(BlueprintController);
-  public readonly designController = inject(DesignController);
+  public readonly designBuilder = inject(DesignBuilder);
 
+  private isViewInitialized = false;
+  private blueprintData: CompleteBlueprint | undefined;
   private readonly bpScene = inject(BlueprintScene);
-  private readonly designBuilder = inject(DesignBuilder);
-
+  private readonly blueprint = inject(Blueprint);
   private readonly bpApi = inject(BlueprintApiService);
+  private readonly route = inject(ActivatedRoute);
   constructor() {}
 
+  public ngOnInit(): void {
+    this.route.data.subscribe((data) => {
+      this.blueprintData = data['blueprint'];
+
+      if (this.isViewInitialized) {
+        this.initializeFullScene();
+      }
+    });
+  }
+
   public ngAfterViewInit(): void {
-    this.bpApi.InitBlueprint();
+    this.designBuilder.start(this.designCanvasRef);
     this.bpController.init(this.bpCanvasRef);
-    this.designBuilder.init(this.designCanvasRef);
-    this.designController.init(
-      this.designCanvasRef,
-      this.designBuilder.renderer,
-      this.designBuilder.camera,
-      this.designBuilder.cameraController
-    );
+    this.isViewInitialized = true;
+
+    if (this.blueprintData) {
+      this.initializeFullScene();
+    }
+  }
+
+  private async initializeFullScene(): Promise<void> {
+    if (!this.blueprintData) {
+      return;
+    }
+
+    this.blueprint.loadBlueprint(this.blueprintData);
+    await this.bpScene.loadItems(this.blueprintData);
+
+    this.bpController.view.draw();
   }
 
   public setBlueprintTool(mode: number): void {
@@ -92,7 +117,7 @@ export class RpBlueprintView implements AfterViewInit {
   }
 
   public setDesignTool(state: ControllerState) {
-    this.designController.switchState(state);
+    this.designBuilder.setDesignTool(state);
     if (this.showBp) {
       this.setView();
     }
@@ -100,9 +125,9 @@ export class RpBlueprintView implements AfterViewInit {
 
   public setView(): void {
     this.showBp = !this.showBp;
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       this.handleWindowResize();
-    }, 0);
+    });
   }
 
   public async onSelectFurniture(furniture: Furniture): Promise<void> {
@@ -111,44 +136,60 @@ export class RpBlueprintView implements AfterViewInit {
     }
     this.setDesignTool(this.designMove);
 
-    const initialPosition = new Vector3();
-    const placeholderItem = new PlaceholderItem(this.bpScene, initialPosition);
-    this.bpScene.add(placeholderItem);
-    this.bpScene.getItems().push(placeholderItem);
-
     try {
-      const finalItem = await this.bpScene.addItem(
-        8,
-        furniture,
-        placeholderItem.position,
-        placeholderItem.rotation.y,
-        new Vector3(100, 100, 100)
-      );
-
-      finalItem.position.copy(placeholderItem.position);
-      finalItem.rotation.copy(placeholderItem.rotation);
-
-      // TODO: Add some kind of state management like subscriber
-      /*
-      if (this.designController.selectedObject === placeholderItem) {
-        this.designController.setSelectedObject(finalItem);
-      }
-      */
-
-      this.bpScene.removeItem(placeholderItem);
+      await this.bpScene.addItem(3, furniture, new Vector3(), 0, new Vector3(100, 100, 100));
     } catch (error) {
-      console.error(error);
-      placeholderItem.setError();
+      throw console.error(error);
     }
   }
 
   public saveBlueprint(): void {
-    this.bpApi.saveBlueprint();
+    if (!this.blueprint.id) {
+      throw console.error('Cannot save blueprint without an ID!');
+    }
+
+    const corners = this.blueprint
+      .getCorners()
+      .map((c): CornerSave => ({ id: c.id, x: c.x, y: c.y }));
+
+    const walls = this.blueprint
+      .getWalls()
+      .map((w): WallSave => ({ startCornerId: w.getStartId(), endCornerId: w.getEndId() }));
+
+    const items = this.bpScene.getItems().map(
+      (i): ItemSave => ({
+        furnitureId: i.furniture.id,
+        posX: i.position.x,
+        posY: i.position.y,
+        posZ: i.position.z,
+        rot: i.rotation.y,
+      })
+    );
+
+    const saveBp: BlueprintSave = {
+      id: this.blueprint.id,
+      corners: corners,
+      walls: walls,
+      items: items,
+    };
+
+    this.bpApi.uploadBlueprint(saveBp).subscribe({
+      next: () => {},
+      error: (error) => {
+        throw console.error(error);
+      },
+    });
   }
 
   @HostListener('window:resize')
   public handleWindowResize() {
     this.bpController.view.handleWindowResize();
     this.designBuilder.handleResize();
+  }
+
+  public ngOnDestroy(): void {
+    this.designBuilder.stop();
+    this.blueprint.clear();
+    this.bpScene.clear();
   }
 }

@@ -1,0 +1,14 @@
+@if (pageData && pageData.blueprints.length > 0) {
+<div>
+  @for (item of pageData.blueprints; track item.id) {
+  <div class="bp-card">
+    <div class="details">{{ item.id }}</div>
+    <div class="details">{{ item.createAt }}</div>
+    <div class="details">{{ item.modifiedAt }}</div>
+    <a [routerLink]="['/room-editor', item.id]">
+      <button>edit</button>
+    </a>
+  </div>
+  }
+</div>
+}

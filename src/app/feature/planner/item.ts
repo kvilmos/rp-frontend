@@ -70,7 +70,6 @@ export abstract class Item extends Group {
     this.receiveShadow = false;
     this.position_set = !!position;
 
-    // ROTATION RING
     const size = new Vector3();
     box.getSize(size);
 

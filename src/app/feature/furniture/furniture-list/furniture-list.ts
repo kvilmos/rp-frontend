@@ -15,10 +15,10 @@ import { FurnitureFilters } from '../furniture_filter';
   imports: [RouterLink, TranslatePipe, FormsModule, ReactiveFormsModule],
 })
 export class RpFurnitureList implements OnInit {
+  public activeFilters: FurnitureFilters = {};
+
   public furnitureList!: FurniturePage;
   private routeSub!: Subscription;
-
-  public activeFilters: FurnitureFilters = {};
 
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);

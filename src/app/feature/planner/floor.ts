@@ -19,9 +19,6 @@ export class Floor {
   constructor(scene: BlueprintScene, room: Room) {
     this.scene = scene;
     this.room = room;
-
-    // missing event handler: onFloorChange event calls the redraw function. It is probably not finished in the master code.
-
     this.floorMesh = this.buildFloor();
   }
 
@@ -32,7 +29,7 @@ export class Floor {
   }
 
   private buildFloor(): Mesh {
-    const textureSettings = this.room.getTexture();
+    // const textureSettings = this.room.getTexture();
     this.textureLoader.load('');
     //var floorTexture = ImageUtils.loadTexture(textureSettings.url);
 
