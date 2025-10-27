@@ -26,7 +26,6 @@
     "pagePrevious": "Previous",
     "submit": "Submit"
   },
-
   "furniture": {
     "chooseFile": "Choose File",
     "fileName": "File name",
@@ -51,6 +50,7 @@
       "min": "The email must be at least {{requiredLength}} characters long.",
       "required": "The email field is required."
     },
+
     "unexpectedError": "Opps! Something went wrong. Please tye again in little while.",
     "internalServerError": "We're sorry, something went wrong on our end. Please try again in a little while",
     "invalidLoginCredentials": "We couldn't find an account with that email and password.",
@@ -68,6 +68,15 @@
     "minlength": "Please enter at least {{requiredLength}} characters.",
     "passwordMismatch": "The passwords do not match.",
     "required": "This field is required."
+  },
+  "home": {
+    "createBlueprint": "Design Your Space",
+    "savedBlueprints": "My Projects",
+    "uploadedFurniture": "My Collection",
+    "sloganCreateBlueprint": "Begin a new project and bring your ideal room to life.",
+    "sloganSavedBlueprints": "Revisit your saved designs to continue editing or view your creations.",
+    "sloganUploadedFurniture": "View and manage your own collection of uploaded furniture and items.",
+    "slogan": "Craft Your Ideal Space"
   },
   "input": {
     "file": {
