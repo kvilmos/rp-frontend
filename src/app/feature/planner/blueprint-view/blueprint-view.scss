@@ -4,7 +4,8 @@
 }
 
 .navbar {
-  background-color: var(--nav-background-color);
+  background-color: var(--primary-color);
+  border-bottom: solid 1px var(--nav-background-color);
   padding: 0.75em;
 }
 

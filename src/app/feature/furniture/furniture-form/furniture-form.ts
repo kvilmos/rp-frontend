@@ -1,4 +1,14 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  ElementRef,
+  HostListener,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -17,9 +27,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
 import { TranslatePipe } from '@ngx-translate/core';
-import { FurnitureThumbnail } from '../furniture_thumbnail';
-import { RpThumbnail } from '../../../shared/rp-thumbnail/rp-thumbnail';
 import { ErrorHandler } from '../../../core/error/error_handler';
+import { PreviewService } from '../preview.service';
+import { THUMBNAIL } from '../../../common/constants/file-constants';
 
 @Component({
   standalone: true,
@@ -37,10 +47,12 @@ import { ErrorHandler } from '../../../core/error/error_handler';
     RpValidationError,
     RpValueDisplay,
     TranslatePipe,
-    RpThumbnail,
   ],
 })
-export class FurnitureForm implements OnInit {
+export class FurnitureForm implements OnInit, AfterViewInit {
+  @ViewChild('thumbnailCanvas', { static: true })
+  private thumbCanvasRef!: ElementRef<HTMLCanvasElement>;
+
   public furnitureForm = new FormGroup({
     fileName: new FormControl({ value: '', disabled: true }),
     fileSize: new FormControl(0, [Validators.max(1000000000), Validators.required]),
@@ -51,54 +63,63 @@ export class FurnitureForm implements OnInit {
   public modelWidth = signal<number | null>(null);
   public modelHeight = signal<number | null>(null);
   public modelDepth = signal<number | null>(null);
-  public thumbnails = signal<FurnitureThumbnail | null>(null);
   public submitted = false;
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly furnitureService = inject(FurnitureService);
   private readonly errorHandler = inject(ErrorHandler);
+  private readonly previewService = inject(PreviewService);
+
   constructor() {}
+  public ngAfterViewInit(): void {
+    this.previewService.initThumbnail(this.thumbCanvasRef);
+  }
 
   public ngOnInit(): void {
     this.furnitureForm.controls.fileSize.reset();
 
-    this.furnitureService
-      .getFile()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((file) => {
-        this.furnitureForm.controls['fileName'].setValue(file?.name ?? null);
-        this.furnitureForm.controls['fileSize'].setValue(file?.size ?? null);
-      });
-    this.furnitureService
-      .getObjectData()
+    this.furnitureService.file$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((file) => {
+      this.furnitureForm.controls['fileName'].setValue(file?.name ?? null);
+      this.furnitureForm.controls['fileSize'].setValue(file?.size ?? null);
+    });
+    this.furnitureService.objectData$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((metadata) => {
         this.modelWidth.set(metadata?.sizeX ?? null);
         this.modelHeight.set(metadata?.sizeY ?? null);
         this.modelDepth.set(metadata?.sizeZ ?? null);
       });
-    this.furnitureService
-      .getSelectedThumbnail()
+    this.furnitureService.selectedThumbnail$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((thumbnail) => {
         this.furnitureForm.controls['thumbnails'].setValue(thumbnail?.id ?? null);
-        this.thumbnails.set(thumbnail ?? null);
       });
   }
 
   public onSelectFile(file: File) {
-    this.furnitureService.resetThumbnails();
+    this.onResetForm();
     this.furnitureService.setFile(file);
   }
 
-  public onSubmitForm(): void {
+  private async createThumbnail(): Promise<void> {
+    const thumbnail = await this.previewService.createThumbnail(THUMBNAIL.WIDTH, THUMBNAIL.HIGHT);
+    this.furnitureService.setThumbnail(thumbnail);
+  }
+
+  public async onSubmitForm(): Promise<void> {
+    await this.createThumbnail();
     this.submitted = true;
     if (this.furnitureForm.invalid) {
       return;
     }
 
     const objectName = this.furnitureForm.value.objectName as string;
-    const furnitureMeta: NewFurniture = { name: objectName };
+    const furnitureMeta: NewFurniture = {
+      name: objectName,
+      sizeX: this.modelWidth() ?? 0.5,
+      sizeY: this.modelHeight() ?? 0.5,
+      sizeZ: this.modelDepth() ?? 0.5,
+    };
 
     this.furnitureService.createFurniture(furnitureMeta).catch((error) => {
       this.errorHandler.handleHttpError(error);
@@ -107,8 +128,11 @@ export class FurnitureForm implements OnInit {
 
   public onResetForm(): void {
     this.submitted = false;
-    this.furnitureService.resetThumbnails();
-    this.furnitureService.resetSelectedThumbnail();
-    this.furnitureService.resetFile();
+    this.furnitureService.reset();
+  }
+
+  @HostListener('window:resize')
+  public onResizeBrowser(): void {
+    this.previewService.onResizeBrowser();
   }
 }

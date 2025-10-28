@@ -16,7 +16,6 @@ import {
   faCube,
   faEraser,
   faHammer,
-  faL,
   faPencil,
   faPenRuler,
   faSave,

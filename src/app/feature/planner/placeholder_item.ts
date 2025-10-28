@@ -12,7 +12,7 @@ export class PlaceholderItem extends Item {
     rotation: number,
     scale: Vector3
   ) {
-    const geometry = new BoxGeometry(1, 1, 1);
+    const geometry = new BoxGeometry(furniture.sizeX, furniture.sizeY, furniture.sizeZ);
     const material = new MeshBasicMaterial({
       color: 0x00ff00,
       transparent: true,

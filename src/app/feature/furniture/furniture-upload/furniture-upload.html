@@ -1,15 +1,15 @@
-<div class="container">
-  <div class="nav">
-    <fa-icon class="nav-back" [icon]="faArrowLeft" (click)="onClickBack()"></fa-icon>
-    <div class="nav-title">{{ 'furniture.previewTitle' | translate }}</div>
+@if (isUploading$ | async) {
+<rp-upload-overlay [progress]="(uploadProgress$ | async) ?? 0"> </rp-upload-overlay>
+}
+<div class="upload-container">
+  <div class="navbar">
+    <a routerLink="/home"><fa-icon class="bt-back" [icon]="iconBack"></fa-icon></a>
+    <div class="title-nav">{{ 'furniture.previewTitle' | translate }}</div>
   </div>
-  <div>
-    <div class="form-section">
-      <rp-furniture-form></rp-furniture-form>
-    </div>
-    <rp-thumbnail-holder></rp-thumbnail-holder>
-    <div class="canvas-wrapper">
-      <rp-furniture-preview></rp-furniture-preview>
-    </div>
+
+  <rp-furniture-preview></rp-furniture-preview>
+
+  <div class="form">
+    <rp-furniture-form></rp-furniture-form>
   </div>
 </div>

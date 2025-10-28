@@ -9,7 +9,6 @@ export const blueprintDataResolver: ResolveFn<CompleteBlueprint> = (
 ): Observable<CompleteBlueprint> => {
   const bpApi = inject(BlueprintApiService);
   const blueprintId = +route.paramMap.get('blueprintId')!;
-  console.log('resolver, ', blueprintId);
 
   return bpApi.getCompleteBlueprintById(blueprintId);
 };
