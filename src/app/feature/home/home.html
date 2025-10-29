@@ -10,14 +10,18 @@
       <div class="card-text">{{ 'home.sloganCreateBlueprint' | translate }}</div>
     </div>
     <div class="card">
-      <div class="card-title">{{ 'home.uploadedFurniture' | translate }}</div>
-      <fa-icon class="fa-2x" [icon]="furnitureIcon"></fa-icon>
-      <div class="card-text">{{ 'home.sloganUploadedFurniture' | translate }}</div>
+      <a routerLink="/profile/furniture/page/1">
+        <div class="card-title">{{ 'home.uploadedFurniture' | translate }}</div>
+        <fa-icon class="fa-2x" [icon]="furnitureIcon"></fa-icon>
+        <div class="card-text">{{ 'home.sloganUploadedFurniture' | translate }}</div>
+      </a>
     </div>
     <div class="card">
-      <div class="card-title">{{ 'home.savedBlueprints' | translate }}</div>
-      <fa-icon class="fa-2x" [icon]="blueprintIcon"></fa-icon>
-      <div class="card-text">{{ 'home.sloganSavedBlueprints' | translate }}</div>
+      <a routerLink="/blueprint/page/1">
+        <div class="card-title">{{ 'home.savedBlueprints' | translate }}</div>
+        <fa-icon class="fa-2x" [icon]="blueprintIcon"></fa-icon>
+        <div class="card-text">{{ 'home.sloganSavedBlueprints' | translate }}</div>
+      </a>
     </div>
   </div>
 </div>

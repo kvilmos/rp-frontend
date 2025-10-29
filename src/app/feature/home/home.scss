@@ -45,8 +45,18 @@
   border-radius: 10px;
   padding: 1.5rem;
   width: 100%;
+  color: var(--text-color);
   cursor: pointer;
   transition: all 0.6s ease;
+}
+
+.card a {
+  text-decoration: none;
+  color: var(--text-color);
+  display: flex;
+  gap: 1rem;
+  flex-direction: column;
+  align-items: center;
 }
 
 .card:hover {

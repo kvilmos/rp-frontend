@@ -50,13 +50,14 @@
 .title-toolbar {
   font-size: 1.3rem;
 }
+
 .title-tools {
   font-size: 1.1rem;
   padding: 1rem 0 0 0;
 }
 
 .item-selector {
-  height: 60vh;
+  height: 50vh;
   overflow-y: auto;
   width: fit-content;
   margin-top: 0.75rem;
@@ -79,6 +80,18 @@
   transition: color 0.2s ease;
 }
 
-.tools fa-icon:hover {
+.tool-icon:hover {
   color: rgb(165, 190, 190);
+}
+
+.active-tool {
+  color: rgb(165, 190, 190);
+}
+
+.tool-delete:hover {
+  color: rgb(190, 154, 166);
+}
+
+.active-tool-delete {
+  color: rgb(190, 154, 166);
 }

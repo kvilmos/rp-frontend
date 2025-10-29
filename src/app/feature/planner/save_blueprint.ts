@@ -1,5 +1,6 @@
 export interface BlueprintSave {
   id: number;
+  name: string;
   corners: CornerSave[];
   walls: WallSave[];
   items: ItemSave[];

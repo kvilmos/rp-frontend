@@ -1,11 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 html body {
+  width: 100vw;
+  height: 100vh;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
 }
+
 :root {
   //.dark-mode {
   --bg-color: #f1efe9;
@@ -50,6 +53,18 @@ html body {
   --button-secondary-background-color_hover: #f0e9e2;
 
   --blueprint-background-color: #f5f3ef;
+
+  --table-border-color: #ccc;
+  --table-header-background-color: #f0f0f0;
+  --table-item-border-color: #e0e0e0;
+  --table-item-color_hover: #f9f9f9;
+  --table-item-primary-color: #ffffff;
+  --table-item-secondary-color: #f9f9f9;
+
+  --icon: #b7b2a7;
+  --icon-delete: #;
+  --icon-delete_hover: #d89c9b;
+  --icon-hover: #d2bc8d;
 }
 .dark-mode {
   //:root {

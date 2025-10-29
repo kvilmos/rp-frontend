@@ -15,8 +15,18 @@
     "signUp": "Sign Up"
   },
   "blueprint": {
+    "placeholder": "My Design...",
+    "table": {
+      "createdAt": "Created",
+      "empty": "You do not have any project",
+      "id": "# ID",
+      "name": "Name",
+      "updatedAt": "Last Update"
+    },
+    "textInput": "Name",
     "titleBlueprint": "Blueprint",
     "titleDesign": "Design",
+    "titleDetails": "Details",
     "titlePage": "Room Editor",
     "titleTools": "Toolbar"
   },

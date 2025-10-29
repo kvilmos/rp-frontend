@@ -3,15 +3,22 @@ import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
 import { Subscription, combineLatest, switchMap } from 'rxjs';
 import { BlueprintApiService } from '../blueprint-api-service';
 import { BlueprintPage } from '../blueprint_load';
+import { DatePipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   standalone: true,
   selector: 'rp-blueprint-list',
   templateUrl: './blueprint-list.html',
   styleUrl: './blueprint-list.scss',
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe, TranslatePipe, FontAwesomeModule],
 })
 export class RpBlueprintList implements OnInit {
+  public iconEdit = faFilePen;
+  public iconDel = faTrash;
+
   public pageData!: BlueprintPage;
   private routeSub!: Subscription;
 

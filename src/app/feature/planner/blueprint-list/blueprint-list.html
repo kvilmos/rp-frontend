@@ -1,14 +1,69 @@
 @if (pageData && pageData.blueprints.length > 0) {
-<div>
+<div class="table-container">
+  <div class="table-header">
+    <div>{{ 'blueprint.table.id' | translate }}</div>
+    <div>{{ 'blueprint.table.name' | translate }}</div>
+    <div>{{ 'blueprint.table.createdAt' | translate }}</div>
+    <div>{{ 'blueprint.table.updatedAt' | translate }}</div>
+  </div>
+
   @for (item of pageData.blueprints; track item.id) {
-  <div class="bp-card">
+  <div class="table-item">
     <div class="details">{{ item.id }}</div>
-    <div class="details">{{ item.createAt }}</div>
-    <div class="details">{{ item.modifiedAt }}</div>
+    <div class="details">{{ item.name }}</div>
+    <div class="details">{{ item.createdAt | date : 'yyyy.MM.dd HH:mm' }}</div>
+    <div class="details">{{ item.updatedAt | date : 'yyyy.MM.dd HH:mm' }}</div>
     <a [routerLink]="['/room-editor', item.id]">
-      <button>edit</button>
+      <div class="icons">
+        <fa-icon class="fa-lg edit-icon" [icon]="iconEdit"></fa-icon>
+        <fa-icon class="fa-lg del-icon" [icon]="iconDel"></fa-icon>
+      </div>
     </a>
   </div>
   }
 </div>
+
+<div class="pagination">
+  @if (pageData.prevPage >= 1) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.prevPage]">{{
+    'common.pagePrevious' | translate
+  }}</a>
+  }@else{
+  <span class="current-page">Previous</span>
+  } @if (pageData.currPage >3 ){
+  <a [queryParamsHandling]="'preserve'" [routerLink]="'/blueprint/page/1'">1</a>
+  <span>...</span>
+  } @if (pageData.prevPage-1 >= 1) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.prevPage - 1]">{{
+    pageData.prevPage - 1
+  }}</a
+  >} @if (pageData.prevPage >= 1) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.prevPage]">{{
+    pageData.prevPage
+  }}</a>
+  }
+  <span class="current-page">{{ pageData.currPage }}</span>
+  @if (pageData.nextPage <= pageData.totalPages) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.nextPage]">{{
+    pageData.nextPage
+  }}</a>
+  } @if (pageData.nextPage+1 <= pageData.totalPages) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.nextPage + 1]">{{
+    pageData.nextPage + 1
+  }}</a>
+  } @if (pageData.currPage < pageData.totalPages-2){
+  <span>...</span>
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.totalPages]">{{
+    pageData.totalPages
+  }}</a>
+  } @if (pageData.nextPage <= pageData.totalPages) {
+  <a [queryParamsHandling]="'preserve'" [routerLink]="['/blueprint/page', pageData.nextPage]">{{
+    'common.pageNext' | translate
+  }}</a>
+  }@else {
+  <span class="current-page">Next</span>
+  }
+</div>
+} @else {
+<p>{{ 'blueprint.table.empty' | translate }}</p>
 }

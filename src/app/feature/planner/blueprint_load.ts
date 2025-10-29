@@ -1,4 +1,4 @@
-import { Furniture } from "../furniture/furniture";
+import { Furniture } from '../furniture/furniture';
 
 export interface BlueprintPage {
   nextPage: number;
@@ -10,15 +10,17 @@ export interface BlueprintPage {
 export interface Blueprint {
   id: number;
   userId: number;
-  createAt: string;
-  modifiedAt: string;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CompleteBlueprint {
   id: number;
   userId: number;
+  name: string;
   createAt: string;
-  modifiedAt: string;
+  updateAt: string;
   corners: CornerLoad[];
   walls: WallLoad[];
   items: ItemLoad[];

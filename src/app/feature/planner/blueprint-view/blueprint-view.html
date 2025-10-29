@@ -16,7 +16,6 @@
         class="blueprintCanvas"
       ></canvas>
     </div>
-
     <div class="blueprint" [ngClass]="{ hidden: showBp }">
       <canvas
         #designCanvas
@@ -29,30 +28,72 @@
   </div>
 
   <div class="tool-bar">
-    <div class="general-tools">
+    <div>
+      <div class="title-toolbar">{{ 'blueprint.titleDetails' | translate }}</div>
+      <hr class="line" />
+      <form [formGroup]="blueprintForm">
+        <rp-text-input
+          [placeholder]="'blueprint.placeholder' | translate"
+          [label]="'blueprint.textInput' | translate"
+          inputId="bpName"
+          formControlName="name"
+        ></rp-text-input>
+      </form>
+    </div>
+    <div>
       <div class="title-toolbar">{{ 'blueprint.titleTools' | translate }}</div>
       <hr class="line" />
       <div class="tools">
-        <fa-icon class="fa-xl" [icon]="iconView" (click)="setView()"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDeleteBp"></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': !showBp }"
+          [icon]="iconView"
+          (click)="setView()"
+        ></fa-icon>
+        <fa-icon class="fa-xl tool-icon" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
+        <fa-icon class="fa-xl tool-delete" [icon]="iconDeleteBp"></fa-icon>
       </div>
     </div>
-    <div class="bp-tools">
+    <div>
       <div class="title-tools">{{ 'blueprint.titleBlueprint' | translate }}</div>
       <hr class="line" />
       <div class="tools">
-        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setBlueprintTool(bpMove)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDraw" (click)="setBlueprintTool(bpDraw)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDelWalls" (click)="setBlueprintTool(bpDel)"></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpMove }"
+          [icon]="iconMove"
+          (click)="setBlueprintTool(bpMove)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpDraw }"
+          [icon]="iconDraw"
+          (click)="setBlueprintTool(bpDraw)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpDel }"
+          [icon]="iconDelWalls"
+          (click)="setBlueprintTool(bpDel)"
+        ></fa-icon>
       </div>
     </div>
-    <div class="design-tools">
+    <div>
       <div class="title-tools">{{ 'blueprint.titleDesign' | translate }}</div>
       <hr class="line" />
       <div class="tools">
-        <fa-icon class="fa-xl" [icon]="iconMove" (click)="setDesignTool(designMove)"></fa-icon>
-        <fa-icon class="fa-xl" [icon]="iconDelItem" (click)="setDesignTool(designDelete)"></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': !showBp && activeDesignTool === designMove }"
+          [icon]="iconMove"
+          (click)="setDesignTool(designMove)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-delete"
+          [ngClass]="{ 'active-tool-delete': !showBp && activeDesignTool === designDelete }"
+          [icon]="iconDelItem"
+          (click)="setDesignTool(designDelete)"
+        ></fa-icon>
       </div>
       <div class="item-selector">
         <rp-furniture-selector (onSelect)="onSelectFurniture($event)"></rp-furniture-selector>

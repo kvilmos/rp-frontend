@@ -193,6 +193,10 @@ export class DesignBuilder {
     this.designController.switchState(state);
   }
 
+  public getDesignTool(): ControllerState {
+    return this.designController.state;
+  }
+
   public onMouseMove(event: MouseEvent): void {
     this.designController.mouseMoveEvent(event);
   }

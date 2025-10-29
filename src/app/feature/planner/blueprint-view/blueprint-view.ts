@@ -36,18 +36,31 @@ import { Blueprint } from '../blueprint';
 import { CompleteBlueprint } from '../blueprint_load';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CornerSave, WallSave, ItemSave, BlueprintSave } from '../save_blueprint';
+import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
   selector: 'rp-blueprint-view',
   templateUrl: 'blueprint-view.html',
   styleUrl: 'blueprint-view.scss',
-  imports: [FontAwesomeModule, NgClass, TranslatePipe, RpFurnitureSelector, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    FontAwesomeModule,
+    NgClass,
+    TranslatePipe,
+    RpFurnitureSelector,
+    RouterLink,
+    RpTextInput,
+  ],
 })
 export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('blueprintCanvas') private bpCanvasRef!: ElementRef<HTMLCanvasElement>;
   @ViewChild('designCanvas') private designCanvasRef!: ElementRef<HTMLCanvasElement>;
 
+  public blueprintForm = new FormGroup({
+    name: new FormControl(''),
+  });
   public showBp = true;
 
   public iconBack = faArrowLeft;
@@ -66,6 +79,10 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   public bpDel = BLUEPRINT.MODE_DELETE;
   public designMove = ControllerState.UNSELECTED;
   public designDelete = ControllerState.DELETE;
+
+  public activeBpTool!: number;
+  public activeDesignTool!: ControllerState;
+
   public readonly bpController = inject(BlueprintController);
   public readonly designBuilder = inject(DesignBuilder);
 
@@ -75,14 +92,19 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   private readonly blueprint = inject(Blueprint);
   private readonly bpApi = inject(BlueprintApiService);
   private readonly route = inject(ActivatedRoute);
-  constructor() {}
+  constructor() {
+    this.activeBpTool = this.bpController.mode;
+    this.activeDesignTool = this.designBuilder.getDesignTool();
+  }
 
   public ngOnInit(): void {
     this.route.data.subscribe((data) => {
       this.blueprintData = data['blueprint'];
-
-      if (this.isViewInitialized) {
-        this.initializeFullScene();
+      if (this.blueprintData) {
+        this.blueprintForm.controls.name.setValue(this.blueprintData.name);
+        if (this.isViewInitialized) {
+          this.initializeFullScene();
+        }
       }
     });
   }
@@ -110,6 +132,7 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
 
   public setBlueprintTool(mode: number): void {
     this.bpController.setMode(mode);
+    this.activeBpTool = this.bpController.mode;
     if (!this.showBp) {
       this.setView();
     }
@@ -117,6 +140,7 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
 
   public setDesignTool(state: ControllerState) {
     this.designBuilder.setDesignTool(state);
+    this.activeDesignTool = this.designBuilder.getDesignTool();
     if (this.showBp) {
       this.setView();
     }
@@ -165,8 +189,10 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
       })
     );
 
+    const name = this.blueprintForm.controls.name.getRawValue() ?? '';
     const saveBp: BlueprintSave = {
       id: this.blueprint.id,
+      name: name,
       corners: corners,
       walls: walls,
       items: items,
