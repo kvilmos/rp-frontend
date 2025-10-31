@@ -1,0 +1,23 @@
+<div class="pagination">
+  <button (click)="onPrevious()" [disabled]="currentPage === 1">
+    {{ 'common.pagePrevious' | translate }}
+  </button>
+
+  @if (pages[0] > 1) {
+  <button (click)="onPageSelect(1)">1</button>
+  @if (pages[0] > 2) {
+  <span>...</span>
+  } } @for (page of pages; track $index) {
+  <button (click)="onPageSelect(page)" [ngClass]="{ 'current-page': page === currentPage }">
+    {{ page }}
+  </button>
+  } @if (pages[pages.length - 1] < totalPages) { @if (pages[pages.length - 1] < totalPages - 1) {
+  <span>...</span>
+  }
+  <button (click)="onPageSelect(totalPages)">{{ totalPages }}</button>
+  }
+
+  <button (click)="onNext()" [disabled]="currentPage === totalPages">
+    {{ 'common.pageNext' | translate }}
+  </button>
+</div>
