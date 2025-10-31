@@ -40,4 +40,8 @@ export class BlueprintApiService {
   public getCompleteBlueprint(id: number): Observable<CompleteBlueprint> {
     return this.http.get<CompleteBlueprint>(`/api/blueprint/complete/${id}`);
   }
+
+  public deleteBlueprint(id: number): Observable<any> {
+    return this.http.delete(`/api/blueprint/${id}`);
+  }
 }

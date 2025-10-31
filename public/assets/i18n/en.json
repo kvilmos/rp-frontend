@@ -32,6 +32,7 @@
   },
   "common": {
     "cancel": "Cancel",
+    "loading": "loading",
     "pageNext": "Next",
     "pagePrevious": "Previous",
     "submit": "Submit"

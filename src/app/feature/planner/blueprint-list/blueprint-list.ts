@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Observable, switchMap } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, switchMap } from 'rxjs';
 import { BlueprintApiService } from '../blueprint-api-service';
 import { BlueprintPage } from '../blueprint_load';
 import { AsyncPipe, DatePipe } from '@angular/common';
@@ -42,13 +42,19 @@ export class RpBlueprintList implements OnInit {
   public pageData$!: Observable<BlueprintPage>;
   public activeFilters: BlueprintFilter = {};
 
+  private refreshTrigger = new BehaviorSubject<void>(undefined);
+
   private readonly bpApi = inject(BlueprintApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   constructor() {}
 
   public ngOnInit(): void {
-    this.pageData$ = this.route.queryParamMap.pipe(
+    this.pageData$ = combineLatest([
+      this.route.queryParamMap,
+      this.refreshTrigger.asObservable(),
+    ]).pipe(
+      map(([queryParams, _]) => queryParams),
       switchMap((queryParams) => {
         const pageParam = queryParams.get('page');
         const orderParam = queryParams.get('order');
@@ -76,6 +82,22 @@ export class RpBlueprintList implements OnInit {
       relativeTo: this.route,
       queryParams: newParams,
       queryParamsHandling: 'merge',
+    });
+  }
+
+  public onBlueprintDelete(id: number) {
+    if (!confirm('Are you sure you want to delete this blueprint?')) {
+      return;
+    }
+
+    this.bpApi.deleteBlueprint(id).subscribe({
+      next: () => {
+        console.log('Blueprint deleted successfully. Refreshing list...');
+        this.refreshTrigger.next();
+      },
+      error: (err) => {
+        console.error('Failed to delete blueprint', err);
+      },
     });
   }
 }

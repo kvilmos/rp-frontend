@@ -51,8 +51,12 @@
   transition: color 0.25s ease;
 }
 
+.edit-icon:visited {
+  color: var(--icon);
+}
+
 .edit-icon:hover {
-  color: var(--icon-hover);
+  color: var(--icon-hover) !important;
 }
 
 .del-icon:hover {

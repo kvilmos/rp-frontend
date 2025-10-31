@@ -19,12 +19,14 @@
     <div class="details">{{ item.name }}</div>
     <div class="details">{{ item.createdAt | date : 'yyyy.MM.dd HH:mm' }}</div>
     <div class="details">{{ item.updatedAt | date : 'yyyy.MM.dd HH:mm' }}</div>
-    <a [routerLink]="['/room-editor', item.id]">
-      <div class="icons">
-        <fa-icon class="fa-lg edit-icon" [icon]="iconEdit"></fa-icon>
-        <fa-icon class="fa-lg del-icon" [icon]="iconDel"></fa-icon>
-      </div>
-    </a>
+    <div class="icons">
+      <a class="edit-icon" [routerLink]="['/room-editor', item.id]"
+        ><fa-icon class="fa-lg" [icon]="iconEdit"></fa-icon
+      ></a>
+      <a class="del-icon" (click)="onBlueprintDelete(item.id)"
+        ><fa-icon class="fa-lg" [icon]="iconDel"></fa-icon
+      ></a>
+    </div>
   </div>
   }
 </div>
