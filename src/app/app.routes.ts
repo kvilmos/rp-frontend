@@ -19,8 +19,9 @@ export const routes: Routes = [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
       { path: 'furniture/page/:page', component: RpFurnitureList },
-      { path: 'blueprint/page/:page', component: RpBlueprintList, data: { scope: 'all' } },
       { path: 'profile/furniture/page/:page', component: RpFurnitureList, data: { scope: 'own' } },
+
+      { path: 'profile/blueprint', component: RpBlueprintList },
     ],
     canActivate: [authGuard],
   },

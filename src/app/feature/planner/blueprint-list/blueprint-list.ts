@@ -1,56 +1,81 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, ParamMap, RouterLink } from '@angular/router';
-import { Subscription, combineLatest, switchMap } from 'rxjs';
+import { Component, OnInit, inject } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Observable, switchMap } from 'rxjs';
 import { BlueprintApiService } from '../blueprint-api-service';
 import { BlueprintPage } from '../blueprint_load';
-import { DatePipe } from '@angular/common';
+import { AsyncPipe, DatePipe } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { BlueprintFilter } from '../blueprint_filter';
+import { FormsModule } from '@angular/forms';
+import { SORTING, SortOption } from '../../../common/constants/list-constants';
+import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';
+import { RpSorter } from '../../../shared/rp-filter/rp-sorter';
 
 @Component({
   standalone: true,
   selector: 'rp-blueprint-list',
   templateUrl: './blueprint-list.html',
   styleUrl: './blueprint-list.scss',
-  imports: [RouterLink, DatePipe, TranslatePipe, FontAwesomeModule],
+  imports: [
+    RouterLink,
+    DatePipe,
+    TranslatePipe,
+    FontAwesomeModule,
+    FormsModule,
+    AsyncPipe,
+    RpSorter,
+    RpPaginator,
+  ],
 })
 export class RpBlueprintList implements OnInit {
-  public iconEdit = faFilePen;
-  public iconDel = faTrash;
+  public readonly iconEdit = faFilePen;
+  public readonly iconDel = faTrash;
+  public readonly sortingOptions: SortOption[] = [
+    SORTING.RECENTLY_MODIFIED,
+    SORTING.OLDEST_MODIFIED,
+    SORTING.LATEST_CREATED,
+    SORTING.OLDEST_CREATED,
+  ];
 
-  public pageData!: BlueprintPage;
-  private routeSub!: Subscription;
+  public pageData$!: Observable<BlueprintPage>;
+  public activeFilters: BlueprintFilter = {};
 
   private readonly bpApi = inject(BlueprintApiService);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   constructor() {}
 
   public ngOnInit(): void {
-    this.routeSub = combineLatest([this.route.paramMap, this.route.queryParamMap])
-      .pipe(
-        switchMap(([params]: [ParamMap, ParamMap]) => {
-          const pageParam = params.get('page');
-          const page = pageParam ? Number.parseInt(pageParam, 10) : 1;
+    this.pageData$ = this.route.queryParamMap.pipe(
+      switchMap((queryParams) => {
+        const pageParam = queryParams.get('page');
+        const orderParam = queryParams.get('order');
 
-          return this.bpApi.pageBlueprint(page);
-        })
-      )
-      .subscribe({
-        next: (data: BlueprintPage) => {
-          this.pageData = data;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error(err);
-        },
-      });
+        this.activeFilters = {
+          page: pageParam ? Number.parseInt(pageParam, 10) : 1,
+          order: orderParam || SORTING.RECENTLY_MODIFIED.value,
+        };
+
+        return this.bpApi.getUserBlueprint(this.activeFilters);
+      })
+    );
   }
 
-  public ngOnDestroy(): void {
-    if (this.routeSub) {
-      this.routeSub.unsubscribe();
-    }
+  public onSortChange(newOrder: string): void {
+    this.updateUrl({ order: newOrder, page: 1 });
+  }
+
+  public onPageChange(newPageNumber: number): void {
+    this.updateUrl({ page: newPageNumber });
+  }
+
+  private updateUrl(newParams: { page?: number; order?: string }): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: newParams,
+      queryParamsHandling: 'merge',
+    });
   }
 }

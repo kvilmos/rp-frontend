@@ -96,8 +96,10 @@
     }
   },
   "sorting": {
-    "latest": "Latest",
-    "oldest": "Oldest",
+    "latestCreated": "Latest Created",
+    "latestUpdated": "Recently Modified",
+    "oldestCreated": "Oldest Created",
+    "oldestUpdated": "Oldest Modified",
     "sorting": "Sorting"
   }
 }

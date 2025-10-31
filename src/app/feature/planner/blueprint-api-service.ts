@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BlueprintSave } from './save_blueprint';
 import { BlueprintPage, CompleteBlueprint } from './blueprint_load';
+import { BlueprintFilter } from './blueprint_filter';
 
 @Injectable({
   providedIn: 'root',
@@ -23,8 +24,17 @@ export class BlueprintApiService {
     return this.http.put(`/api/blueprint/${blueprint.id}`, blueprint);
   }
 
-  public pageBlueprint(page: number): Observable<BlueprintPage> {
-    return this.http.get<BlueprintPage>(`/api/blueprint/page/${page}`);
+  public getUserBlueprint(params: BlueprintFilter = {}): Observable<BlueprintPage> {
+    let httpParams = new HttpParams();
+
+    if (params.page) {
+      httpParams = httpParams.set('page', params.page);
+    }
+    if (params.order) {
+      httpParams = httpParams.set('order', params.order);
+    }
+
+    return this.http.get<BlueprintPage>(`/api/profile/blueprint`, { params: httpParams });
   }
 
   public getCompleteBlueprint(id: number): Observable<CompleteBlueprint> {
