@@ -45,6 +45,9 @@
     "name": "Furniture Name",
     "namePlaceholder": "Black Leather Couch",
     "previewTitle": "Furniture Preview",
+    "table": {
+      "empty": "There is no furniture"
+    },
     "thumbnailsTitle": "Thumbnails Gallery",
     "thumbnailsText": "Choose one",
     "sizeDepth": "Depth",
