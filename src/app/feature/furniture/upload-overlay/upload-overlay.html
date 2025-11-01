@@ -1,0 +1,9 @@
+<div class="overlay">
+  <div class="progress-box">
+    <h3>{{ 'uploading.title' | translate }}</h3>
+    <div class="progress-bar-container">
+      <div class="progress-bar" [ngStyle]="{ width: progress + '%' }"></div>
+    </div>
+    <p>{{ progress }}%</p>
+  </div>
+</div>

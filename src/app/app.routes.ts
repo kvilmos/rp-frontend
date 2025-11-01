@@ -8,6 +8,8 @@ import { loggedInGuard } from './guard/logged-in-guard';
 import { RpBlueprintView } from './feature/planner/blueprint-view/blueprint-view';
 import { RpFurnitureList } from './feature/furniture/furniture-list/furniture-list';
 import { MainLayout } from './layout/main-layout/main-layout';
+import { RpBlueprintList } from './feature/planner/blueprint-list/blueprint-list';
+import { blueprintDataResolver } from './feature/planner/blueprint-data-resolver';
 
 export const routes: Routes = [
   {
@@ -16,7 +18,9 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },
-      { path: 'furniture/page/:page', component: RpFurnitureList },
+      { path: 'furniture', component: RpFurnitureList },
+      { path: 'profile/furniture', component: RpFurnitureList },
+      { path: 'profile/blueprint', component: RpBlueprintList },
     ],
     canActivate: [authGuard],
   },
@@ -31,9 +35,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
   },
   {
-    path: 'planner',
+    path: 'room-editor/:blueprintId',
     component: RpBlueprintView,
     canActivate: [authGuard],
+    resolve: {
+      blueprint: blueprintDataResolver,
+    },
   },
   {
     path: '**',

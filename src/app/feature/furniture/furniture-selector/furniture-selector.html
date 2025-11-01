@@ -10,11 +10,11 @@
     }
   </div>
   } @else if (!loading) {
-  <p>There is no furniture. :c</p>
+  <p>{{ 'furniture.table.empty' | translate }}</p>
   } @if (hasNextPage) {
   <div class="load-trigger" #loadTrigger>
-    loading... @if(loading) {
-    <p>loading ...</p>
+    @if(loading) {
+    <p>{{ 'common.loading' | translate }}...</p>
     }
   </div>
   }

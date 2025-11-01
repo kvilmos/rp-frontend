@@ -1,17 +1,24 @@
-.nav {
-  background-color: var(--nav-background-color);
+.planner {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.navbar {
+  background-color: var(--primary-color);
+  border-bottom: solid 1px var(--nav-background-color);
   padding: 0.75em;
 }
 
-.nav-title {
+.title-nav {
   width: 100%;
   font-weight: 600;
   vertical-align: middle;
   text-align: center;
 }
 
-.nav-back {
+.bt-back {
   position: absolute;
+  color: #000;
 }
 
 .blueprint {
@@ -24,48 +31,67 @@
   background-color: var(--blueprint-background-color);
 }
 
-.design {
-  position: fixed;
-  width: 15rem;
-  height: 15rem;
-  margin: 1rem;
-  right: 0;
+.hidden {
+  display: none !important;
 }
 
-.controls {
+.tool-bar {
   position: relative;
-  padding: 1em;
   display: flex;
   flex-direction: column;
-  gap: 0.3em;
-  width: 10rem;
+  width: 300px;
+  height: 100%;
+  padding: 12px;
+  gap: 12px;
+  background-color: white;
+  border-right: solid 1px var(--outline-color);
 }
 
-.bp-button {
+.title-toolbar {
+  font-size: 1.3rem;
+}
+
+.title-tools {
+  font-size: 1.1rem;
+  padding: 1rem 0 0 0;
+}
+
+.item-selector {
+  height: 50vh;
+  overflow-y: auto;
+  width: fit-content;
+  margin-top: 0.75rem;
+}
+
+.line {
+  border: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--outline-color);
+}
+
+.tools {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  border-radius: 2em;
-  cursor: pointer;
-
-  background-color: var(--button-secondary-background-color);
-  color: var(--button-secondary-color);
-
-  border: none;
-  border-style: solid;
-  border-width: 1px;
-  border-color: var(--button-secondary-border-color);
-
-  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
-  &:hover {
-    background-color: var(--button-secondary-background-color_hover);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
+  gap: 10px;
 }
 
-.icon {
-  margin: 0.5em;
+.tools fa-icon {
+  transition: color 0.2s ease;
+}
+
+.tool-icon:hover {
+  color: rgb(165, 190, 190);
+}
+
+.active-tool {
+  color: rgb(165, 190, 190);
+}
+
+.tool-delete:hover {
+  color: rgb(190, 154, 166);
+}
+
+.active-tool-delete {
+  color: rgb(190, 154, 166);
 }

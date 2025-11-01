@@ -1,36 +1,103 @@
-<div>
-  <div class="nav">
-    <fa-icon class="nav-back" [icon]="iconBack" (click)="onClickBack()"></fa-icon>
-    <div class="nav-title">{{ 'blueprint.editorTitle' | translate }}</div>
+<div class="planner">
+  <div>
+    <div class="navbar">
+      <a routerLink="/home"><fa-icon class="bt-back" [icon]="iconBack"></fa-icon></a>
+      <div class="title-nav">{{ 'blueprint.titlePage' | translate }}</div>
+    </div>
   </div>
-</div>
-<div class="blueprint" [ngClass]="">
-  <canvas
-    #blueprintCanvas
-    (mousedown)="bpController.onMouseDown()"
-    (mouseup)="bpController.onMouseUp()"
-    (mousemove)="bpController.onMouseMove($event)"
-    class="blueprintCanvas"
-  ></canvas>
-</div>
-<div class="design">
-  <canvas #designCanvas></canvas>
-  <button (click)="setView()" class="bp-button">
-    <fa-icon [icon]="iconDesign" class="fa-lg icon"></fa-icon>
-    {{ 'blueprint.button.changeView' | translate }}
-  </button>
-</div>
-<div class="controls">
-  <button (click)="setMode(modeMove)" class="bp-button">
-    <fa-icon [icon]="iconMove" class="fa-lg icon"></fa-icon>
-    {{ 'blueprint.button.move' | translate }}
-  </button>
-  <button (click)="setMode(modeDraw)" class="bp-button">
-    <fa-icon [icon]="iconDraw" class="fa-lg icon"></fa-icon>
-    {{ 'blueprint.button.draw' | translate }}
-  </button>
-  <button (click)="setMode(modeDelete)" class="bp-button">
-    <fa-icon [icon]="iconDelete" class="fa-lg icon"></fa-icon>
-    {{ 'blueprint.button.delete' | translate }}
-  </button>
+
+  <div class="blueprint">
+    <div class="blueprint" [ngClass]="{ hidden: !showBp }">
+      <canvas
+        #blueprintCanvas
+        (mousedown)="bpController.onMouseDown()"
+        (mouseup)="bpController.onMouseUp()"
+        (mousemove)="bpController.onMouseMove($event)"
+        class="blueprintCanvas"
+      ></canvas>
+    </div>
+    <div class="blueprint" [ngClass]="{ hidden: showBp }">
+      <canvas
+        #designCanvas
+        (mousedown)="designBuilder.onMouseDown()"
+        (mouseup)="designBuilder.onMouseUp()"
+        (mousemove)="designBuilder.onMouseMove($event)"
+      >
+      </canvas>
+    </div>
+  </div>
+
+  <div class="tool-bar">
+    <div>
+      <div class="title-toolbar">{{ 'blueprint.titleDetails' | translate }}</div>
+      <hr class="line" />
+      <form [formGroup]="blueprintForm">
+        <rp-text-input
+          [placeholder]="'blueprint.placeholder' | translate"
+          [label]="'blueprint.textInput' | translate"
+          inputId="bpName"
+          formControlName="name"
+        ></rp-text-input>
+      </form>
+    </div>
+    <div>
+      <div class="title-toolbar">{{ 'blueprint.titleTools' | translate }}</div>
+      <hr class="line" />
+      <div class="tools">
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': !showBp }"
+          [icon]="iconView"
+          (click)="setView()"
+        ></fa-icon>
+        <fa-icon class="fa-xl tool-icon" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
+        <fa-icon class="fa-xl tool-delete" [icon]="iconDeleteBp"></fa-icon>
+      </div>
+    </div>
+    <div>
+      <div class="title-tools">{{ 'blueprint.titleBlueprint' | translate }}</div>
+      <hr class="line" />
+      <div class="tools">
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpMove }"
+          [icon]="iconMove"
+          (click)="setBlueprintTool(bpMove)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpDraw }"
+          [icon]="iconDraw"
+          (click)="setBlueprintTool(bpDraw)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': showBp && activeBpTool === bpDel }"
+          [icon]="iconDelWalls"
+          (click)="setBlueprintTool(bpDel)"
+        ></fa-icon>
+      </div>
+    </div>
+    <div>
+      <div class="title-tools">{{ 'blueprint.titleDesign' | translate }}</div>
+      <hr class="line" />
+      <div class="tools">
+        <fa-icon
+          class="fa-xl tool-icon"
+          [ngClass]="{ 'active-tool': !showBp && activeDesignTool === designMove }"
+          [icon]="iconMove"
+          (click)="setDesignTool(designMove)"
+        ></fa-icon>
+        <fa-icon
+          class="fa-xl tool-delete"
+          [ngClass]="{ 'active-tool-delete': !showBp && activeDesignTool === designDelete }"
+          [icon]="iconDelItem"
+          (click)="setDesignTool(designDelete)"
+        ></fa-icon>
+      </div>
+      <div class="item-selector">
+        <rp-furniture-selector (onSelect)="onSelectFurniture($event)"></rp-furniture-selector>
+      </div>
+    </div>
+  </div>
 </div>

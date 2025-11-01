@@ -1,24 +1,44 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FurniturePreview } from '../furniture-preview/furniture-preview';
 import { FurnitureForm } from '../furniture-form/furniture-form';
-import { ThumbnailHolder } from '../thumbnail-holder/thumbnail-holder';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FurnitureService } from '../furniture.service';
+import { RpUploadOverlay } from '../upload-overlay/upload-overlay';
+import { Observable } from 'rxjs';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'rp-furniture-upload',
   templateUrl: './furniture-upload.html',
   styleUrl: './furniture-upload.scss',
-  imports: [FurniturePreview, FurnitureForm, ThumbnailHolder, FontAwesomeModule, TranslatePipe],
+  imports: [
+    RpUploadOverlay,
+    RouterLink,
+    FurniturePreview,
+    FurnitureForm,
+    FontAwesomeModule,
+    TranslatePipe,
+    AsyncPipe,
+  ],
 })
-export class FurnitureUpload {
-  public faArrowLeft = faArrowLeft;
+export class FurnitureUpload implements OnDestroy {
+  public iconBack = faArrowLeft;
 
-  private readonly router = inject(Router);
-  public onClickBack(): void {
-    this.router.navigate(['']);
+  public readonly isUploading$: Observable<boolean>;
+  public readonly uploadProgress$: Observable<number>;
+
+  private readonly furnitureService = inject(FurnitureService);
+
+  constructor() {
+    this.isUploading$ = this.furnitureService.isUploading$;
+    this.uploadProgress$ = this.furnitureService.uploadProgress$;
+  }
+
+  public ngOnDestroy(): void {
+    this.furnitureService.reset();
   }
 }

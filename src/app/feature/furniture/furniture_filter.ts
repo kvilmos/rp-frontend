@@ -1,3 +1,4 @@
-export interface FurnitureFilters {
-  sortByCreateAt?: string;
+export interface FurnitureFilter {
+  page?: number;
+  order?: string;
 }

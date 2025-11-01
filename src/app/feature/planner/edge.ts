@@ -5,11 +5,16 @@ import {
   DoubleSide,
   Float32BufferAttribute,
   FrontSide,
+  Material,
   Mesh,
   MeshBasicMaterial,
+  MeshStandardMaterial,
+  RepeatWrapping,
   Shape,
   ShapeGeometry,
   Side,
+  SRGBColorSpace,
+  TextureLoader,
   Vector2,
   Vector3,
 } from 'three';
@@ -39,16 +44,11 @@ export class Edge {
     this.wall = edge.wall;
     this.front = edge.front;
 
-    // missing event handler: redraw
-    // missing event handler: camera
-
     this.updateMesh();
     this.addToScene();
   }
 
   public remove(): void {
-    // this.edge.redrawCallbacks.remove(redraw);
-    // this.controls.cameraMovedCallbacks.remove(updateVisibility);
     this.removeFromScene();
   }
 
@@ -76,14 +76,24 @@ export class Edge {
   }
 
   private updateMesh(): void {
-    const wallMaterial = new MeshBasicMaterial({
-      color: 0xffffff,
+    const textureLoader = new TextureLoader();
+    const texturePath = '/assets/images/textures/wall.jpg';
+    const wallTexture = textureLoader.load(texturePath);
+
+    wallTexture.wrapS = RepeatWrapping;
+    wallTexture.wrapT = RepeatWrapping;
+    wallTexture.colorSpace = SRGBColorSpace;
+
+    const wallMaterial = new MeshStandardMaterial({
+      map: wallTexture,
       side: FrontSide,
+      roughness: 0.9,
     });
 
-    const fillerMaterial = new MeshBasicMaterial({
+    const fillerMaterial = new MeshStandardMaterial({
       color: DESIGN.EDGE_FILLER_COLOR,
       side: DoubleSide,
+      roughness: 0.9,
     });
 
     this.edgeMeshes.push(
@@ -132,28 +142,16 @@ export class Edge {
 
     const geometry = new BufferGeometry();
     const vertices = new Float32Array([
-      v1.x,
-      v1.y,
-      v1.z, // 0. indexű vertex
-      v2.x,
-      v2.y,
-      v2.z, // 1. indexű vertex
-      v3.x,
-      v3.y,
-      v3.z, // 2. indexű vertex
-      v4.x,
-      v4.y,
-      v4.z, // 3. indexű vertex
-    ]);
+      v1.x, v1.y, v1.z, // 0. vertex
+      v2.x, v2.y, v2.z, // 1. vertex
+      v3.x, v3.y, v3.z, // 2. vertex
+      v4.x, v4.y, v4.z, // 3. vertex
+    ]); 
     geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 
     const indices = [
-      0,
-      1,
-      2, // (v1, v2, v3)
-      0,
-      2,
-      3, // (v1, v3, v4)
+      0, 1, 2, // (v1, v2, v3)
+      0, 2, 3, // (v1, v3, v4)
     ];
     geometry.setIndex(indices);
 
@@ -194,7 +192,7 @@ export class Edge {
   private makeWall(
     start: { x: number; y: number },
     end: { x: number; y: number },
-    material: MeshBasicMaterial
+    material: Material
   ): Mesh {
     const height = this.wall.height;
 
@@ -206,18 +204,10 @@ export class Edge {
     const geometry = new BufferGeometry();
 
     const vertices = new Float32Array([
-      v1.x,
-      v1.y,
-      v1.z, // index: 0
-      v2.x,
-      v2.y,
-      v2.z, // index: 1
-      v3.x,
-      v3.y,
-      v3.z, // index: 2
-      v4.x,
-      v4.y,
-      v4.z, // index: 3
+      v1.x, v1.y, v1.z, // index: 0
+      v2.x, v2.y, v2.z, // index: 1
+      v3.x, v3.y, v3.z, // index: 2
+      v4.x, v4.y, v4.z, // index: 3
     ]);
 
     const indices = [0, 1, 2, 0, 2, 3];
@@ -226,14 +216,10 @@ export class Edge {
     geometry.setIndex(indices);
 
     const uvs = new Float32Array([
-      0,
-      0, // v1 UV
-      1,
-      0, // v2 UV
-      1,
-      1, // v3 UV
-      0,
-      1, // v4 UV
+      0, 0, // v1 UV
+      1, 0, // v2 UV
+      1, 1, // v3 UV
+      0, 1, // v4 UV
     ]);
 
     geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
@@ -263,20 +249,7 @@ export class Edge {
     this.edgeMeshes.forEach((plane) => {
       plane.visible = this.visible;
     });
-
-    // this.updateObjectVisibility();
   }
-
-  /*
-    private updateObjectVisibility(): void {
-      this.wall.items.forEach((item) => {
-        item.updateEdgeVisibility(this.visible, this.front);
-      });
-      this.wall.onItems.forEach((item) => {
-        item.updateEdgeVisibility(this.visible, this.front);
-      });
-    }
-  */
 
   private toVec2(pos: { x: number; y: number }): Vector2 {
     return new Vector2(pos.x, pos.y);

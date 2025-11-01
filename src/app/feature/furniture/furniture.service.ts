@@ -1,90 +1,44 @@
 import { inject, Injectable } from '@angular/core';
 import { NewFurniture } from './new_furniture';
 import { HttpClient } from '@angular/common/http';
-import {
-  Observable,
-  BehaviorSubject,
-  lastValueFrom,
-  last,
-  map,
-  catchError,
-  of,
-  forkJoin,
-} from 'rxjs';
+import { Observable, BehaviorSubject, lastValueFrom, last, forkJoin, combineLatest } from 'rxjs';
 import { ObjectData } from './object_data';
 import { FurnitureThumbnail } from './furniture_thumbnail';
 import { FurnitureUrls } from '../../common/interface/furniture_urls';
 
-interface UploadResult {
-  source: string;
-  success: boolean;
-  error?: any;
+interface UploadProgress {
+  loaded: number;
+  total: number;
+  percent: number;
 }
+
 @Injectable({ providedIn: 'root' })
 export class FurnitureService {
   private readonly file = new BehaviorSubject<File | null>(null);
+  public readonly file$ = this.file.asObservable();
   private readonly objectData = new BehaviorSubject<ObjectData | null>(null);
+  public readonly objectData$ = this.objectData.asObservable();
   private readonly selectedThumbnail = new BehaviorSubject<FurnitureThumbnail | null>(null);
-  private readonly thumbnails = new BehaviorSubject<FurnitureThumbnail[]>([]);
+  public readonly selectedThumbnail$ = this.selectedThumbnail.asObservable();
+
+  private readonly _isUploading = new BehaviorSubject<boolean>(false);
+  public readonly isUploading$ = this._isUploading.asObservable();
+  private readonly _uploadProgress = new BehaviorSubject<number>(0);
+  public readonly uploadProgress$ = this._uploadProgress.asObservable();
 
   private readonly http = inject(HttpClient);
   constructor() {}
 
-  public getFile(): Observable<File | null> {
-    return this.file.asObservable();
-  }
-
-  public getObjectData(): Observable<ObjectData | null> {
-    return this.objectData.asObservable();
-  }
-
-  public getThumbnails(): Observable<FurnitureThumbnail[]> {
-    return this.thumbnails.asObservable();
-  }
-
-  public setFile(file: File): void {
+  public setFile(file: File | null): void {
     this.file.next(file);
-  }
-
-  public resetFile(): void {
-    this.file.next(null);
   }
 
   public setObjectData(meta: ObjectData | null): void {
     this.objectData.next(meta);
   }
 
-  public pushThumbnail(thumbnail: FurnitureThumbnail): void {
-    const thumbnails = this.thumbnails.getValue();
-    if (thumbnails) {
-      this.thumbnails.next([...thumbnails, thumbnail]);
-    }
-  }
-
-  public unsetThumbnail(id: string): void {
-    const currentThumbnails = this.thumbnails.getValue();
-    const newImages = currentThumbnails.filter((thumbnail) => thumbnail.id !== id);
-    this.thumbnails.next(newImages);
-  }
-
-  public selectThumbnail(id: string): void {
-    const currentThumbnails = this.thumbnails.getValue();
-    const selectedThumbnail = currentThumbnails.find((thumbnail) => thumbnail.id === id);
-    if (selectedThumbnail) {
-      this.selectedThumbnail.next(selectedThumbnail);
-    }
-  }
-
-  public getSelectedThumbnail(): Observable<FurnitureThumbnail | null> {
-    return this.selectedThumbnail.asObservable();
-  }
-
-  public resetSelectedThumbnail(): void {
-    this.selectedThumbnail.next(null);
-  }
-
-  public resetThumbnails(): void {
-    this.thumbnails.next([]);
+  public setThumbnail(thumbnail: FurnitureThumbnail | null): void {
+    this.selectedThumbnail.next(thumbnail);
   }
 
   public async createFurniture(furniture: NewFurniture): Promise<void> {
@@ -98,31 +52,41 @@ export class FurnitureService {
       throw new Error('thumbnailNotFound');
     }
 
+    this._isUploading.next(true);
+    this._uploadProgress.next(0);
+
     try {
       const uploadUrls = await lastValueFrom(this.requestCreateFurniture(furniture));
       const thumbnailBlob = await this.dataUrlToBlob(thumbnail.imageSrc);
 
-      const allUploads$: Observable<UploadResult>[] = [];
-      const modelUpload$ = this.uploadFile(uploadUrls.objectUrl, modelFile).pipe(
-        last(),
-        map(() => ({ source: 'main_model', success: true })),
-        catchError((error) => of({ source: 'main_model', success: false, error }))
-      );
-      allUploads$.push(modelUpload$);
-      const thumbnailUpload$ = this.uploadFile(uploadUrls.thumbnailUrl, thumbnailBlob).pipe(
-        last(),
-        map(() => ({ source: thumbnail.id, success: true })),
-        catchError((error) => of({ source: thumbnail.id, success: false, error }))
-      );
-      allUploads$.push(thumbnailUpload$);
+      const modelSize = modelFile.size;
+      const thumbnailSize = thumbnailBlob.size;
+      const totalUploadSize = modelSize + thumbnailSize;
 
-      const uploadResults = await lastValueFrom(forkJoin(allUploads$));
-      const failedUploads = uploadResults.filter((result) => !result.success);
-      if (failedUploads.length > 0) {
-        throw new Error('uploadingFailed');
-      }
+      const modelProgress$ = this.uploadFile(uploadUrls.objectUrl, modelFile);
+      const thumbnailProgress$ = this.uploadFile(uploadUrls.thumbnailUrl, thumbnailBlob);
+
+      const progressSubscription = combineLatest([modelProgress$, thumbnailProgress$]).subscribe(
+        ([modelProg, thumbProg]) => {
+          const totalBytesLoaded = modelProg.loaded + thumbProg.loaded;
+
+          const weightedPercent = Math.round((totalBytesLoaded / totalUploadSize) * 100);
+
+          this._uploadProgress.next(weightedPercent);
+        }
+      );
+
+      const modelCompletion$ = modelProgress$.pipe(last());
+      const thumbnailCompletion$ = thumbnailProgress$.pipe(last());
+
+      await lastValueFrom(forkJoin([modelCompletion$, thumbnailCompletion$]));
+
+      progressSubscription.unsubscribe();
     } catch (error) {
-      throw error;
+      throw new Error('uploadingFailed');
+    } finally {
+      this._isUploading.next(false);
+      this._uploadProgress.next(100);
     }
   }
 
@@ -135,21 +99,28 @@ export class FurnitureService {
     return this.http.post<FurnitureUrls>('/api/furniture', furniture);
   }
 
-  private uploadFile(url: string, file: File | Blob): Observable<number> {
-    return new Observable<number>((observer) => {
+  private uploadFile(url: string, file: File | Blob): Observable<UploadProgress> {
+    return new Observable<UploadProgress>((observer) => {
       const xhr = new XMLHttpRequest();
 
       xhr.upload.addEventListener('progress', (event) => {
-        console.log('progress', event);
         if (event.lengthComputable) {
           const percentComplete = Math.round((event.loaded / event.total) * 100);
-          observer.next(percentComplete);
+          observer.next({
+            loaded: event.loaded,
+            total: event.total,
+            percent: percentComplete,
+          });
         }
       });
 
       xhr.addEventListener('load', () => {
         if (xhr.status >= 200 && xhr.status < 300) {
-          observer.next(100);
+          observer.next({
+            loaded: file.size,
+            total: file.size,
+            percent: 100,
+          });
           observer.complete();
         } else {
           const error = new Error(`ServerError: ${xhr.status}`);
@@ -167,5 +138,11 @@ export class FurnitureService {
 
       return () => xhr.abort();
     });
+  }
+
+  public reset(): void {
+    this.setFile(null);
+    this.setThumbnail(null);
+    this.setObjectData(null);
   }
 }

@@ -1,43 +1,45 @@
-import { ElementRef, inject, Injectable, NgZone, OnDestroy } from '@angular/core';
+import { ElementRef, inject, Injectable, NgZone } from '@angular/core';
 import { Blueprint } from './blueprint';
 import { BlueprintScene } from './blueprint_scene';
 import {
-  CameraHelper,
+  AmbientLight,
   DirectionalLight,
-  HemisphereLight,
   PCFSoftShadowMap,
   PerspectiveCamera,
+  SRGBColorSpace,
   Vector3,
   WebGLRenderer,
 } from 'three';
 import { DESIGN } from '../../common/constants/planner-constants';
 import { Floor } from './floor';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { Edge } from './edge';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { ControllerState, DesignController } from './builder_controller';
+import { Subject, takeUntil } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class DesignBuilder implements OnDestroy {
-  private renderer!: WebGLRenderer;
-  private camera!: PerspectiveCamera;
-  private animationFrameId!: number;
+@Injectable({ providedIn: 'root' })
+export class DesignBuilder {
+  public renderer!: WebGLRenderer;
   private canvas!: HTMLCanvasElement;
-  private controls!: OrbitControls;
+  private animationFrameId!: number;
+
+  public camera!: PerspectiveCamera;
+  public cameraController!: OrbitControls;
 
   private dirLight!: DirectionalLight;
-  private hemisphereLight!: HemisphereLight;
+  private ambientLight!: AmbientLight;
 
   private floorMeshes: Floor[] = [];
   private edgeMeshes: Edge[] = [];
 
+  private destroy$ = new Subject<void>();
+  public designController = inject(DesignController);
   private readonly scene = inject(BlueprintScene);
   private readonly blueprint = inject(Blueprint);
   private readonly zone = inject(NgZone);
-
   constructor() {}
 
-  public init(canvasRef: ElementRef<HTMLCanvasElement>) {
+  public start(canvasRef: ElementRef<HTMLCanvasElement>) {
     this.canvas = canvasRef.nativeElement;
     this.camera = new PerspectiveCamera(45, 1, 1, 10000);
     this.renderer = new WebGLRenderer({
@@ -45,61 +47,49 @@ export class DesignBuilder implements OnDestroy {
       antialias: true,
       preserveDrawingBuffer: true,
     });
+
     this.renderer.autoClear = false;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFSoftShadowMap;
+    this.renderer.outputColorSpace = SRGBColorSpace;
     this.scene.getScene().background = DESIGN.BACKGROUND_COLOR_LIGHT;
-
-    // skyBox
-    // controller
-
-    this.controls = new OrbitControls(this.camera, this.canvas);
-    this.camera.position.set(0, 2000, 0);
-
-    this.handleResize();
-    this.centerCamera();
-
-    this.blueprint.onUpdateRoom$.pipe().subscribe((data) => {
-      console.log('onUpdateRoom', data);
-      this.loadBlueprint();
-      this.updateShadowCamera();
-    });
 
     this.loadLights();
     this.loadBlueprint();
 
-    this.controls.addEventListener('change', () => {
+    this.cameraController = new OrbitControls(this.camera, this.canvas);
+    this.cameraController.addEventListener('change', () => {
       for (let i = 0; i < this.floorMeshes.length; i++) {
         this.edgeMeshes[i].updateVisibility();
       }
     });
 
-    this.startRenderingLoop();
+    this.camera.position.set(0, 2000, 0);
+    this.handleResize();
+    this.centerCamera();
 
-    // mouse-canvas related controls
+    this.designController.init(canvasRef, this.renderer, this.camera, this.cameraController);
+
+    this.blueprint.onUpdateRoom$
+      .pipe()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((_) => {
+        this.loadBlueprint();
+        this.updateShadowCamera();
+      });
+
+    this.startRenderingLoop();
   }
 
   public loadLights(): void {
-    const tol = 1;
-    const height = 300;
+    this.ambientLight = new AmbientLight(0xffffff, 0.5);
+    this.scene.add(this.ambientLight);
 
-    this.hemisphereLight = new HemisphereLight(0xffffff, 0x888888, 1.1);
-    this.hemisphereLight.position.set(0, height, 0);
-    this.scene.add(this.hemisphereLight);
-
-    this.dirLight = new DirectionalLight(0xffffff, 0);
-    this.dirLight.color.setHSL(1, 1, 0.1);
+    this.dirLight = new DirectionalLight(0xffffff, 1.5);
     this.dirLight.castShadow = true;
 
-    this.dirLight.shadow.mapSize.width = 1024;
-    this.dirLight.shadow.mapSize.height = 1024;
-    this.dirLight.shadow.camera.far = tol + height;
-    this.dirLight.shadow.bias = -0.0001;
-
-    this.dirLight.visible = true;
-
-    const helper = new CameraHelper(this.dirLight.shadow.camera);
-    this.scene.add(helper);
+    this.dirLight.shadow.mapSize.width = 4096;
+    this.dirLight.shadow.mapSize.height = 4096;
 
     this.scene.add(this.dirLight);
     this.scene.add(this.dirLight.target);
@@ -143,24 +133,22 @@ export class DesignBuilder implements OnDestroy {
 
     const edges = this.blueprint.wallEdges();
     for (let i = 0; i < edges.length; i++) {
-      const edge = new Edge(this.scene, edges[i], this.controls);
+      const edge = new Edge(this.scene, edges[i], this.cameraController);
       this.edgeMeshes.push(edge);
     }
-
-    this.scene.needsUpdate = true;
   }
 
-  private centerCamera() {
+  private centerCamera(): void {
     const yOffset = 1500.0;
 
     const pan = this.blueprint.getCenter();
     pan.y = yOffset;
     const distance = this.blueprint.getSize().z * 1.5;
 
-    var offset = pan.clone().add(new Vector3(0, distance, distance));
+    const offset = pan.clone().add(new Vector3(0, distance, distance));
     this.camera.position.copy(offset);
 
-    // this.controls.update();
+    this.cameraController.update();
   }
 
   public startRenderingLoop(): void {
@@ -168,7 +156,7 @@ export class DesignBuilder implements OnDestroy {
       const render = () => {
         this.renderer.render(this.scene.getScene(), this.camera);
         this.animationFrameId = requestAnimationFrame(render);
-        this.controls.update();
+        this.cameraController.update();
       };
       render();
     });
@@ -183,17 +171,44 @@ export class DesignBuilder implements OnDestroy {
   public handleResize(): void {
     const parent = this.canvas.parentElement;
     if (parent) {
-      const width = parent.clientHeight;
-      const height = parent.clientWidth;
+      const width = parent.clientWidth;
+      const height = parent.clientHeight;
+
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
+
       this.renderer.setSize(width, height);
     }
     if (this.camera && this.renderer) {
     }
   }
 
-  public ngOnDestroy(): void {
+  public setDesignTool(state: ControllerState): void {
+    this.designController.switchState(state);
+  }
+
+  public getDesignTool(): ControllerState {
+    return this.designController.state;
+  }
+
+  public onMouseMove(event: MouseEvent): void {
+    this.designController.mouseMoveEvent(event);
+  }
+
+  public onMouseDown(): void {
+    this.designController.mouseDownEvent();
+  }
+
+  public onMouseUp(): void {
+    this.designController.mouseUpEvent();
+  }
+
+  public stop(): void {
     this.stopRenderingLoop();
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.cameraController?.dispose();
+    this.renderer?.dispose();
+    this.destroy$ = new Subject<void>();
   }
 }

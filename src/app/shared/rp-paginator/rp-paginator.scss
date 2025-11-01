@@ -1,0 +1,35 @@
+.pagination {
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 2rem;
+}
+
+.pagination button {
+  padding: 1em;
+  text-decoration: none;
+  border: solid 1px rgb(188, 188, 188);
+  border-radius: 5px;
+  transition: color 0.2s;
+  color: #000;
+}
+.pagination span {
+  background-color: rgb(227, 227, 227);
+  border: solid 1px rgb(103, 103, 103);
+  border-radius: 5px;
+  padding: 0.8em;
+}
+
+.current-page {
+  background-color: rgb(227, 227, 227);
+  color: #c0c0c0;
+}
+
+.pagination button:hover {
+  color: #8bb1ff;
+}
+
+button:disabled {
+  background-color: rgb(227, 227, 227);
+  color: #c0c0c0;
+}

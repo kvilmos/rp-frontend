@@ -1,10 +1,15 @@
 .navbar {
+  position: sticky;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 60px;
-  background-color: #cecece;
+  background-color: var(--primary-color);
+  border-bottom: solid 1px var(--nav-background-color);
   padding: 0 20px;
+  z-index: 100;
+  text-transform: uppercase;
 }
 
 .initial {
@@ -22,23 +27,41 @@
 }
 
 .title:hover {
-  color: #b0acac;
+  color: #676767;
 }
 
-.anchors {
+.links {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.anchors a {
+.links a {
   text-decoration: none;
   color: #333;
   padding: 8px 12px;
   border-radius: 5px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-.anchors a:hover {
-  background-color: #ddd;
+.links a:hover {
+  text-decoration: underline;
+  color: #676767;
+}
+
+.links button,
+.logout {
+  background-color: #00000000;
+  border: none;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 1rem;
+  color: var(--text-color);
+  transition: all 0.3s;
+}
+
+.links button:hover,
+.logout:hover {
+  text-decoration: underline;
+  color: #676767;
 }

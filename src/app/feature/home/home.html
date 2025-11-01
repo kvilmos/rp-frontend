@@ -1,1 +1,27 @@
-<p>home works!</p>
+<div class="home-component">
+  <picture class="home-image">
+    <div class="home-text">{{ 'home.slogan' | translate }}</div>
+    <img src="assets/images/home_cover.png" class="image" />
+  </picture>
+  <div class="card-holder">
+    <div class="card" (click)="onCreateBlueprint()">
+      <div class="card-title">{{ 'home.createBlueprint' | translate }}</div>
+      <fa-icon class="fa-2x" [icon]="addIcon"></fa-icon>
+      <div class="card-text">{{ 'home.sloganCreateBlueprint' | translate }}</div>
+    </div>
+    <div class="card">
+      <a routerLink="/profile/furniture">
+        <div class="card-title">{{ 'home.uploadedFurniture' | translate }}</div>
+        <fa-icon class="fa-2x" [icon]="furnitureIcon"></fa-icon>
+        <div class="card-text">{{ 'home.sloganUploadedFurniture' | translate }}</div>
+      </a>
+    </div>
+    <div class="card">
+      <a routerLink="/profile/blueprint">
+        <div class="card-title">{{ 'home.savedBlueprints' | translate }}</div>
+        <fa-icon class="fa-2x" [icon]="blueprintIcon"></fa-icon>
+        <div class="card-text">{{ 'home.sloganSavedBlueprints' | translate }}</div>
+      </a>
+    </div>
+  </div>
+</div>
