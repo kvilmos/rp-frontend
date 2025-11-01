@@ -2,10 +2,11 @@ import { ElementRef, inject, Injectable, NgZone } from '@angular/core';
 import { Blueprint } from './blueprint';
 import { BlueprintScene } from './blueprint_scene';
 import {
+  AmbientLight,
   DirectionalLight,
-  HemisphereLight,
   PCFSoftShadowMap,
   PerspectiveCamera,
+  SRGBColorSpace,
   Vector3,
   WebGLRenderer,
 } from 'three';
@@ -26,7 +27,7 @@ export class DesignBuilder {
   public cameraController!: OrbitControls;
 
   private dirLight!: DirectionalLight;
-  private hemisphereLight!: HemisphereLight;
+  private ambientLight!: AmbientLight;
 
   private floorMeshes: Floor[] = [];
   private edgeMeshes: Edge[] = [];
@@ -46,9 +47,11 @@ export class DesignBuilder {
       antialias: true,
       preserveDrawingBuffer: true,
     });
+
     this.renderer.autoClear = false;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = PCFSoftShadowMap;
+    this.renderer.outputColorSpace = SRGBColorSpace;
     this.scene.getScene().background = DESIGN.BACKGROUND_COLOR_LIGHT;
 
     this.loadLights();
@@ -79,23 +82,14 @@ export class DesignBuilder {
   }
 
   public loadLights(): void {
-    const tol = 1;
-    const height = 300;
+    this.ambientLight = new AmbientLight(0xffffff, 0.5);
+    this.scene.add(this.ambientLight);
 
-    this.hemisphereLight = new HemisphereLight(0xffffff, 0x888888, 1.1);
-    this.hemisphereLight.position.set(0, height, 0);
-    this.scene.add(this.hemisphereLight);
-
-    this.dirLight = new DirectionalLight(0xffffff, 0);
-    this.dirLight.color.setHSL(1, 1, 0.1);
+    this.dirLight = new DirectionalLight(0xffffff, 1.5);
     this.dirLight.castShadow = true;
 
-    this.dirLight.shadow.mapSize.width = 1024;
-    this.dirLight.shadow.mapSize.height = 1024;
-    this.dirLight.shadow.camera.far = tol + height;
-    this.dirLight.shadow.bias = -0.0001;
-
-    this.dirLight.visible = true;
+    this.dirLight.shadow.mapSize.width = 4096;
+    this.dirLight.shadow.mapSize.height = 4096;
 
     this.scene.add(this.dirLight);
     this.scene.add(this.dirLight.target);

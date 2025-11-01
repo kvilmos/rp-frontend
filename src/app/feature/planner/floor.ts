@@ -1,9 +1,11 @@
 import {
   DoubleSide,
   Mesh,
-  MeshPhongMaterial,
+  MeshStandardMaterial,
+  RepeatWrapping,
   Shape,
   ShapeGeometry,
+  SRGBColorSpace,
   TextureLoader,
   Vector2,
 } from 'three';
@@ -29,18 +31,20 @@ export class Floor {
   }
 
   private buildFloor(): Mesh {
-    // const textureSettings = this.room.getTexture();
-    this.textureLoader.load('');
-    //var floorTexture = ImageUtils.loadTexture(textureSettings.url);
+    const texturePath = '/assets/images/textures/floor.jpg';
+    const floorTexture = this.textureLoader.load(texturePath);
+    const textureScale = 128;
 
-    const floorMaterialTop = new MeshPhongMaterial({
+    floorTexture.wrapS = RepeatWrapping;
+    floorTexture.wrapT = RepeatWrapping;
+    floorTexture.colorSpace = SRGBColorSpace;
+
+    const floorMaterialTop = new MeshStandardMaterial({
       side: DoubleSide,
-      color: 0xcccccc,
-      specular: 0x0a0a0a,
+      map: floorTexture,
+      roughness: 0.8,
+      metalness: 0.2,
     });
-
-    var textureScale = 400; // textureSettings.scale;
-    // TODO: TEXTURE Setting
 
     const points = [];
     for (let i = 0; i < this.room.interiorCorners.length; i++) {
@@ -50,11 +54,14 @@ export class Floor {
 
     const shape = new Shape(points);
     const geometry = new ShapeGeometry(shape);
+
     const floor = new Mesh(geometry, floorMaterialTop);
 
     floor.rotation.set(Math.PI / 2, 0, 0);
     floor.scale.set(textureScale, textureScale, textureScale);
+
     floor.receiveShadow = true;
+    floor.castShadow = false;
 
     return floor;
   }
