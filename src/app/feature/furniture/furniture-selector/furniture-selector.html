@@ -1,5 +1,13 @@
 <div class="selector-panel">
-  @if (furnitureList && furnitureList.length > 0) {
+  @if (categories$ | async; as categories) {
+  <div class="category-filter">
+    <rp-filter
+      [options]="categories"
+      [currentFilter]="activeFilters.category"
+      (filterChange)="onCategoryFilterChange($event)"
+    ></rp-filter>
+  </div>
+  } @if (furnitureList && furnitureList.length > 0) {
   <div class="grid-view">
     @for (item of furnitureList; track item.id) {
     <div class="item">

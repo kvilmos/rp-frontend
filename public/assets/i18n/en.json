@@ -39,6 +39,21 @@
   },
   "furniture": {
     "chooseFile": "Choose File",
+    "category": {
+      "bedsBedroomFurniture": "Bedroom",
+      "floorLamps": "Floor Lamps",
+      "formTitle": "Categories",
+      "kitchen": "Kitchen",
+      "notSelected": "Not Selected",
+      "officeFurniture": "Office",
+      "rugsCarpets": "Rugs",
+      "tables": "Tables",
+      "title": "Categories",
+      "seating": "Seating",
+      "select": "Select Category",
+      "storageFurniture": "Storage",
+      "vasesPlants": "Plants"
+    },
     "fileName": "File name",
     "furnitureDetails": "Furniture Details",
     "furnitureSize": "Furniture Size",

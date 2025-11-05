@@ -8,6 +8,7 @@ import {
   ViewChild,
   ElementRef,
   OnInit,
+  AfterViewInit,
 } from '@angular/core';
 import { Furniture } from '../furniture';
 import { FurniturePage } from '../furniture_page';
@@ -15,21 +16,32 @@ import { FurnitureApiService } from '../furniture-api.service';
 import { FurnitureFilter } from '../furniture_filter';
 import { SORTING } from '../../../common/constants/list-constants';
 import { TranslatePipe } from '@ngx-translate/core';
+import { FurnitureCategory } from '../furniture-category.interface';
+import { Observable } from 'rxjs';
+import { RpFilter } from '../../../shared/rp-filter/rp-filter';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   standalone: true,
   selector: 'rp-furniture-selector',
   templateUrl: 'furniture-selector.html',
   styleUrl: 'furniture-selector.scss',
-  imports: [TranslatePipe],
+  imports: [TranslatePipe, AsyncPipe, RpFilter],
 })
-export class RpFurnitureSelector implements OnInit, OnDestroy {
+export class RpFurnitureSelector implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('loadTrigger') loadTrigger!: ElementRef;
   @Output() onSelect = new EventEmitter<Furniture>();
 
+  public categories$!: Observable<FurnitureCategory[]>;
+  public activeFilters: FurnitureFilter = {
+    page: 1,
+    order: SORTING.LATEST_CREATED.value,
+    category: undefined,
+  };
   public furnitureList: Furniture[] = [];
   public loading = false;
   public hasNextPage = true;
+
   private currentPage = 1;
 
   private observerInitialized = false;
@@ -40,10 +52,15 @@ export class RpFurnitureSelector implements OnInit, OnDestroy {
   constructor() {}
 
   public ngOnInit(): void {
+    this.categories$ = this.furnitureApi.getCategories();
     this.loadFurniture();
   }
 
-  public setupObserver() {
+  public ngAfterViewInit(): void {
+    this.setupObserver();
+  }
+
+  private setupObserver() {
     if (!this.loadTrigger || this.observerInitialized) {
       return;
     }
@@ -68,16 +85,17 @@ export class RpFurnitureSelector implements OnInit, OnDestroy {
     if (this.loading || !this.hasNextPage) return;
 
     this.loading = true;
-    const filter: FurnitureFilter = {
-      page: this.currentPage,
-      order: SORTING.LATEST_CREATED.value,
-    };
 
-    this.furnitureApi.getAllFurniture(filter).subscribe({
+    this.furnitureApi.getAllFurniture(this.activeFilters).subscribe({
       next: (pageData: FurniturePage) => {
-        if (pageData && pageData.furniture && pageData.furniture.length > 0) {
-          this.furnitureList.push(...pageData.furniture);
-          this.currentPage++;
+        if (pageData && pageData.furniture) {
+          if (this.activeFilters.page === 1) {
+            this.furnitureList = pageData.furniture;
+          } else {
+            this.furnitureList.push(...pageData.furniture);
+          }
+
+          this.activeFilters.page!++;
           this.hasNextPage = pageData.currPage < pageData.totalPages;
         } else {
           this.hasNextPage = false;
@@ -97,6 +115,16 @@ export class RpFurnitureSelector implements OnInit, OnDestroy {
 
   public onSelectFurniture(furniture: Furniture) {
     this.onSelect.emit(furniture);
+  }
+
+  public onCategoryFilterChange(newCategory?: number): void {
+    this.activeFilters.category = newCategory;
+    this.activeFilters.page = 1;
+    this.furnitureList = [];
+    this.hasNextPage = true;
+    this.loading = false;
+
+    this.loadFurniture();
   }
 
   public ngOnDestroy(): void {

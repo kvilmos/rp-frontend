@@ -17,7 +17,7 @@ import { RpControlValueAccessor } from '../rp-control-value-accessor';
   ],
 })
 export class RpSelectInput<T> extends RpControlValueAccessor<T> {
-  @Input() options: T[] = [];
+  @Input() options: Object[] = [];
   @Input() selectId = '';
   @Input() label = '';
 }

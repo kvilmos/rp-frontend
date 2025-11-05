@@ -46,6 +46,21 @@
     }}</rp-value-display>
   </div>
 
+  <div class="sub-title">{{ 'furniture.category.formTitle' | translate }}</div>
+  <hr class="line" />
+  @if (categories$ | async; as categories) {
+  <select formControlName="category" id="category-select">
+    <option [ngValue]="null" disabled>{{ 'furniture.category.select' | translate }}</option>
+    @for (category of categories; track category.id) {
+    <option [value]="category.id">{{ 'furniture.category.' + category.name | translate }}</option>
+    }
+  </select>
+  }
+  <rp-validation-error
+    [class.hidden]="!submitted && !furnitureForm.controls.category.touched"
+    [errors]="furnitureForm.controls.category.errors"
+  ></rp-validation-error>
+
   <div class="sub-title">{{ 'furniture.subTitleThumbnail' | translate }}</div>
   <hr class="line" />
   <canvas class="thumbnailCanvas" #thumbnailCanvas></canvas>
