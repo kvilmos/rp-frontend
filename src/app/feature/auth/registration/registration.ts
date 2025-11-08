@@ -40,7 +40,7 @@ export class Registration {
       ]),
       email: new FormControl('', [
         Validators.required,
-        // Validators.email,
+        Validators.email,
         Validators.minLength(6),
         Validators.maxLength(255),
       ]),
