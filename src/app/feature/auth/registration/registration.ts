@@ -5,7 +5,7 @@ import { RpValidationError } from '../../../shared/rp-validation-error/rp-valida
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
-import { NewUser } from '../new_user.interface';
+import { NewUser } from '../new-user.interface';
 import { matchValidator } from '../../../common/validator';
 import { ErrorDisplay } from '../../../core/error/error.interface';
 import { ErrorHandler } from '../../../core/error/error-handler.service';

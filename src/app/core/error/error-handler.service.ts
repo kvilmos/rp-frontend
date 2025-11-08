@@ -23,6 +23,7 @@ export class ErrorHandler {
     if (!apiError || !apiError.message) {
       const err: ErrorDisplay = { key: 'unexpectedError' };
       errors.push(err);
+      this.showError(`${ERROR_TRANSLATE_BASE}common.internalServerError`);
       return errors;
     }
 
@@ -65,7 +66,7 @@ export class ErrorHandler {
 
     this.translate.get(translateRef).subscribe((message: string) => {
       this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
-        duration: 1500,
+        duration: ERROR_SNACKBAR_DURATION,
       });
     });
   }

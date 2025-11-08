@@ -1,4 +1,4 @@
-import { UserData } from './user_data.interface';
+import { UserData } from './user-data.interface';
 
 export interface LoginResponse {
   accessToken: string;
