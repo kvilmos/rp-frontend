@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { FurnitureFilter } from './furniture_filter';
 import { FurniturePage } from './furniture_page';
 import { Observable } from 'rxjs';
+import { FurnitureCategory } from './furniture-category.interface';
 
 @Injectable({ providedIn: 'root' })
 export class FurnitureApiService {
@@ -10,6 +11,8 @@ export class FurnitureApiService {
 
   public getAllFurniture(filters: FurnitureFilter = {}): Observable<FurniturePage> {
     const httpParams = this.buildParams(filters);
+    console.log(filters);
+
     return this.http.get<FurniturePage>('/api/furniture', { params: httpParams });
   }
 
@@ -26,7 +29,14 @@ export class FurnitureApiService {
     if (filters.order) {
       params = params.set('order', filters.order);
     }
+    if (filters.category) {
+      params = params.set('category', filters.category);
+    }
 
     return params;
+  }
+
+  public getCategories(): Observable<FurnitureCategory[]> {
+    return this.http.get<FurnitureCategory[]>('/api/furniture-category');
   }
 }

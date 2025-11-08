@@ -11,7 +11,7 @@ import { BlueprintFilter } from '../blueprint_filter';
 import { FormsModule } from '@angular/forms';
 import { SORTING, SortOption } from '../../../common/constants/list-constants';
 import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';
-import { RpSorter } from '../../../shared/rp-filter/rp-sorter';
+import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
 
 @Component({
   standalone: true,

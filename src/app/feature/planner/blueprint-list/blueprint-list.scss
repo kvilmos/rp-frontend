@@ -1,3 +1,10 @@
+.sorter {
+  display: flex;
+  flex-direction: row;
+  margin: 1em;
+  gap: 1rem;
+}
+
 .table-container {
   font-family: sans-serif;
   margin: 20px;

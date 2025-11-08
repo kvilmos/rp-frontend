@@ -1,8 +1,17 @@
-<rp-sorter
-  [options]="sortingOptions"
-  [currentSort]="activeFilters.order!"
-  (sortChange)="onSortChange($event)"
-></rp-sorter>
+<div class="filters">
+  <rp-sorter
+    [options]="sortingOptions"
+    [currentSort]="activeFilters.order!"
+    (sortChange)="onSortChange($event)"
+  ></rp-sorter>
+  @if (categories$ | async; as categories) {
+  <rp-filter
+    [options]="categories"
+    [currentFilter]="activeFilters.category"
+    (filterChange)="onCategoryFilterChange($event)"
+  ></rp-filter>
+  }
+</div>
 
 @if (pageData$ | async; as pageData) {
 <div class="grid-view">
