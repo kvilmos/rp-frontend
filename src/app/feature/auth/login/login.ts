@@ -4,11 +4,11 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { RpButton } from '../../../shared/rp-button/rp-button';
 import { AuthService } from '../auth.service';
-import { LoginCredentials } from '../login_credentials';
+import { LoginCredentials } from '../login_credentials.interface';
 import { Router } from '@angular/router';
-import { ErrorHandler } from '../../../core/error/error_handler';
+import { ErrorHandler } from '../../../core/error/error-handler.service';
 import { KeyValuePipe } from '@angular/common';
-import { ErrorDisplay } from '../../../core/error/type';
+import { ErrorDisplay } from '../../../core/error/error.interface';
 
 @Component({
   standalone: true,
@@ -43,7 +43,7 @@ export class Login {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        this.serverErrors.set(this.errorHandler.parseHttpError(err));
+        this.serverErrors.set(this.errorHandler.processHttpError(err));
       },
     });
   }

@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
-import { NewUser } from './new_user';
+import { NewUser } from './new_user.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { LoginCredentials } from './login_credentials';
-import { UserData } from './user_data';
-import { LoginResponse } from './login_response';
-import { Token } from './token';
+import { LoginCredentials } from './login_credentials.interface';
+import { UserData } from './user_data.interface';
+import { LoginResponse } from './login_response.interface';
+import { Token } from './token.interface';
 
 @Injectable({
   providedIn: 'root',

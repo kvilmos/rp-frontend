@@ -3,7 +3,7 @@
   <ul>
     @for (error of errors | keyvalue; track error.key ) {
     <li>
-      {{ 'error.' + error.key | translate : error.value }}
+      {{ 'form.error.' + error.key | translate : error.value }}
     </li>
     }
   </ul>

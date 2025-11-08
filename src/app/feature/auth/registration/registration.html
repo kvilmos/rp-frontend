@@ -74,9 +74,9 @@
       @for(error of serverErrors(); track $index) {
       <div>
         @if (error.param) { @for (param of error.param | keyvalue; track param.key) {
-        {{ 'error.' + error.key | translate : error.param }}
+        {{ error.key | translate : error.param }}
         } }@else {
-        {{ 'error.' + error.key | translate }}
+        {{ error.key | translate }}
         }
       </div>
       }
