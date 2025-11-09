@@ -16,7 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ObjectData } from '../object_data';
 import { faCamera, faCircleHalfStroke, faTableCells } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ErrorHandler } from '../../../core/error/error-handler.service';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { PreviewService } from '../preview.service';
 
 @Component({

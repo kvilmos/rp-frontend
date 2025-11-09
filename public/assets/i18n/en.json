@@ -122,7 +122,9 @@
   },
   "server": {
     "success": {
-      "registration": "Successful Registration!"
+      "login": "Logged in successfully!",
+      "logout": "Logged out successfully!",
+      "registration": "Registered successfully!"
     },
     "error": {
       "common": {

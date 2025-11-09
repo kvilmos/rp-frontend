@@ -3,11 +3,12 @@ import { inject, Injectable } from '@angular/core';
 import { ApiError, ErrorDisplay, ValidationError } from './error.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
+import { ERROR_TRANSLATE_BASE } from '../constants/error.constant';
 import {
-  ERROR_SNACKBAR_DURATION,
-  ERROR_TRANSLATE_BASE,
-} from '../../common/constants/error.constant';
-import { SNACKBAR_CLOSE_SYMBOL } from '../../common/constants/common.constant';
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_ERROR_CLASS,
+} from '../constants/common.constant';
 
 @Injectable({
   providedIn: 'root',
@@ -15,6 +16,7 @@ import { SNACKBAR_CLOSE_SYMBOL } from '../../common/constants/common.constant';
 export class ErrorHandler {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translate = inject(TranslateService);
+  constructor() {}
 
   public processHttpError(err: HttpErrorResponse): ErrorDisplay[] {
     const errors: ErrorDisplay[] = [];
@@ -66,14 +68,16 @@ export class ErrorHandler {
 
     this.translate.get(translateRef).subscribe((message: string) => {
       this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
-        duration: ERROR_SNACKBAR_DURATION,
+        duration: SNACKBAR_DURATION,
+        panelClass: SNACKBAR_ERROR_CLASS,
       });
     });
   }
 
   public showError(message: string): void {
     this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
-      duration: ERROR_SNACKBAR_DURATION,
+      duration: SNACKBAR_DURATION,
+      panelClass: SNACKBAR_ERROR_CLASS,
     });
   }
 }

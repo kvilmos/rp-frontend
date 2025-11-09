@@ -3,14 +3,19 @@ import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { RpButton } from '../../../shared/rp-button/rp-button';
 import { RpValidationError } from '../../../shared/rp-validation-error/rp-validation-error';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
 import { NewUser } from '../new-user.interface';
-import { matchValidator } from '../../../common/validator';
-import { ErrorDisplay } from '../../../core/error/error.interface';
-import { ErrorHandler } from '../../../core/error/error-handler.service';
+import { matchValidator } from '../../../utils/validator';
+import { ErrorDisplay } from '../../../common/error/error.interface';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { KeyValuePipe } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_SUCCESS_CLASS,
+} from '../../../common/constants/common.constant';
 
 @Component({
   standalone: true,
@@ -63,6 +68,7 @@ export class Registration {
   private readonly snackBar = inject(MatSnackBar);
   private readonly authService = inject(AuthService);
   private readonly errorHandler = inject(ErrorHandler);
+  private readonly translate = inject(TranslateService);
   constructor() {}
 
   public onSubmitForm(): void {
@@ -75,9 +81,11 @@ export class Registration {
     this.authService.registerNewUser(user).subscribe({
       next: () => {
         this.registrationForm.reset;
-        this.snackBar.open('success', 'x', {
-          duration: 1000,
-          panelClass: ['registration-success'],
+        this.translate.get('server.success.registration').subscribe((message: string) => {
+          this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+            duration: SNACKBAR_DURATION,
+            panelClass: SNACKBAR_SUCCESS_CLASS,
+          });
         });
         this.modeClick.emit();
       },

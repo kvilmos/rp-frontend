@@ -3,7 +3,7 @@ import { FurnitureUpload } from './feature/furniture/furniture-upload/furniture-
 import { AuthPage } from './feature/auth/auth-page/auth-page';
 import { Home } from './feature/home/home';
 import { authGuard } from './guard/auth-guard';
-import { NotFound } from './core/not-found/not-found';
+import { NotFound } from './common/not-found/not-found';
 import { loggedInGuard } from './guard/logged-in-guard';
 import { RpBlueprintView } from './feature/planner/blueprint-view/blueprint-view';
 import { RpFurnitureList } from './feature/furniture/furniture-list/furniture-list';
