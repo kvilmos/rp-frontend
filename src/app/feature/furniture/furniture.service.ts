@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, lastValueFrom, last, forkJoin, combineLatest } from 'rxjs';
 import { ObjectData } from './object_data';
 import { FurnitureThumbnail } from './furniture_thumbnail';
-import { FurnitureUrls } from '../../common/interface/furniture_urls';
+import { FurnitureUrls } from '../../common/interface/furniture_urls.interface';
 
 interface UploadProgress {
   loaded: number;
