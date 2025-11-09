@@ -108,3 +108,13 @@ html body {
 .hidden {
   visibility: hidden;
 }
+
+.snackbar-success {
+  background-color: #adc89c;
+  color: #fff;
+}
+
+.snackbar-error {
+  background-color: #c89c9c;
+  color: #fff;
+}

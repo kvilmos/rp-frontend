@@ -5,12 +5,19 @@ import { BlueprintApiService } from '../../feature/planner/blueprint-api-service
 import { CompleteBlueprint } from '../../feature/planner/blueprint_load';
 import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_SUCCESS_CLASS,
+} from '../../common/constants/common.constant';
 
 @Component({
   standalone: true,
   selector: 'rp-navbar',
-  templateUrl: 'navbar.html',
-  styleUrl: 'navbar.scss',
+  templateUrl: 'rp-navbar.html',
+  styleUrl: 'rp-navbar.scss',
   imports: [RouterLink, FontAwesomeModule],
 })
 export class RpNavbar {
@@ -19,7 +26,8 @@ export class RpNavbar {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly bpApi = inject(BlueprintApiService);
-
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   constructor() {}
 
   public onCreateBlueprint(): void {
@@ -35,5 +43,11 @@ export class RpNavbar {
 
   public onClickLogout(): void {
     this.authService.logout();
+    this.translate.get('server.success.logout').subscribe((message: string) => {
+      this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+        duration: SNACKBAR_DURATION,
+        panelClass: SNACKBAR_SUCCESS_CLASS,
+      });
+    });
   }
 }

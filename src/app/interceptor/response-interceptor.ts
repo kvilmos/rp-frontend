@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { map } from 'rxjs';
-import { ResponseFrame } from '../interface/response_frame';
+import { ResponseFrame } from '../common/interface/response_frame.interface';
 
 export const responseInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(

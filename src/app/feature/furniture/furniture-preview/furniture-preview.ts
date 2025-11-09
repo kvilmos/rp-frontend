@@ -16,7 +16,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ObjectData } from '../object_data';
 import { faCamera, faCircleHalfStroke, faTableCells } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { ErrorHandler } from '../../../core/error/error_handler';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { PreviewService } from '../preview.service';
 
 @Component({
@@ -52,7 +52,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
 
           return this.processFurnitureFile$(file).pipe(
             catchError((error) => {
-              this.errorHandler.showUserError(error);
+              this.errorHandler.showError(error);
               this.previewService.setObject();
               return of(null);
             })
@@ -76,7 +76,7 @@ export class FurniturePreview implements OnInit, AfterViewInit {
       reader.onload = (event) => {
         const fileContent = event.target?.result;
         if (!(fileContent instanceof ArrayBuffer)) {
-          this.errorHandler.showUserError('fileReaderFailed');
+          this.errorHandler.showError('fileReaderFailed');
           return;
         }
 

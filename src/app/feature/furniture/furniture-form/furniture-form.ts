@@ -27,7 +27,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MetricPipe } from '../../../utils/metric-pipe';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
 import { TranslatePipe } from '@ngx-translate/core';
-import { ErrorHandler } from '../../../core/error/error_handler';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { PreviewService } from '../preview.service';
 import { THUMBNAIL } from '../../../common/constants/file-constants';
 import { FurnitureCategory } from '../furniture-category.interface';
