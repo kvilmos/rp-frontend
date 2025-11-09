@@ -30,6 +30,9 @@
     "titlePage": "Room Editor",
     "titleTools": "Toolbar"
   },
+  "confirm": {
+    "newBlueprint": "Are you sure you want to create a new blueprint?"
+  },
   "common": {
     "cancel": "Cancel",
     "loading": "loading",
