@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { RpNavbar } from '../../shared/navbar/navbar';
+import { RpNavbar } from '../../shared/rp-navbar/rp-navbar';
 
 @Component({
   standalone: true,
