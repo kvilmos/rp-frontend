@@ -1,59 +1,85 @@
-# RpFrontend
+# Room Planner Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+Ez a repository a "Room Planner" alkalmazás Angularral készített frontend kliensét tartalmazza. Ez a felhasználói felület felelős az adatok vizuális megjelenítéséért és a felhasználói interakciók kezeléséért.
 
-## Development server
+## Technológiák
 
-To start a local development server, run:
+- **Framework:** [Angular](https://angular.io/)
+- **Nyelv:** TypeScript
+- **Fejlesztői proxy:** Nginx (Docker segítségével), ami egységesíti a backend és a frontend szolgáltatások elérését.
 
-```bash
-ng serve
-```
+## Előfeltételek
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+A projekt futtatásához az alábbi eszközök szükségesek:
 
-## Code scaffolding
+- [Node.js](https://nodejs.org/) (LTS verzió javasolt) és npm
+- [Angular CLI](https://angular.io/cli) globálisan telepítve: `npm install -g @angular/cli`
+- [Docker](https://www.docker.com/products/docker-desktop/) és Docker Compose
+- [rp-database](https://github.com/kvilmos/rp-database)
+- [rp-backend](https://github.com/kvilmos/rp-backend)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Telepítés és Futtatás
 
-```bash
-ng generate component component-name
-```
+Kövesd az alábbi lépéseket a fejlesztői környezet elindításához.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### 1. Backend és adatbázis elindítása
 
-```bash
-ng generate --help
-```
+Győződj meg róla, hogy az `rp-database` és `rp-backend` repositorykban leírtak szerint minden háttérszolgáltatás el van indítva és fut. A frontend nem fog tudni működni a háttér API-k nélkül.
 
-## Building
+- [rp-database](https://github.com/kvilmos/rp-database)
+- [rp-backend](https://github.com/kvilmos/rp-backend)
 
-To build the project run:
+### 2. Frontend függőségek telepítése
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Nyiss egy terminált a projekt gyökérkönyvtárában (`rp-frontend`), és telepítsd a szükséges Node.js csomagokat:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
+### 3. Fejlesztői Proxy indítása
 
-For end-to-end (e2e) testing, run:
+A frontend egy Nginx proxyt használ, hogy a backend API és MinIO kéréseket egyszerűen, CORS hibák nélkül kezelje.
 
-```bash
-ng e2e
-```
+1.  Lépj be a `dev-proxy` könyvtárba:
+    ```bash
+    cd dev-proxy
+    ```
+2.  Indítsd el az Nginx konténert a háttérben:
+    ```bash
+    docker-compose up -d
+    ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Ez elindít egy Nginx szervert a `80`-as porton. Az `nginx.conf` fájl alapján a bejövő kéréseket a megfelelő helyre irányítja:
 
-## Additional Resources
+- A sima frontend (`/`) kéréseket továbbítja az Angular fejlesztői szerver felé (`localhost:4200`).
+- Az `/api/` végpontra érkező kéréseket továbbítja a Go backend felé (`localhost:4747`).
+- Az `/minio/` végpontra érkező kéréseket továbbítja a MinIO szerver felé (`localhost:9000`).
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### 4. Angular fejlesztői szerver indítása
+
+Most, hogy a proxy fut, elindíthatod magát az Angular alkalmazást.
+
+1.  Lépj vissza a projekt gyökérkönyvtárába.
+2.  Indítsd el az `ng serve` parancsot:
+    ```bash
+    ng serve --host 0.0.0.0
+    ```
+
+### 5. Alkalmazás megnyitása
+
+A fejlesztői szerver elindulása után az alkalmazást a böngésződben a **proxy címen** keresztül éred el:
+
+**http://localhost**
+
+Fontos, hogy ne a `http://localhost:4200`-as címet használd közvetlenül, mert akkor a backend API hívások CORS hibát fognak dobni. A `localhost` (80-as port) címen keresztül az Nginx proxy gondoskodik a kérések helyes továbbításáról.
+
+---
+
+## Hasznos parancsok
+
+- **Függőségek telepítése:** `npm install`
+- **Fejlesztői szerver indítása:** `ng serve`
+- **Build a production környezethez:** `ng build`
+- **Unit tesztek futtatása:** `ng test`
+- **Proxy leállítása:** A `dev-proxy` mappában futtasd: `docker-compose down`
