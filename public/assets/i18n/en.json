@@ -24,11 +24,11 @@
       "updatedAt": "Last Update"
     },
     "textInput": "Name",
-    "titleBlueprint": "Blueprint",
-    "titleDesign": "Design",
-    "titleDetails": "Details",
+    "titleBlueprint": "Blueprint Tools",
+    "titleDesign": "Design Tools",
+    "titleDetails": "Project Details",
     "titlePage": "Room Editor",
-    "titleTools": "Toolbar"
+    "titleTools": "Project Tools"
   },
   "confirm": {
     "newBlueprint": "Are you sure you want to create a new blueprint?"
