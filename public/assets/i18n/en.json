@@ -31,6 +31,8 @@
     "titleTools": "Project Tools"
   },
   "confirm": {
+    "deleteBlueprint": "Are you sure you want to delete the {{blueprintName}} (#{{blueprintId}}) blueprint?",
+    "editBlueprint": "Are you sure you want to edit the {{blueprintName}} (# {{blueprintId}}) blueprint?",
     "newBlueprint": "Are you sure you want to create a new blueprint?"
   },
   "common": {
@@ -127,9 +129,13 @@
     "success": {
       "login": "Logged in successfully!",
       "logout": "Logged out successfully!",
-      "registration": "Registered successfully!"
+      "registration": "Registered successfully!",
+      "deleteBlueprint": "Blueprint deleted successfully."
     },
     "error": {
+      "blueprint": {
+        "deleteFailed": "Failed to delete blueprint"
+      },
       "common": {
         "unexpectedError": "Something went wrong. Please tye again in little while.",
         "unprocessableEntity": "Invalid data sent.",

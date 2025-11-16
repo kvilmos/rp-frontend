@@ -1,10 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, switchMap } from 'rxjs';
 import { BlueprintApiService } from '../blueprint-api-service';
-import { BlueprintPage } from '../blueprint_load';
+import { Blueprint, BlueprintPage } from '../blueprint_load';
 import { AsyncPipe, DatePipe } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { BlueprintFilter } from '../blueprint_filter';
@@ -12,6 +12,14 @@ import { FormsModule } from '@angular/forms';
 import { SORTING, SortOption } from '../../../common/constants/list-constants';
 import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';
 import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_SUCCESS_CLASS,
+} from '../../../common/constants/common.constant';
+import { ErrorDisplay } from '../../../common/error/error.interface';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
 
 @Component({
   standalone: true,
@@ -19,7 +27,6 @@ import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
   templateUrl: './blueprint-list.html',
   styleUrl: './blueprint-list.scss',
   imports: [
-    RouterLink,
     DatePipe,
     TranslatePipe,
     FontAwesomeModule,
@@ -39,6 +46,7 @@ export class RpBlueprintList implements OnInit {
     SORTING.OLDEST_CREATED,
   ];
 
+  public serverErrors: WritableSignal<ErrorDisplay[]> = signal([]);
   public pageData$!: Observable<BlueprintPage>;
   public activeFilters: BlueprintFilter = {};
 
@@ -47,6 +55,9 @@ export class RpBlueprintList implements OnInit {
   private readonly bpApi = inject(BlueprintApiService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly errorHandler = inject(ErrorHandler);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   constructor() {}
 
   public ngOnInit(): void {
@@ -85,19 +96,42 @@ export class RpBlueprintList implements OnInit {
     });
   }
 
-  public onBlueprintDelete(id: number) {
-    if (!confirm('Are you sure you want to delete this blueprint?')) {
-      return;
-    }
+  public onBlueprintDelete(blueprint: Blueprint) {
+    this.translate
+      .get('confirm.deleteBlueprint', {
+        blueprintId: blueprint.id,
+        blueprintName: blueprint.name,
+      })
+      .subscribe((confirmStr: string) => {
+        if (confirm(confirmStr)) {
+          this.bpApi.deleteBlueprint(blueprint.id).subscribe({
+            next: () => {
+              this.translate.get('server.success.deleteBlueprint').subscribe((message: string) => {
+                this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+                  duration: SNACKBAR_DURATION,
+                  panelClass: SNACKBAR_SUCCESS_CLASS,
+                });
+              });
+              this.refreshTrigger.next();
+            },
+            error: (err) => {
+              this.serverErrors.set(this.errorHandler.processHttpError(err));
+            },
+          });
+        }
+      });
+  }
 
-    this.bpApi.deleteBlueprint(id).subscribe({
-      next: () => {
-        console.log('Blueprint deleted successfully. Refreshing list...');
-        this.refreshTrigger.next();
-      },
-      error: (err) => {
-        console.error('Failed to delete blueprint', err);
-      },
-    });
+  public onBlueprintEdit(blueprint: Blueprint) {
+    this.translate
+      .get('confirm.editBlueprint', {
+        blueprintId: blueprint.id,
+        blueprintName: blueprint.name,
+      })
+      .subscribe((confirmStr: string) => {
+        if (confirm(confirmStr)) {
+          this.router.navigate(['/room-editor', blueprint.id]);
+        }
+      });
   }
 }
