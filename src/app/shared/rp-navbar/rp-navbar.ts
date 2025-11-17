@@ -31,13 +31,17 @@ export class RpNavbar {
   constructor() {}
 
   public onCreateBlueprint(): void {
-    this.bpApi.createBlueprint().subscribe({
-      next: (blueprint: CompleteBlueprint) => {
-        this.router.navigate(['/room-editor', blueprint.id]);
-      },
-      error: (err) => {
-        console.error(err);
-      },
+    this.translate.get('confirm.newBlueprint').subscribe((confirmStr: string) => {
+      if (confirm(confirmStr)) {
+        this.bpApi.createBlueprint().subscribe({
+          next: (blueprint: CompleteBlueprint) => {
+            this.router.navigate(['/room-editor', blueprint.id]);
+          },
+          error: (err) => {
+            console.error(err);
+          },
+        });
+      }
     });
   }
 

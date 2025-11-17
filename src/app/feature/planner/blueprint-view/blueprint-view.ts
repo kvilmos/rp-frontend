@@ -6,7 +6,9 @@ import {
   inject,
   OnDestroy,
   OnInit,
+  signal,
   ViewChild,
+  WritableSignal,
 } from '@angular/core';
 import { BlueprintController } from '../blueprint_controller';
 import {
@@ -24,8 +26,8 @@ import {
 import { BLUEPRINT } from '../../../common/constants/planner-constants';
 import { DesignBuilder } from '../design_builder';
 import { NgClass } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Furniture } from '../../furniture/furniture';
 import { BlueprintScene } from '../blueprint_scene';
 import { Vector3 } from 'three';
@@ -38,6 +40,14 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { CornerSave, WallSave, ItemSave, BlueprintSave } from '../save_blueprint';
 import { RpTextInput } from '../../../shared/rp-text-input/rp-text-input';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ErrorHandler } from '../../../common/error/error-handler.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_SUCCESS_CLASS,
+} from '../../../common/constants/common.constant';
+import { ErrorDisplay } from '../../../common/error/error.interface';
 
 @Component({
   standalone: true,
@@ -83,6 +93,8 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   public activeBpTool!: number;
   public activeDesignTool!: ControllerState;
 
+  public serverErrors: WritableSignal<ErrorDisplay[]> = signal([]);
+
   public readonly bpController = inject(BlueprintController);
   public readonly designBuilder = inject(DesignBuilder);
 
@@ -92,6 +104,11 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
   private readonly blueprint = inject(Blueprint);
   private readonly bpApi = inject(BlueprintApiService);
   private readonly route = inject(ActivatedRoute);
+
+  private readonly router = inject(Router);
+  private readonly errorHandler = inject(ErrorHandler);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   constructor() {
     this.activeBpTool = this.bpController.mode;
     this.activeDesignTool = this.designBuilder.getDesignTool();
@@ -204,6 +221,36 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
         throw console.error(error);
       },
     });
+  }
+
+  public deleteBlueprint(): void {
+    if (!this.blueprintData) {
+      return;
+    }
+
+    this.translate
+      .get('confirm.deleteBlueprint', {
+        blueprintId: this.blueprintData.id,
+        blueprintName: this.blueprintData.name,
+      })
+      .subscribe((confirmStr: string) => {
+        if (confirm(confirmStr)) {
+          this.bpApi.deleteBlueprint(this.blueprintData!.id).subscribe({
+            next: () => {
+              this.translate.get('server.success.deleteBlueprint').subscribe((message: string) => {
+                this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+                  duration: SNACKBAR_DURATION,
+                  panelClass: SNACKBAR_SUCCESS_CLASS,
+                });
+              });
+              this.router.navigate(['/home']);
+            },
+            error: (err) => {
+              this.serverErrors.set(this.errorHandler.processHttpError(err));
+            },
+          });
+        }
+      });
   }
 
   @HostListener('window:resize')

@@ -29,18 +29,6 @@
 
   <div class="tool-bar">
     <div>
-      <div class="title-toolbar">{{ 'blueprint.titleDetails' | translate }}</div>
-      <hr class="line" />
-      <form [formGroup]="blueprintForm">
-        <rp-text-input
-          [placeholder]="'blueprint.placeholder' | translate"
-          [label]="'blueprint.textInput' | translate"
-          inputId="bpName"
-          formControlName="name"
-        ></rp-text-input>
-      </form>
-    </div>
-    <div>
       <div class="title-toolbar">{{ 'blueprint.titleTools' | translate }}</div>
       <hr class="line" />
       <div class="tools">
@@ -51,8 +39,20 @@
           (click)="setView()"
         ></fa-icon>
         <fa-icon class="fa-xl tool-icon" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
-        <fa-icon class="fa-xl tool-delete" [icon]="iconDeleteBp"></fa-icon>
+        <fa-icon class="fa-xl tool-del" [icon]="iconDeleteBp" (click)="deleteBlueprint()"></fa-icon>
       </div>
+    </div>
+    <div>
+      <div class="title-tools">{{ 'blueprint.titleDetails' | translate }}</div>
+      <hr class="line" />
+      <form [formGroup]="blueprintForm">
+        <rp-text-input
+          [placeholder]="'blueprint.placeholder' | translate"
+          [label]="'blueprint.textInput' | translate"
+          inputId="bpName"
+          formControlName="name"
+        ></rp-text-input>
+      </form>
     </div>
     <div>
       <div class="title-tools">{{ 'blueprint.titleBlueprint' | translate }}</div>
