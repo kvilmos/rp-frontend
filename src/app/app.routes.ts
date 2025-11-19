@@ -2,19 +2,19 @@ import { Routes } from '@angular/router';
 import { FurnitureUpload } from './feature/furniture/furniture-upload/furniture-upload';
 import { AuthPage } from './feature/auth/auth-page/auth-page';
 import { Home } from './feature/home/home';
-import { authGuard } from './guard/auth-guard';
+import { authGuard } from './feature/auth/auth-guard';
 import { NotFound } from './common/not-found/not-found';
-import { loggedInGuard } from './guard/logged-in-guard';
+import { loggedInGuard } from './feature/auth/logged-in-guard';
 import { RpBlueprintView } from './feature/planner/blueprint-view/blueprint-view';
 import { RpFurnitureList } from './feature/furniture/furniture-list/furniture-list';
-import { MainLayout } from './layout/main-layout/main-layout';
+import { RpMainLayout } from './layout/rp-main-layout/rp-main-layout';
 import { RpBlueprintList } from './feature/planner/blueprint-list/blueprint-list';
 import { blueprintDataResolver } from './feature/planner/blueprint-data-resolver';
 
 export const routes: Routes = [
   {
     path: '',
-    component: MainLayout,
+    component: RpMainLayout,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: Home },

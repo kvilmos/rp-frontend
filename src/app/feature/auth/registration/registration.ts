@@ -6,7 +6,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../auth.service';
 import { NewUser } from '../new-user.interface';
-import { matchValidator } from '../../../utils/validator';
+import { matchValidator } from '../../../common/utils/validator';
 import { ErrorDisplay } from '../../../common/error/error.interface';
 import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { KeyValuePipe } from '@angular/common';

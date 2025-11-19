@@ -24,7 +24,7 @@ import { RpValidationError } from '../../../shared/rp-validation-error/rp-valida
 import { RpButton } from '../../../shared/rp-button/rp-button';
 import { AsyncPipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MetricPipe } from '../../../utils/metric-pipe';
+import { MetricPipe } from '../../../common/utils/metric-pipe';
 import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-display';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ErrorHandler } from '../../../common/error/error-handler.service';
