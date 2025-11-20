@@ -13,7 +13,7 @@ import {
   Color,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { PREVIEW } from '../../common/constants/renderer-constants';
+import { PREVIEW } from '../../common/constant/renderer.constant';
 import { FurnitureThumbnail } from './furniture_thumbnail';
 
 @Injectable({ providedIn: 'root' })

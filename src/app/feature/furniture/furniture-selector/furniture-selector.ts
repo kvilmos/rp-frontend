@@ -14,7 +14,7 @@ import { Furniture } from '../furniture';
 import { FurniturePage } from '../furniture_page';
 import { FurnitureApiService } from '../../../api/furniture-api.service';
 import { FurnitureFilter } from '../furniture_filter';
-import { SORTING } from '../../../common/constants/list-constants';
+import { SORTING } from '../../../common/constant/list.constant';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FurnitureCategory } from '../furniture-category.interface';
 import { Observable } from 'rxjs';

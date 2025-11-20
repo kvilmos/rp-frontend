@@ -10,7 +10,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { DESIGN } from '../../common/constants/planner-constants';
+import { DESIGN } from '../../common/constant/planner.constant';
 import { Floor } from './floor';
 import { Edge } from './edge';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';

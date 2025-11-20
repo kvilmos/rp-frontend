@@ -23,7 +23,7 @@ import {
   faSave,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { BLUEPRINT } from '../../../common/constant/planner.constant';
 import { DesignBuilder } from '../design_builder';
 import { NgClass } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -45,7 +45,7 @@ import {
   SNACKBAR_CLOSE_SYMBOL,
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
-} from '../../../common/constants/common.constant';
+} from '../../../common/constant/common.constant';
 import { ErrorDisplay } from '../../../common/error/error.interface';
 import { BlueprintApiService } from '../../../api/blueprint-api-service';
 

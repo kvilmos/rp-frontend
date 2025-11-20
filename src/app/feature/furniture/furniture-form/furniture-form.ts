@@ -29,7 +29,7 @@ import { RpValueDisplay } from '../../../shared/rp-value-display/rp-value-displa
 import { TranslatePipe } from '@ngx-translate/core';
 import { ErrorHandler } from '../../../common/error/error-handler.service';
 import { PreviewService } from '../preview.service';
-import { THUMBNAIL } from '../../../common/constants/file-constants';
+import { THUMBNAIL } from '../../../common/constant/file.constant';
 import { FurnitureCategory } from '../furniture-category.interface';
 import { Observable } from 'rxjs';
 import { FurnitureApiService } from '../../../api/furniture-api.service';

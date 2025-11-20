@@ -4,7 +4,7 @@ import { FurniturePage } from '../furniture_page';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FurnitureFilter } from '../furniture_filter';
-import { SortOption, SORTING } from '../../../common/constants/list-constants';
+import { SortOption, SORTING } from '../../../common/constant/list.constant';
 import { FurnitureApiService } from '../../../api/furniture-api.service';
 import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
 import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';

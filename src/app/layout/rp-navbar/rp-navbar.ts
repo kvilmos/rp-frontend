@@ -10,7 +10,7 @@ import {
   SNACKBAR_CLOSE_SYMBOL,
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
-} from '../../common/constants/common.constant';
+} from '../../common/constant/common.constant';
 import { BlueprintApiService } from '../../api/blueprint-api-service';
 
 @Component({

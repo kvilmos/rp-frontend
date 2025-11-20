@@ -1,6 +1,6 @@
 import { ElementRef, inject, Injectable } from '@angular/core';
 import { BlueprintView } from './blueprint_view';
-import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { Corner } from './corner';
 import { Wall } from './wall';
 import { Blueprint } from './blueprint';
