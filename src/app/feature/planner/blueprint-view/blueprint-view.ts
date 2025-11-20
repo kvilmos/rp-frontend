@@ -33,7 +33,6 @@ import { BlueprintScene } from '../blueprint_scene';
 import { Vector3 } from 'three';
 import { ControllerState } from '../builder_controller';
 import { RpFurnitureSelector } from '../../furniture/furniture-selector/furniture-selector';
-import { BlueprintApiService } from '../blueprint-api-service';
 import { Blueprint } from '../blueprint';
 import { CompleteBlueprint } from '../blueprint_load';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -48,6 +47,7 @@ import {
   SNACKBAR_SUCCESS_CLASS,
 } from '../../../common/constants/common.constant';
 import { ErrorDisplay } from '../../../common/error/error.interface';
+import { BlueprintApiService } from '../../../api/blueprint-api-service';
 
 @Component({
   standalone: true,
@@ -215,7 +215,7 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
       items: items,
     };
 
-    this.bpApi.uploadBlueprint(saveBp).subscribe({
+    this.bpApi.updateBlueprint(saveBp).subscribe({
       next: () => {},
       error: (error) => {
         throw console.error(error);

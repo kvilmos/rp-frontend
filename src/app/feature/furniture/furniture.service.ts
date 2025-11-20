@@ -1,10 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { NewFurniture } from './new_furniture';
-import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, lastValueFrom, last, forkJoin, combineLatest } from 'rxjs';
 import { ObjectData } from './object_data';
 import { FurnitureThumbnail } from './furniture_thumbnail';
-import { FurnitureUrls } from '../../common/interface/furniture_urls.interface';
+import { FurnitureApiService } from '../../api/furniture-api.service';
 
 interface UploadProgress {
   loaded: number;
@@ -26,7 +25,7 @@ export class FurnitureService {
   private readonly _uploadProgress = new BehaviorSubject<number>(0);
   public readonly uploadProgress$ = this._uploadProgress.asObservable();
 
-  private readonly http = inject(HttpClient);
+  private readonly furnitureApi = inject(FurnitureApiService);
   constructor() {}
 
   public setFile(file: File | null): void {
@@ -56,7 +55,7 @@ export class FurnitureService {
     this._uploadProgress.next(0);
 
     try {
-      const uploadUrls = await lastValueFrom(this.requestCreateFurniture(furniture));
+      const uploadUrls = await lastValueFrom(this.furnitureApi.requestCreateFurniture(furniture));
       const thumbnailBlob = await this.dataUrlToBlob(thumbnail.imageSrc);
 
       const modelSize = modelFile.size;
@@ -93,10 +92,6 @@ export class FurnitureService {
   private async dataUrlToBlob(dataUrl: string): Promise<Blob> {
     const response = await fetch(dataUrl);
     return await response.blob();
-  }
-
-  private requestCreateFurniture(furniture: NewFurniture): Observable<FurnitureUrls> {
-    return this.http.post<FurnitureUrls>('/api/furniture', furniture);
   }
 
   private uploadFile(url: string, file: File | Blob): Observable<UploadProgress> {

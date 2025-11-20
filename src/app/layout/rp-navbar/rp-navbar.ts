@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { AuthService } from '../../feature/auth/auth.service';
 import { Router, RouterLink } from '@angular/router';
-import { BlueprintApiService } from '../../feature/planner/blueprint-api-service';
 import { CompleteBlueprint } from '../../feature/planner/blueprint_load';
 import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -12,6 +11,7 @@ import {
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
 } from '../../common/constants/common.constant';
+import { BlueprintApiService } from '../../api/blueprint-api-service';
 
 @Component({
   standalone: true,

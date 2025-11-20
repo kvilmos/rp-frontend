@@ -3,8 +3,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faCouch, faHouseChimneyWindow, faPenRuler } from '@fortawesome/free-solid-svg-icons';
 import { TranslatePipe } from '@ngx-translate/core';
-import { BlueprintApiService } from '../planner/blueprint-api-service';
-import { CompleteBlueprint } from '../planner/blueprint_load';
+import { CompleteBlueprint } from '../../../feature/planner/blueprint_load';
+import { BlueprintApiService } from '../../../api/blueprint-api-service';
 
 @Component({
   standalone: true,

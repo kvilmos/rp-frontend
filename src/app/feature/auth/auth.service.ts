@@ -1,12 +1,11 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap, throwError } from 'rxjs';
-import { NewUser } from './new-user.interface';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LoginCredentials } from './login-credentials.interface';
 import { UserData } from './user-data.interface';
 import { LoginResponse } from './login-response.interface';
 import { Token } from './token.interface';
+import { AuthApiService } from '../../api/auth-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +15,7 @@ export class AuthService {
   private readonly currentUser = new BehaviorSubject<UserData | null>(null);
   private readonly authState = new BehaviorSubject<boolean>(false);
 
-  private readonly http = inject(HttpClient);
+  private readonly authApi = inject(AuthApiService);
   private readonly router = inject(Router);
   constructor() {}
 
@@ -32,12 +31,8 @@ export class AuthService {
     return this.authState.asObservable();
   }
 
-  public registerNewUser(user: NewUser): Observable<any> {
-    return this.http.post('/api/auth/register', user, { withCredentials: true });
-  }
-
   public loginUser(credentials: LoginCredentials): Observable<LoginResponse> {
-    return this.requestLogin(credentials).pipe(
+    return this.authApi.login(credentials).pipe(
       tap((loginRes) => {
         this.accessToken = loginRes.accessToken;
         this.currentUser.next(loginRes.user);
@@ -47,19 +42,11 @@ export class AuthService {
     );
   }
 
-  private requestLogin(user: LoginCredentials): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>('/api/auth/login', user, { withCredentials: true });
-  }
-
   public logout(): void {
-    this.requestLogout().subscribe({
+    this.authApi.logout().subscribe({
       next: () => this.handleLogout(),
       error: () => this.handleLogout(),
     });
-  }
-
-  private requestLogout(): Observable<void> {
-    return this.http.post<void>('/api/auth/logout', {}, { withCredentials: true });
   }
 
   private handleLogout(): void {
@@ -85,7 +72,7 @@ export class AuthService {
   }
 
   public requestCurrentUser(): Observable<UserData> {
-    return this.http.get<UserData>('/api/verify/me', { withCredentials: true }).pipe(
+    return this.authApi.verifyUser().pipe(
       tap((user) => {
         this.currentUser.next(user);
         this.authState.next(true);
@@ -94,7 +81,7 @@ export class AuthService {
   }
 
   public renewToken(): Observable<Token> {
-    return this.requestRenewToken().pipe(
+    return this.authApi.renewToken().pipe(
       tap((token) => {
         this.accessToken = token.accessToken;
       }),
@@ -102,9 +89,5 @@ export class AuthService {
         return throwError(() => error);
       })
     );
-  }
-
-  public requestRenewToken(): Observable<Token> {
-    return this.http.post<Token>('/api/auth/token', {}, { withCredentials: true });
   }
 }

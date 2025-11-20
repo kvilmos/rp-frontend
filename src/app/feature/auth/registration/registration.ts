@@ -4,7 +4,6 @@ import { RpButton } from '../../../shared/rp-button/rp-button';
 import { RpValidationError } from '../../../shared/rp-validation-error/rp-validation-error';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { AuthService } from '../auth.service';
 import { NewUser } from '../new-user.interface';
 import { matchValidator } from '../../../common/utils/validator';
 import { ErrorDisplay } from '../../../common/error/error.interface';
@@ -16,6 +15,7 @@ import {
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
 } from '../../../common/constants/common.constant';
+import { AuthApiService } from '../../../api/auth-api.service';
 
 @Component({
   standalone: true,
@@ -66,7 +66,7 @@ export class Registration {
   );
 
   private readonly snackBar = inject(MatSnackBar);
-  private readonly authService = inject(AuthService);
+  private readonly authApi = inject(AuthApiService);
   private readonly errorHandler = inject(ErrorHandler);
   private readonly translate = inject(TranslateService);
   constructor() {}
@@ -78,7 +78,7 @@ export class Registration {
     }
 
     const user: NewUser = this.registrationForm.value as NewUser;
-    this.authService.registerNewUser(user).subscribe({
+    this.authApi.registerUser(user).subscribe({
       next: () => {
         this.registrationForm.reset;
         this.translate.get('server.success.registration').subscribe((message: string) => {

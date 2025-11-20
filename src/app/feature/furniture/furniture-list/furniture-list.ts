@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FurnitureFilter } from '../furniture_filter';
 import { SortOption, SORTING } from '../../../common/constants/list-constants';
-import { FurnitureApiService } from '../furniture-api.service';
+import { FurnitureApiService } from '../../../api/furniture-api.service';
 import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
 import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';
 import { AsyncPipe } from '@angular/common';

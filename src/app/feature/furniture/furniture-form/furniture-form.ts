@@ -32,7 +32,7 @@ import { PreviewService } from '../preview.service';
 import { THUMBNAIL } from '../../../common/constants/file-constants';
 import { FurnitureCategory } from '../furniture-category.interface';
 import { Observable } from 'rxjs';
-import { FurnitureApiService } from '../furniture-api.service';
+import { FurnitureApiService } from '../../../api/furniture-api.service';
 
 @Component({
   standalone: true,
