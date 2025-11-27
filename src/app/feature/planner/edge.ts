@@ -30,7 +30,6 @@ export class Edge {
 
   private edge: HalfEdge;
   private wall: Wall;
-  private front: boolean;
   private visible: boolean = false;
 
   private edgeMeshes: Mesh[] = [];
@@ -42,7 +41,6 @@ export class Edge {
 
     this.edge = edge;
     this.wall = edge.wall;
-    this.front = edge.front;
 
     this.updateMesh();
     this.addToScene();
@@ -142,28 +140,16 @@ export class Edge {
 
     const geometry = new BufferGeometry();
     const vertices = new Float32Array([
-      v1.x,
-      v1.y,
-      v1.z, // 0. vertex
-      v2.x,
-      v2.y,
-      v2.z, // 1. vertex
-      v3.x,
-      v3.y,
-      v3.z, // 2. vertex
-      v4.x,
-      v4.y,
-      v4.z, // 3. vertex
+      v1.x, v1.y, v1.z, // 0. vertex
+      v2.x, v2.y, v2.z, // 1. vertex
+      v3.x, v3.y, v3.z, // 2. vertex
+      v4.x, v4.y, v4.z, // 3. vertex
     ]);
     geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 
     const indices = [
-      0,
-      1,
-      2, // (v1, v2, v3)
-      0,
-      2,
-      3, // (v1, v3, v4)
+      0, 1, 2, // (v1, v2, v3)
+      0, 2, 3, // (v1, v3, v4)
     ];
     geometry.setIndex(indices);
 
@@ -216,18 +202,10 @@ export class Edge {
     const geometry = new BufferGeometry();
 
     const vertices = new Float32Array([
-      v1.x,
-      v1.y,
-      v1.z, // index: 0
-      v2.x,
-      v2.y,
-      v2.z, // index: 1
-      v3.x,
-      v3.y,
-      v3.z, // index: 2
-      v4.x,
-      v4.y,
-      v4.z, // index: 3
+      v1.x, v1.y, v1.z, // index: 0
+      v2.x, v2.y, v2.z, // index: 1
+      v3.x, v3.y, v3.z, // index: 2
+      v4.x, v4.y, v4.z, // index: 3
     ]);
 
     const indices = [0, 1, 2, 0, 2, 3];
@@ -236,14 +214,10 @@ export class Edge {
     geometry.setIndex(indices);
 
     const uvs = new Float32Array([
-      0,
-      0, // v1 UV
-      1,
-      0, // v2 UV
-      1,
-      1, // v3 UV
-      0,
-      1, // v4 UV
+      0, 0, // v1 UV
+      1, 0, // v2 UV
+      1, 1, // v3 UV
+      0, 1, // v4 UV
     ]);
 
     geometry.setAttribute('uv', new BufferAttribute(uvs, 2));
