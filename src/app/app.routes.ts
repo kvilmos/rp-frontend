@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { FurnitureUpload } from './feature/furniture/furniture-upload/furniture-upload';
-import { AuthPage } from './feature/auth/auth-page/auth-page';
+import { RpAuthPage } from './feature/auth/auth-page/auth-page';
 import { authGuard } from './feature/auth/auth.guard';
 import { NotFound } from './common/page/not-found/not-found';
 import { loggedInGuard } from './feature/auth/logged-in.guard';
@@ -26,7 +26,7 @@ export const routes: Routes = [
   },
   {
     path: 'authentication',
-    component: AuthPage,
+    component: RpAuthPage,
     canActivate: [loggedInGuard],
   },
   {
