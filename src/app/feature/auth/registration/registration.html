@@ -83,10 +83,10 @@
     </div>
     }
 
-    <rp-button type="submit">{{ 'auth.signUp' | translate }}</rp-button>
+    <rp-button type="submit" id="sign-up">{{ 'auth.signUp' | translate }}</rp-button>
     <hr class="line" />
     <div class="text">{{ 'auth.or' | translate }}</div>
-    <rp-button (click)="onClickMode()" class="change-mode-button">{{
+    <rp-button (click)="onClickMode()" class="change-mode-button" id="to-sign-in">{{
       'auth.signIn' | translate
     }}</rp-button>
   </form>

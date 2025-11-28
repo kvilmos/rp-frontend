@@ -1,7 +1,9 @@
 <div class="planner">
   <div>
     <div class="navbar">
-      <a routerLink="/home"><fa-icon class="bt-back" [icon]="iconBack"></fa-icon></a>
+      <a routerLink="/home"
+        ><fa-icon class="bt-back" [icon]="iconBack" id="back-button"></fa-icon
+      ></a>
       <div class="title-nav">{{ 'blueprint.titlePage' | translate }}</div>
     </div>
   </div>
@@ -38,7 +40,12 @@
           [icon]="iconView"
           (click)="setView()"
         ></fa-icon>
-        <fa-icon class="fa-xl tool-icon" [icon]="iconSave" (click)="saveBlueprint()"></fa-icon>
+        <fa-icon
+          class="fa-xl tool-icon"
+          [icon]="iconSave"
+          (click)="saveBlueprint()"
+          id="save-blueprint"
+        ></fa-icon>
         <fa-icon class="fa-xl tool-del" [icon]="iconDeleteBp" (click)="deleteBlueprint()"></fa-icon>
       </div>
     </div>
@@ -49,7 +56,7 @@
         <rp-text-input
           [placeholder]="'blueprint.placeholder' | translate"
           [label]="'blueprint.textInput' | translate"
-          inputId="bpName"
+          inputId="blueprint-name"
           formControlName="name"
         ></rp-text-input>
       </form>
