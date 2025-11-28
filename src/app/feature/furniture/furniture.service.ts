@@ -4,6 +4,13 @@ import { Observable, BehaviorSubject, lastValueFrom, last, forkJoin, combineLate
 import { ObjectData } from './object_data';
 import { FurnitureThumbnail } from './furniture_thumbnail';
 import { FurnitureApiService } from '../../api/furniture-api.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
+import {
+  SNACKBAR_CLOSE_SYMBOL,
+  SNACKBAR_DURATION,
+  SNACKBAR_SUCCESS_CLASS,
+} from '../../common/constant/common.constant';
 
 interface UploadProgress {
   loaded: number;
@@ -26,6 +33,8 @@ export class FurnitureService {
   public readonly uploadProgress$ = this._uploadProgress.asObservable();
 
   private readonly furnitureApi = inject(FurnitureApiService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly translate = inject(TranslateService);
   constructor() {}
 
   public setFile(file: File | null): void {
@@ -70,6 +79,13 @@ export class FurnitureService {
           const totalBytesLoaded = modelProg.loaded + thumbProg.loaded;
 
           const weightedPercent = Math.round((totalBytesLoaded / totalUploadSize) * 100);
+
+          this.translate.get('server.success.uploadFurniture').subscribe((message: string) => {
+            this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+              duration: SNACKBAR_DURATION,
+              panelClass: SNACKBAR_SUCCESS_CLASS,
+            });
+          });
 
           this._uploadProgress.next(weightedPercent);
         }

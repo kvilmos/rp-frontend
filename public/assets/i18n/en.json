@@ -40,7 +40,8 @@
     "loading": "loading",
     "pageNext": "Next",
     "pagePrevious": "Previous",
-    "submit": "Submit"
+    "submit": "Submit",
+    "uploading": "Uploading"
   },
   "furniture": {
     "chooseFile": "Choose File",
@@ -127,12 +128,6 @@
     "sorting": "Sorting"
   },
   "server": {
-    "success": {
-      "login": "Logged in successfully!",
-      "logout": "Logged out successfully!",
-      "registration": "Registered successfully!",
-      "deleteBlueprint": "Blueprint deleted successfully."
-    },
     "error": {
       "blueprint": {
         "deleteFailed": "Failed to delete blueprint"
@@ -149,6 +144,14 @@
         "emailAlreadyExist": "The email address has already been taken.",
         "validationFailed": "The registration form is not correct!"
       }
+    },
+    "success": {
+      "deleteBlueprint": "Blueprint deleted successfully.",
+      "login": "Logged in successfully!",
+      "logout": "Logged out successfully!",
+      "registration": "Registered successfully!",
+      "saveBlueprint": "Blueprint has been saved!",
+      "uploadFurniture": "Successful upload!"
     }
   }
 }

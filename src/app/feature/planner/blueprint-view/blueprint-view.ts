@@ -216,7 +216,14 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
     };
 
     this.bpApi.updateBlueprint(saveBp).subscribe({
-      next: () => {},
+      next: () => {
+        this.translate.get('server.success.saveBlueprint').subscribe((message: string) => {
+          this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+            duration: SNACKBAR_DURATION,
+            panelClass: SNACKBAR_SUCCESS_CLASS,
+          });
+        });
+      },
       error: (error) => {
         throw console.error(error);
       },
