@@ -1,85 +1,53 @@
 # Room Planner Frontend
 
-Ez a repository a "Room Planner" alkalmazás Angularral készített frontend kliensét tartalmazza. Ez a felhasználói felület felelős az adatok vizuális megjelenítéséért és a felhasználói interakciók kezeléséért.
+Angular client for the **Room Planner** application.
 
-## Technológiák
+## Tech Stack
 
-- **Framework:** [Angular](https://angular.io/)
-- **Nyelv:** TypeScript
-- **Fejlesztői proxy:** Nginx (Docker segítségével), ami egységesíti a backend és a frontend szolgáltatások elérését.
+- **Framework:** Angular (TypeScript)
+- **Dev Proxy:** Nginx (via Docker) to unify backend, frontend, and MinIO access.
 
-## Előfeltételek
+## Prerequisites
 
-A projekt futtatásához az alábbi eszközök szükségesek:
+- Node.js & npm
+- Docker & Docker Compose
+- Angular CLI (`npm install -g @angular/cli`)
+- Running instances of [rp-database](https://github.com/kvilmos/rp-database) and [rp-backend](https://github.com/kvilmos/rp-backend).
 
-- [Node.js](https://nodejs.org/) (LTS verzió javasolt) és npm
-- [Angular CLI](https://angular.io/cli) globálisan telepítve: `npm install -g @angular/cli`
-- [Docker](https://www.docker.com/products/docker-desktop/) és Docker Compose
-- [rp-database](https://github.com/kvilmos/rp-database)
-- [rp-backend](https://github.com/kvilmos/rp-backend)
+## Getting Started
 
-## Telepítés és Futtatás
+### 1. Start the Dev Proxy
 
-Kövesd az alábbi lépéseket a fejlesztői környezet elindításához.
+The proxy handles CORS by routing requests to the API (:4747), MinIO (:9000), and Frontend.
 
-### 1. Backend és adatbázis elindítása
+```bash
+cd dev-proxy
+docker-compose up -d
+cd ..
+```
 
-Győződj meg róla, hogy az `rp-database` és `rp-backend` repositorykban leírtak szerint minden háttérszolgáltatás el van indítva és fut. A frontend nem fog tudni működni a háttér API-k nélkül.
+### 2. Run the Application
 
-- [rp-database](https://github.com/kvilmos/rp-database)
-- [rp-backend](https://github.com/kvilmos/rp-backend)
-
-### 2. Frontend függőségek telepítése
-
-Nyiss egy terminált a projekt gyökérkönyvtárában (`rp-frontend`), és telepítsd a szükséges Node.js csomagokat:
+Install dependencies and start the dev server.
 
 ```bash
 npm install
+ng serve --host 0.0.0.0
 ```
 
-### 3. Fejlesztői Proxy indítása
+### 3. Access
 
-A frontend egy Nginx proxyt használ, hogy a backend API és MinIO kéréseket egyszerűen, CORS hibák nélkül kezelje.
+Open **http://localhost** in your browser.
 
-1.  Lépj be a `dev-proxy` könyvtárba:
-    ```bash
-    cd dev-proxy
-    ```
-2.  Indítsd el az Nginx konténert a háttérben:
-    ```bash
-    docker-compose up -d
-    ```
-
-Ez elindít egy Nginx szervert a `80`-as porton. Az `nginx.conf` fájl alapján a bejövő kéréseket a megfelelő helyre irányítja:
-
-- A sima frontend (`/`) kéréseket továbbítja az Angular fejlesztői szerver felé (`localhost:4200`).
-- Az `/api/` végpontra érkező kéréseket továbbítja a Go backend felé (`localhost:4747`).
-- Az `/minio/` végpontra érkező kéréseket továbbítja a MinIO szerver felé (`localhost:9000`).
-
-### 4. Angular fejlesztői szerver indítása
-
-Most, hogy a proxy fut, elindíthatod magát az Angular alkalmazást.
-
-1.  Lépj vissza a projekt gyökérkönyvtárába.
-2.  Indítsd el az `ng serve` parancsot:
-    ```bash
-    ng serve --host 0.0.0.0
-    ```
-
-### 5. Alkalmazás megnyitása
-
-A fejlesztői szerver elindulása után az alkalmazást a böngésződben a **proxy címen** keresztül éred el:
-
-**http://localhost**
-
-Fontos, hogy ne a `http://localhost:4200`-as címet használd közvetlenül, mert akkor a backend API hívások CORS hibát fognak dobni. A `localhost` (80-as port) címen keresztül az Nginx proxy gondoskodik a kérések helyes továbbításáról.
+> **Note:** Do not use `localhost:4200` directly, as this bypasses the proxy and will cause CORS errors with the backend.
 
 ---
 
-## Hasznos parancsok
+## Useful Commands
 
-- **Függőségek telepítése:** `npm install`
-- **Fejlesztői szerver indítása:** `ng serve`
-- **Build a production környezethez:** `ng build`
-- **Unit tesztek futtatása:** `ng test`
-- **Proxy leállítása:** A `dev-proxy` mappában futtasd: `docker-compose down`
+| Command               | Description                         |
+| :-------------------- | :---------------------------------- |
+| `npm install`         | Install dependencies                |
+| `ng serve`            | Start dev server                    |
+| `ng build`            | Build for production                |
+| `docker-compose down` | Stop proxy (inside `dev-proxy` dir) |
