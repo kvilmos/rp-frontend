@@ -1,59 +1,53 @@
-# RpFrontend
+# Room Planner Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+Angular client for the **Room Planner** application.
 
-## Development server
+## Tech Stack
 
-To start a local development server, run:
+- **Framework:** Angular (TypeScript)
+- **Dev Proxy:** Nginx (via Docker) to unify backend, frontend, and MinIO access.
 
-```bash
-ng serve
-```
+## Prerequisites
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Node.js & npm
+- Docker & Docker Compose
+- Angular CLI (`npm install -g @angular/cli`)
+- Running instances of [rp-database](https://github.com/kvilmos/rp-database) and [rp-backend](https://github.com/kvilmos/rp-backend).
 
-## Code scaffolding
+## Getting Started
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 1. Start the Dev Proxy
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+The proxy handles CORS by routing requests to the API (:4747), MinIO (:9000), and Frontend.
 
 ```bash
-ng generate --help
+cd dev-proxy
+docker-compose up -d
+cd ..
 ```
 
-## Building
+### 2. Run the Application
 
-To build the project run:
+Install dependencies and start the dev server.
 
 ```bash
-ng build
+npm install
+ng serve --host 0.0.0.0
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### 3. Access
 
-## Running unit tests
+Open **http://localhost** in your browser.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+> **Note:** Do not use `localhost:4200` directly, as this bypasses the proxy and will cause CORS errors with the backend.
 
-```bash
-ng test
-```
+---
 
-## Running end-to-end tests
+## Useful Commands
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+| Command               | Description                         |
+| :-------------------- | :---------------------------------- |
+| `npm install`         | Install dependencies                |
+| `ng serve`            | Start dev server                    |
+| `ng build`            | Build for production                |
+| `docker-compose down` | Stop proxy (inside `dev-proxy` dir) |
