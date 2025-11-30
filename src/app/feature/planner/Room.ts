@@ -13,7 +13,6 @@ export class Room {
   private blueprint: Blueprint;
   public corners: Corner[];
 
-  /** floor plane for intersection testing */
   public floorMesh: Mesh | null = null;
   private edgePointer: HalfEdge | null = null;
 

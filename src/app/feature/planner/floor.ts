@@ -24,12 +24,6 @@ export class Floor {
     this.floorMesh = this.buildFloor();
   }
 
-  private redraw(): void {
-    this.removeFromScene();
-    this.floorMesh = this.buildFloor();
-    this.addToScene();
-  }
-
   private buildFloor(): Mesh {
     const texturePath = '/assets/images/textures/floor.jpg';
     const floorTexture = this.textureLoader.load(texturePath);

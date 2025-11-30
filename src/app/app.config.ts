@@ -11,8 +11,8 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
-import { responseInterceptor } from './interceptor/response-interceptor';
-import { tokenInterceptor } from './interceptor/token-interceptor';
+import { responseInterceptor } from './api/response-interceptor';
+import { tokenInterceptor } from './api/token-interceptor';
 import { AuthService } from './feature/auth/auth.service';
 
 export const appConfig: ApplicationConfig = {

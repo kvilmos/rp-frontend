@@ -3,12 +3,12 @@ import { inject, Injectable } from '@angular/core';
 import { ApiError, ErrorDisplay, ValidationError } from './error.interface';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
-import { ERROR_TRANSLATE_BASE } from '../constants/error.constant';
+import { ERROR_TRANSLATE_BASE } from '../constant/error.constant';
 import {
   SNACKBAR_CLOSE_SYMBOL,
   SNACKBAR_DURATION,
   SNACKBAR_ERROR_CLASS,
-} from '../constants/common.constant';
+} from '../constant/common.constant';
 
 @Injectable({
   providedIn: 'root',

@@ -3,6 +3,7 @@
   <div class="sub-title">{{ 'furniture.chooseFile' | translate }}</div>
   <hr class="line" />
   <rp-file-input
+    id="file-input"
     inputId="furniture-file-input"
     allowedFileTypes=".glb,.gltf"
     (selected)="onSelectFile($event)"
@@ -49,7 +50,7 @@
   <div class="sub-title">{{ 'furniture.category.formTitle' | translate }}</div>
   <hr class="line" />
   @if (categories$ | async; as categories) {
-  <select formControlName="category" id="category-select">
+  <select formControlName="category" id="category-select" class="category-selector">
     <option [ngValue]="null" disabled>{{ 'furniture.category.select' | translate }}</option>
     @for (category of categories; track category.id) {
     <option [value]="category.id">{{ 'furniture.category.' + category.name | translate }}</option>

@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Vector3 } from 'three';
 import { Subject, takeUntil } from 'rxjs';
-import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { HalfEdge } from './half_edge';
 import { map, hasValue } from './utils';
 import { Corner } from './corner';

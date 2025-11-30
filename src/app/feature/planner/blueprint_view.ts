@@ -1,5 +1,5 @@
 import { ElementRef } from '@angular/core';
-import { BLUEPRINT } from '../../common/constants/planner-constants';
+import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { BlueprintController } from './blueprint_controller';
 import { Corner } from './corner';
 import { Wall } from './wall';

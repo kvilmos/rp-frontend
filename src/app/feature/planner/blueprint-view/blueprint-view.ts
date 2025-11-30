@@ -23,7 +23,7 @@ import {
   faSave,
   faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons';
-import { BLUEPRINT } from '../../../common/constants/planner-constants';
+import { BLUEPRINT } from '../../../common/constant/planner.constant';
 import { DesignBuilder } from '../design_builder';
 import { NgClass } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -33,7 +33,6 @@ import { BlueprintScene } from '../blueprint_scene';
 import { Vector3 } from 'three';
 import { ControllerState } from '../builder_controller';
 import { RpFurnitureSelector } from '../../furniture/furniture-selector/furniture-selector';
-import { BlueprintApiService } from '../blueprint-api-service';
 import { Blueprint } from '../blueprint';
 import { CompleteBlueprint } from '../blueprint_load';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -46,8 +45,9 @@ import {
   SNACKBAR_CLOSE_SYMBOL,
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
-} from '../../../common/constants/common.constant';
+} from '../../../common/constant/common.constant';
 import { ErrorDisplay } from '../../../common/error/error.interface';
+import { BlueprintApiService } from '../../../api/blueprint-api-service';
 
 @Component({
   standalone: true,
@@ -215,8 +215,15 @@ export class RpBlueprintView implements OnInit, AfterViewInit, OnDestroy {
       items: items,
     };
 
-    this.bpApi.uploadBlueprint(saveBp).subscribe({
-      next: () => {},
+    this.bpApi.updateBlueprint(saveBp).subscribe({
+      next: () => {
+        this.translate.get('server.success.saveBlueprint').subscribe((message: string) => {
+          this.snackBar.open(message, SNACKBAR_CLOSE_SYMBOL, {
+            duration: SNACKBAR_DURATION,
+            panelClass: SNACKBAR_SUCCESS_CLASS,
+          });
+        });
+      },
       error: (error) => {
         throw console.error(error);
       },

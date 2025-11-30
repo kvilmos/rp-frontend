@@ -15,6 +15,7 @@ export function pointDistanceFromLine(
   var tPoint = closestPointOnLine(x, y, x1, y1, x2, y2);
   var tDx = x - tPoint.x;
   var tDy = y - tPoint.y;
+
   return Math.sqrt(tDx * tDx + tDy * tDy);
 }
 

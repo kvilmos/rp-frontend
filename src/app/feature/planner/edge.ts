@@ -22,7 +22,7 @@ import { BlueprintScene } from './blueprint_scene';
 import { HalfEdge } from './half_edge';
 import { Wall } from './wall';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { DESIGN } from '../../common/constants/planner-constants';
+import { DESIGN } from '../../common/constant/planner.constant';
 
 export class Edge {
   private scene: BlueprintScene;
@@ -30,7 +30,6 @@ export class Edge {
 
   private edge: HalfEdge;
   private wall: Wall;
-  private front: boolean;
   private visible: boolean = false;
 
   private edgeMeshes: Mesh[] = [];
@@ -42,7 +41,6 @@ export class Edge {
 
     this.edge = edge;
     this.wall = edge.wall;
-    this.front = edge.front;
 
     this.updateMesh();
     this.addToScene();
@@ -146,7 +144,7 @@ export class Edge {
       v2.x, v2.y, v2.z, // 1. vertex
       v3.x, v3.y, v3.z, // 2. vertex
       v4.x, v4.y, v4.z, // 3. vertex
-    ]); 
+    ]);
     geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
 
     const indices = [

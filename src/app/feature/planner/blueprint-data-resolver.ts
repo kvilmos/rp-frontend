@@ -2,7 +2,7 @@ import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
 import { Observable } from 'rxjs';
 import { CompleteBlueprint } from './blueprint_load';
 import { inject } from '@angular/core';
-import { BlueprintApiService } from './blueprint-api-service';
+import { BlueprintApiService } from '../../api/blueprint-api-service';
 
 export const blueprintDataResolver: ResolveFn<CompleteBlueprint> = (
   route: ActivatedRouteSnapshot

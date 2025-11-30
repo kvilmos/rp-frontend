@@ -1,7 +1,6 @@
 import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, combineLatest, map, Observable, switchMap } from 'rxjs';
-import { BlueprintApiService } from '../blueprint-api-service';
 import { Blueprint, BlueprintPage } from '../blueprint_load';
 import { AsyncPipe, DatePipe } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -9,7 +8,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faFilePen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { BlueprintFilter } from '../blueprint_filter';
 import { FormsModule } from '@angular/forms';
-import { SORTING, SortOption } from '../../../common/constants/list-constants';
+import { SORTING, SortOption } from '../../../common/constant/list.constant';
 import { RpPaginator } from '../../../shared/rp-paginator/rp-paginator';
 import { RpSorter } from '../../../shared/rp-sorter/rp-sorter';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -17,9 +16,10 @@ import {
   SNACKBAR_CLOSE_SYMBOL,
   SNACKBAR_DURATION,
   SNACKBAR_SUCCESS_CLASS,
-} from '../../../common/constants/common.constant';
+} from '../../../common/constant/common.constant';
 import { ErrorDisplay } from '../../../common/error/error.interface';
 import { ErrorHandler } from '../../../common/error/error-handler.service';
+import { BlueprintApiService } from '../../../api/blueprint-api-service';
 
 @Component({
   standalone: true,

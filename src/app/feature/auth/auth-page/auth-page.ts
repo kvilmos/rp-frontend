@@ -10,7 +10,7 @@ import { NgClass } from '@angular/common';
   styleUrl: 'auth-page.scss',
   imports: [Registration, Login, NgClass],
 })
-export class AuthPage {
+export class RpAuthPage {
   public isLoginMode = true;
 
   public onSelectLogin(): void {
