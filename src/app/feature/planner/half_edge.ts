@@ -1,8 +1,8 @@
 import { BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { Wall } from './wall';
-import { getAngle, angle2pi, distance } from './utils';
+import { getAngle, angle2pi, distance } from './blueprint3d-utils';
 import { Corner } from './corner';
-import { Room } from './room-fix';
+import { Room } from './room';
 
 export class HalfEdge {
   public next: HalfEdge | null = null;
@@ -61,43 +61,25 @@ export class HalfEdge {
     const v4 = v1.clone();
     v4.y = this.wall.height;
 
-    // console.log('v1:', v1);
-    // console.log('v2:', v2);
-    // console.log('v3:', v3);
-    // console.log('v4:', v4);
-
     var geometry = new BufferGeometry();
 
-    // geometry.vertices = [v1, v2, v3, v4];
     const vertices = new Float32Array([
-      v1.x,
-      v1.y,
-      v1.z,
-      v2.x,
-      v2.y,
-      v2.z,
-      v3.x,
-      v3.y,
-      v3.z,
-      v4.x,
-      v4.y,
-      v4.z,
+      v1.x, v1.y, v1.z,
+      v2.x, v2.y, v2.z,
+      v3.x, v3.y, v3.z,
+      v4.x, v4.y, v4.z,
     ]);
-
-    // geometry.faces.push(new Face3(0, 1, 2));
-    // geometry.faces.push(new Face3(0, 2, 3));
 
     const indices = [0, 1, 2, 0, 2, 3];
     geometry.setAttribute('position', new BufferAttribute(vertices, 3));
     geometry.setIndex(indices);
 
-    //geometry.computeFaceNormals();
     geometry.computeVertexNormals();
     geometry.computeBoundingBox();
 
     this.plane = new Mesh(geometry, new MeshBasicMaterial());
     this.plane.visible = false;
-    this.plane.userData['edge'] = this; // js monkey patch
+    this.plane.userData['edge'] = this;
 
     this.computeTransforms(
       this.interiorTransform,

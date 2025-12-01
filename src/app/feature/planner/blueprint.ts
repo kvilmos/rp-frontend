@@ -3,10 +3,10 @@ import { Vector3 } from 'three';
 import { Subject, takeUntil } from 'rxjs';
 import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { HalfEdge } from './half_edge';
-import { map, hasValue } from './utils';
+import { map, hasValue } from './blueprint3d-utils';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { Room } from './room-fix';
+import { Room } from './room';
 import { CompleteBlueprint } from './blueprint_load';
 import { GeometryEngine } from './geometry-engine';
 

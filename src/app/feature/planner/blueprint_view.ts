@@ -3,10 +3,10 @@ import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { BlueprintController } from './blueprint_controller';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { Room } from './room-fix';
+import { Room } from './room';
 import { HalfEdge } from './half_edge';
 import { Blueprint } from './blueprint';
-import { cmToMeasure } from './utils';
+import { cmToMeasure } from './blueprint3d-utils';
 
 export class BlueprintView {
   public canvasElement!: HTMLCanvasElement;

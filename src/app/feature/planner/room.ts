@@ -2,7 +2,7 @@ import { DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } fr
 import { Corner } from './corner';
 import { HalfEdge } from './half_edge';
 import { Blueprint } from './blueprint';
-import { map } from './utils';
+import { map } from './blueprint3d-utils';
 
 const defaultRoomTexture = {
   url: 'rooms/textures/hardwood.png',
