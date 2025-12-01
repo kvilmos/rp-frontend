@@ -10,7 +10,7 @@ import {
   Vector2,
 } from 'three';
 import { BlueprintScene } from './blueprint_scene';
-import { Room } from './room';
+import { Room } from './room-fix';
 
 export class Floor {
   private scene: BlueprintScene;

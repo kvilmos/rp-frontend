@@ -6,7 +6,7 @@ import { HalfEdge } from './half_edge';
 import { map, hasValue } from './utils';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { Room } from './room';
+import { Room } from './room-fix';
 import { CompleteBlueprint } from './blueprint_load';
 import { GeometryEngine } from './geometry-engine';
 

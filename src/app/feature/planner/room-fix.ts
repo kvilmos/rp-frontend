@@ -47,7 +47,7 @@ export class Room {
     this.floorMesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
     this.floorMesh.visible = false;
     this.floorMesh.rotation.set(Math.PI / 2, 0, 0);
-    (<any>this.floorMesh).room = this; // js monkey patch
+    (<any>this.floorMesh).room = this;
   }
 
   private updateInteriorCorners() {

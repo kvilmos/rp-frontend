@@ -2,7 +2,7 @@ import { BufferAttribute, BufferGeometry, Matrix4, Mesh, MeshBasicMaterial, Vect
 import { Wall } from './wall';
 import { getAngle, angle2pi, distance } from './utils';
 import { Corner } from './corner';
-import { Room } from './room';
+import { Room } from './room-fix';
 
 export class HalfEdge {
   public next: HalfEdge | null = null;

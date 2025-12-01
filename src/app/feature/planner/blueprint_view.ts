@@ -3,7 +3,7 @@ import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { BlueprintController } from './blueprint_controller';
 import { Corner } from './corner';
 import { Wall } from './wall';
-import { Room } from './room';
+import { Room } from './room-fix';
 import { HalfEdge } from './half_edge';
 import { Blueprint } from './blueprint';
 import { cmToMeasure } from './utils';
