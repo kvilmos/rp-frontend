@@ -1,6 +1,6 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
 import { Wall } from './wall';
-import { closestPointOnLine, distance } from './utils';
+import { closestPointOnLine, distance } from './blueprint3d-utils';
 import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { Subject } from 'rxjs';
 import { Blueprint } from './blueprint';

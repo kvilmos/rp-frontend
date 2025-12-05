@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Corner } from './corner';
-import { angle2pi, cycle_OnTest, isClockwise, map, removeIf } from './utils';
+import { angle2pi, cycle_OnTest, isClockwise, map, removeIf } from './blueprint3d-utils';
 
 @Injectable({ providedIn: 'root' })
 export class GeometryEngine {

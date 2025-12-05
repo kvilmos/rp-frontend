@@ -2,7 +2,7 @@ import { DoubleSide, Mesh, MeshBasicMaterial, Shape, ShapeGeometry, Vector2 } fr
 import { Corner } from './corner';
 import { HalfEdge } from './half_edge';
 import { Blueprint } from './blueprint';
-import { map } from './utils';
+import { map } from './blueprint3d-utils';
 
 const defaultRoomTexture = {
   url: 'rooms/textures/hardwood.png',
@@ -47,7 +47,7 @@ export class Room {
     this.floorMesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
     this.floorMesh.visible = false;
     this.floorMesh.rotation.set(Math.PI / 2, 0, 0);
-    (<any>this.floorMesh).room = this; // js monkey patch
+    (<any>this.floorMesh).room = this;
   }
 
   private updateInteriorCorners() {

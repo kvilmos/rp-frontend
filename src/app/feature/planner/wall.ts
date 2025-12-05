@@ -1,6 +1,6 @@
 import { generateUUID } from 'three/src/math/MathUtils.js';
 import { Corner } from './corner';
-import { pointDistanceFromLine } from './utils';
+import { pointDistanceFromLine } from './blueprint3d-utils';
 import { BLUEPRINT } from '../../common/constant/planner.constant';
 import { HalfEdge } from './half_edge';
 import { Subject } from 'rxjs';
