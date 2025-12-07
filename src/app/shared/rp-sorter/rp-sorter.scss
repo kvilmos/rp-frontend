@@ -1,0 +1,22 @@
+.sorter {
+  text-transform: uppercase;
+}
+
+.sorter select {
+  border: none;
+  background-color: #00000000;
+  text-decoration: none;
+  font-family: sans-serif;
+  font-weight: bold;
+  transition: all 0.4s ease;
+  text-transform: uppercase;
+}
+
+.sorter select:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sorter select:focus {
+  outline: none;
+}

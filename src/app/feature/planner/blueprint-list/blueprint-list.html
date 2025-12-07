@@ -1,0 +1,43 @@
+<rp-sorter
+  class="sorter"
+  [options]="sortingOptions"
+  [currentSort]="activeFilters.order!"
+  (sortChange)="onSortChange($event)"
+></rp-sorter>
+
+@if (pageData$ | async; as pageData) {
+<div class="table-container">
+  <div class="table-header">
+    <div>{{ 'blueprint.table.id' | translate }}</div>
+    <div>{{ 'blueprint.table.name' | translate }}</div>
+    <div>{{ 'blueprint.table.createdAt' | translate }}</div>
+    <div>{{ 'blueprint.table.updatedAt' | translate }}</div>
+  </div>
+
+  @for (item of pageData.blueprints; track item.id) {
+  <div class="table-item">
+    <div class="details">{{ item.id }}</div>
+    <div class="details">{{ item.name }}</div>
+    <div class="details">{{ item.createdAt | date : 'yyyy.MM.dd HH:mm' }}</div>
+    <div class="details">{{ item.updatedAt | date : 'yyyy.MM.dd HH:mm' }}</div>
+    <div class="icons">
+      <a class="edit-icon" (click)="onBlueprintEdit(item)"
+        ><fa-icon class="fa-lg" [icon]="iconEdit"></fa-icon
+      ></a>
+      <a class="del-icon" (click)="onBlueprintDelete(item)"
+        ><fa-icon class="fa-lg" [icon]="iconDel"></fa-icon
+      ></a>
+    </div>
+  </div>
+  }
+</div>
+
+<rp-paginator
+  [currentPage]="pageData.currPage"
+  [totalPages]="pageData.totalPages"
+  (pageChange)="onPageChange($event)"
+></rp-paginator>
+
+} @else {
+<p>{{ 'blueprint.table.empty' | translate }}</p>
+}

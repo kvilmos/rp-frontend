@@ -1,0 +1,15 @@
+<div class="navbar">
+  <div class="initial">
+    <a class="title" routerLink="/home">Room Planner</a>
+    <div class="links">
+      <a routerLink="/furniture">Collection</a>
+      <a routerLink="/profile/blueprint">Designs</a>
+      <a routerLink="/furniture-upload">New furniture</a>
+      <button (click)="onCreateBlueprint()">New Blueprint</button>
+    </div>
+  </div>
+  <button class="logout" (click)="onClickLogout()">
+    <fa-icon class="fa-lg" [icon]="logoutIcon"></fa-icon>
+    Logout
+  </button>
+</div>

@@ -1,0 +1,79 @@
+<form [formGroup]="furnitureForm" (ngSubmit)="onSubmitForm()" class="furniture-form">
+  <div class="title">{{ 'furniture.uploadFurniture' | translate }}</div>
+  <div class="sub-title">{{ 'furniture.chooseFile' | translate }}</div>
+  <hr class="line" />
+  <rp-file-input
+    id="file-input"
+    inputId="furniture-file-input"
+    allowedFileTypes=".glb,.gltf"
+    (selected)="onSelectFile($event)"
+  ></rp-file-input>
+  <rp-validation-error
+    [class.hidden]="!submitted && !furnitureForm.controls.fileSize.touched"
+    [errors]="furnitureForm.controls.fileSize.errors"
+  ></rp-validation-error>
+
+  <div class="sub-title">{{ 'furniture.furnitureDetails' | translate }}</div>
+  <hr class="line" />
+  <div class="text-inputs">
+    <rp-text-input
+      [label]="'furniture.fileName' | translate"
+      inputId="fileName"
+      formControlName="fileName"
+    ></rp-text-input>
+    <rp-text-input
+      [placeholder]="'furniture.namePlaceholder' | translate"
+      [label]="'furniture.name' | translate"
+      inputId="furnitureName"
+      formControlName="objectName"
+    ></rp-text-input>
+    <rp-validation-error
+      [class.hidden]="!submitted && !furnitureForm.controls.objectName.touched"
+      [errors]="furnitureForm.controls.objectName.errors"
+    ></rp-validation-error>
+  </div>
+
+  <div class="sub-title">{{ 'furniture.furnitureSize' | translate }}</div>
+  <hr class="line" />
+  <div class="metric-display">
+    <rp-value-display class="metric-item" [label]="'furniture.sizeWidth' | translate">{{
+      modelWidth() | metric : 'cm' | number : '1.1-2'
+    }}</rp-value-display>
+    <rp-value-display class="metric-item" [label]="'furniture.sizeHeight' | translate">{{
+      modelHeight() | metric : 'cm' | number : '1.1-2'
+    }}</rp-value-display>
+    <rp-value-display class="metric-item" [label]="'furniture.sizeDepth' | translate">{{
+      modelDepth() | metric : 'cm' | number : '1.1-2'
+    }}</rp-value-display>
+  </div>
+
+  <div class="sub-title">{{ 'furniture.category.formTitle' | translate }}</div>
+  <hr class="line" />
+  @if (categories$ | async; as categories) {
+  <select formControlName="category" id="category-select" class="category-selector">
+    <option [ngValue]="null" disabled>{{ 'furniture.category.select' | translate }}</option>
+    @for (category of categories; track category.id) {
+    <option [value]="category.id">{{ 'furniture.category.' + category.name | translate }}</option>
+    }
+  </select>
+  }
+  <rp-validation-error
+    [class.hidden]="!submitted && !furnitureForm.controls.category.touched"
+    [errors]="furnitureForm.controls.category.errors"
+  ></rp-validation-error>
+
+  <div class="sub-title">{{ 'furniture.subTitleThumbnail' | translate }}</div>
+  <hr class="line" />
+  <canvas class="thumbnailCanvas" #thumbnailCanvas></canvas>
+  <rp-validation-error
+    [class.hidden]="!submitted"
+    [errors]="furnitureForm.controls.thumbnails.errors"
+  ></rp-validation-error>
+
+  <div class="button-section">
+    <rp-button type="reset" class="cancel-button" (click)="onResetForm()">{{
+      'common.cancel' | translate
+    }}</rp-button>
+    <rp-button type="submit" class="submit-button">{{ 'common.submit' | translate }}</rp-button>
+  </div>
+</form>

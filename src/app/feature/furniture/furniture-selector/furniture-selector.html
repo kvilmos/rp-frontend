@@ -1,0 +1,29 @@
+<div class="selector-panel">
+  @if (categories$ | async; as categories) {
+  <div class="category-filter">
+    <rp-filter
+      [options]="categories"
+      [currentFilter]="activeFilters.category"
+      (filterChange)="onCategoryFilterChange($event)"
+    ></rp-filter>
+  </div>
+  } @if (furnitureList && furnitureList.length > 0) {
+  <div class="grid-view">
+    @for (item of furnitureList; track item.id) {
+    <div class="item">
+      <picture (click)="onSelectFurniture(item)">
+        <img [src]="item.thumbnailUrl" [alt]="item.name" />
+      </picture>
+    </div>
+    }
+  </div>
+  } @else if (!loading) {
+  <p>{{ 'furniture.table.empty' | translate }}</p>
+  } @if (hasNextPage) {
+  <div class="load-trigger" #loadTrigger>
+    @if(loading) {
+    <p>{{ 'common.loading' | translate }}...</p>
+    }
+  </div>
+  }
+</div>

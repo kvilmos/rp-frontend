@@ -1,0 +1,24 @@
+.preview-canvas {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.panel {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  margin-bottom: 6em;
+}
+
+.controls {
+  display: flex;
+  color: #494747;
+}
+
+fa-icon:hover {
+  color: #000;
+}

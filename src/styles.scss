@@ -1,0 +1,120 @@
+/* You can add global styles to this file, and also import other style files */
+html body {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+:root {
+  //.dark-mode {
+  --bg-color: #f1efe9;
+  --nav-background-color: #bdae9e;
+  --primary-color: #cbbca8;
+
+  --text-color: #333333;
+  --title-color: #48392e;
+
+  --error-color: #e53935;
+  --error-display-color: #ebb8b7;
+
+  --icon-hearth-color: #d49090;
+  --icon-trash-color: #808080;
+
+  --card-primary-color: #ffffff;
+  --card-secondary-color: #e4dcd2;
+
+  --outline-color: #cfceca;
+  --outline-shadow-color: rgba(207, 206, 202, 1);
+  --outline-dark-shadow-color: #0000005c;
+
+  --disabled-background-color: #eeeeee;
+
+  --dropzone-text-color: #888;
+  --dropzone-svg-color: #aaa;
+  --dropzone-border-color: #ccc;
+  --dropzone-hover-color: #f1f1f1;
+
+  --text-input-label-color: #888;
+  --text-input-placeholder-color: #888;
+  --text-input-background-color: #ffffff;
+
+  --button-primary-color: #ffffff;
+  --button-primary-border-color: #4a4036;
+  --button-primary-background-color: #4a4036;
+  --button-primary-background-color_hover: #685a4c;
+
+  --button-secondary-color: #4a4036;
+  --button-secondary-border-color: #4a4036;
+  --button-secondary-background-color: #ffffff;
+  --button-secondary-background-color_hover: #f0e9e2;
+
+  --blueprint-background-color: #f5f3ef;
+
+  --table-border-color: #ccc;
+  --table-header-background-color: #f0f0f0;
+  --table-item-border-color: #e0e0e0;
+  --table-item-color_hover: #f9f9f9;
+  --table-item-primary-color: #ffffff;
+  --table-item-secondary-color: #f9f9f9;
+
+  --icon: #b7b2a7;
+  --icon-delete: #;
+  --icon-delete_hover: #d89c9b;
+  --icon-hover: #d2bc8d;
+}
+.dark-mode {
+  //:root {
+  --bg-color: #242424;
+  --primary-color: #cbbca8;
+
+  --text-color: #d4d1c5;
+  --title-color: #d4d1c5;
+
+  --error-color: #b12725;
+
+  --card-primary-color: #8a7963;
+  --card-secondary-color: #e4dcd2;
+
+  --outline-color: #4a4036;
+  --outline-shadow-color: rgba(74, 64, 54, 0.726);
+
+  //not picked
+  --disabled-background-color: #eeeeee;
+
+  --dropzone-text-color: #888;
+  --dropzone-svg-color: #aaa;
+  --dropzone-border-color: #ccc;
+  --dropzone-hover-color: #f1f1f1;
+  //
+  --text-input-label-color: #333;
+  --text-input-placeholder-color: #b3b0a5;
+  --text-input-background-color: #796858;
+
+  --button-primary-color: #d4d1c5;
+  --button-primary-border-color: #4a4036;
+  --button-primary-background-color: #38322a;
+  --button-primary-background-color_hover: #685a4c;
+
+  --button-secondary-color: #d4d1c5;
+  --button-secondary-border-color: #29241e;
+  --button-secondary-background-color: #443a31;
+  --button-secondary-background-color_hover: #5f5345;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.snackbar-success {
+  background-color: #adc89c;
+  color: #fff;
+}
+
+.snackbar-error {
+  background-color: #c89c9c;
+  color: #fff;
+}

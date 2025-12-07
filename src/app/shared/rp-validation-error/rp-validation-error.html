@@ -1,0 +1,15 @@
+<div class="error-container">
+  @if (errors){
+  <ul>
+    @for (error of errors | keyvalue; track error.key ) {
+    <li>
+      @if(error.key == 'email') {
+      {{ 'form.error.email.' + error.key | translate : error.value }}
+      }@else{
+      {{ 'form.error.' + error.key | translate : error.value }}
+      }
+    </li>
+    }
+  </ul>
+  }
+</div>

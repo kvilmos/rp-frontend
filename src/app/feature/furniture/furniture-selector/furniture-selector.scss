@@ -1,0 +1,45 @@
+.selector-panel {
+  background-color: var(--card-primary-color);
+}
+
+.category-filter {
+  background-color: var(--card-primary-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.grid-view {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 0.3em;
+}
+
+.item {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px var(--outline-color);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 5px var(--outline-dark-shadow-color);
+}
+
+.item img {
+  height: 100%;
+  width: 125px;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 8px;
+  border: solid 1px var(--outline-color);
+}
+
+.load-trigger {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}

@@ -1,0 +1,13 @@
+.error-container {
+  min-height: 1.5rem;
+  font-size: 0.8em;
+}
+
+li {
+  color: var(--error-color);
+}
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

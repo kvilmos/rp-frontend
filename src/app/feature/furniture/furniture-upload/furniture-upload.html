@@ -1,0 +1,15 @@
+@if (isUploading$ | async) {
+<rp-upload-overlay [progress]="(uploadProgress$ | async) ?? 0"> </rp-upload-overlay>
+}
+<div class="upload-container">
+  <div class="navbar">
+    <a routerLink="/home"><fa-icon class="bt-back" [icon]="iconBack" id="back-button"></fa-icon></a>
+    <div class="title-nav">{{ 'furniture.previewTitle' | translate }}</div>
+  </div>
+
+  <rp-furniture-preview></rp-furniture-preview>
+
+  <div class="form">
+    <rp-furniture-form></rp-furniture-form>
+  </div>
+</div>

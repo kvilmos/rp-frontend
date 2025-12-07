@@ -1,0 +1,29 @@
+<div class="rp-form-control">
+  @if(label){
+  <label [for]="domId">{{ label }}</label>
+  }
+  <label
+    rpDropzone
+    [for]="domId"
+    (hovered)="toggleHover($event)"
+    (dropped)="onDrop($event)"
+    [class.hovering]="isHovering"
+    class="dropzone"
+  >
+    <div class="dropzone-content">
+      <fa-icon [icon]="icon" class="fa-4x"></fa-icon>
+      <input
+        type="file"
+        [id]="domId"
+        [accept]="allowedFileTypes"
+        (change)="onDrop($event.target.files!)"
+        class="file-input"
+      />
+      <p>
+        {{ 'input.file.dropFile' | translate }}
+        <strong>{{ 'input.file.clickHere' | translate }}</strong>
+      </p>
+      <small>{{ 'input.file.supportedFormats' | translate }}: {{ allowedFileTypes }}</small>
+    </div>
+  </label>
+</div>

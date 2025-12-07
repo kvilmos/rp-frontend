@@ -1,0 +1,11 @@
+<div class="sorter">
+  <label for="sort-select"> {{ 'furniture.category.title' | translate }}:</label>
+  <select id="sort-select" [ngModel]="currentFilter" (ngModelChange)="onSelectionChange($event)">
+    <option [ngValue]="null">{{ 'furniture.category.notSelected' | translate }}</option>
+    @for (option of options; track $index) {
+    <option class="sorter-option" [value]="option.id">
+      {{ 'furniture.category.' + option.name | translate }}
+    </option>
+    }
+  </select>
+</div>

@@ -1,0 +1,71 @@
+.sorter {
+  display: flex;
+  flex-direction: row;
+  margin: 1em;
+  gap: 1rem;
+}
+
+.table-container {
+  font-family: sans-serif;
+  margin: 20px;
+}
+
+.common-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 4fr 2fr 2fr 1fr;
+  gap: 15px;
+  align-items: center;
+  padding: 12px 20px;
+}
+
+.table-header {
+  @extend .common-grid-layout;
+  background-color: var(--table-header-background-color);
+  font-weight: bold;
+  border-bottom: 2px solid var(--table-border-color);
+  border-radius: 8px 8px 0 0;
+}
+
+.table-item {
+  @extend .common-grid-layout;
+  background-color: var(--table-item-primary-color);
+  border-bottom: 1px solid var(--table-item-border-color);
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #f9f9f9;
+  }
+
+  &:last-child {
+    border-bottom: none;
+    border-radius: 0 0 8px 8px;
+  }
+}
+
+.table-item:nth-child(even) {
+  background-color: var(--table-item-secondary-color);
+}
+
+.icons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  color: var(--icon);
+  cursor: pointer;
+}
+
+.icons fa-icon {
+  transition: color 0.25s ease;
+}
+
+.edit-icon:visited {
+  color: var(--icon);
+}
+
+.edit-icon:hover {
+  color: var(--icon-hover) !important;
+}
+
+.del-icon:hover {
+  color: var(--icon-delete_hover);
+}

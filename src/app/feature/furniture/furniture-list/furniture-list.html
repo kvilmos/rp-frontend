@@ -1,0 +1,35 @@
+<div class="filters">
+  <rp-sorter
+    [options]="sortingOptions"
+    [currentSort]="activeFilters.order!"
+    (sortChange)="onSortChange($event)"
+  ></rp-sorter>
+  @if (categories$ | async; as categories) {
+  <rp-filter
+    [options]="categories"
+    [currentFilter]="activeFilters.category"
+    (filterChange)="onCategoryFilterChange($event)"
+  ></rp-filter>
+  }
+</div>
+
+@if (pageData$ | async; as pageData) {
+<div class="grid-view">
+  @for (item of pageData.furniture; track $index) {
+  <div class="item">
+    <img [src]="item.thumbnailUrl" [alt]="item.name" />
+    <div class="details">{{ item.name }}</div>
+  </div>
+  }
+</div>
+
+<rp-paginator
+  [currentPage]="pageData.currPage"
+  [totalPages]="pageData.totalPages"
+  (pageChange)="onPageChange($event)"
+></rp-paginator>
+
+} @else {
+<p>{{ 'furniture.table.empty' | translate }}</p>
+
+}

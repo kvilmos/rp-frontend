@@ -1,0 +1,10 @@
+<div class="sorter">
+  <label for="sort-select"> {{ 'sorting.sorting' | translate }}:</label>
+  <select id="sort-select" [ngModel]="currentSort" (ngModelChange)="onSelectionChange($event)">
+    @for (option of options; track $index) {
+    <option class="sorter-option" [value]="option.value">
+      {{ option.label | translate }}
+    </option>
+    }
+  </select>
+</div>
